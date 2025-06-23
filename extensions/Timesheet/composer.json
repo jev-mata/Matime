@@ -1,0 +1,30 @@
+{
+    "name": "solidtime-io/timesheet",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Extensions\\Timesheet\\": "app/",
+            "Extensions\\Timesheet\\Database\\Factories\\": "database/factories/",
+            "Extensions\\Timesheet\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Extensions\\Timesheet\\Tests\\": "tests/"
+        }
+    }
+}
