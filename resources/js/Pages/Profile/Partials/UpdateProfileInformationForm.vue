@@ -28,18 +28,23 @@ const photoPreview = ref<ArrayBuffer | undefined | string | null>(null);
 const photoInput = ref<HTMLInputElement | null>(null);
 
 const updateProfileInformation = () => {
-    if (
-        photoInput.value &&
-        photoInput.value.files &&
-        photoInput.value.files?.length > 0
-    ) {
-        form.photo = photoInput.value?.files[0];
+    const file = photoInput.value?.files?.[0] ?? null;
+
+    if (file instanceof File) {
+        form.photo = file;
+    } else {
+        form.photo = null;
     }
 
     form.post(route('user-profile-information.update'), {
         errorBag: 'updateProfileInformation',
         preserveScroll: true,
-        onSuccess: () => clearPhotoFileInput(),
+        onSuccess: () => {
+            clearPhotoFileInput();
+        },
+        onError: (errors) => {
+            console.error('Profile update failed:', errors);
+        },
     });
 };
 
@@ -108,6 +113,7 @@ const page = usePage<{
                     id="photo"
                     ref="photoInput"
                     type="file"
+                    name="photo"
                     class="hidden"
                     @change="updatePhotoPreview" />
 

@@ -42,7 +42,7 @@ class TimesheetServiceProvider extends ServiceProvider
                 'title' => 'Submit',
                 'icon' => 'ClockIcon', // must match a key in your frontend iconMap
                 'route' => 'timesheet.index',
-                'href' => '/timesheet',
+                'href' => '/time/submit?date='.now(),
                 'show' => true,
             ],
         ]);

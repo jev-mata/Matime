@@ -173,7 +173,11 @@ async function submit() {
                             <SelectItem value="hyphen-separated-yyyy-mm-dd"
                                 >YYYY-MM-DD</SelectItem
                             >
+                            <SelectItem value="short-text-month-dd-yyyy"
+                                >MMM D, YYYY</SelectItem
+                            > 
                         </SelectContent>
+
                     </Select>
                 </div>
             </div>

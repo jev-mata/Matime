@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue';
+import { ref, onMounted, watchEffect, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type {
     CreateClientBody,
@@ -20,6 +20,11 @@ import TimeEntryRowHeading from '@/packages/ui/src/TimeEntry/TimeEntryRowHeading
 import TimeEntryRow from '@/packages/ui/src/TimeEntry/TimeEntryRow.vue';
 import type { TimeEntriesGroupedByType } from '@/types/time-entries';
 import axios from 'axios';
+
+import {
+    type TimeEntriesQueryParams,
+} from '@/packages/api/src';
+import dayjs from 'dayjs';
 const selectedTimeEntries = defineModel<TimeEntry[]>('selected', {
     default: [],
 });
@@ -29,6 +34,8 @@ const props = defineProps<{
     tasks: Task[];
     tags: Tag[];
     clients: Client[];
+    loadEntries: () => Promise<void>;
+
     createTag: (name: string) => Promise<Tag | undefined>;
     updateTimeEntry: (entry: TimeEntry) => void;
     updateTimeEntries: (ids: string[], changes: Partial<TimeEntry>) => void;
@@ -69,15 +76,18 @@ export type IsSubmitted = {
 function getBimonthlyKey(dateInput: string | Date): string {
     const date = new Date(dateInput);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+
+    const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date); // "Jan", "Feb", etc.
+
     const isFirstHalf = date.getDate() <= 15;
     const start = isFirstHalf ? '1' : '16';
     const end = isFirstHalf
         ? '15'
-        : new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate().toString();
+        : new Date(year, date.getMonth() + 1, 0).getDate().toString(); // Last day of the month
 
-    return `${year}-${month} (${start}-${end})`;
+    return `${month} ${year} (${start}-${end})`;
 }
+
 
 function isSameBimonthlyPeriod(entryDate: string | Date, submittedEntries: TimesheetRecord[]): boolean {
     const entryKey = getBimonthlyKey(entryDate);
@@ -90,9 +100,14 @@ function isSameBimonthlyPeriod(entryDate: string | Date, submittedEntries: Times
 
 
 const groupedTimeEntries = ref<GroupedTimeEntries>({});
-
+watch(groupedTimeEntries, () => {
+    groupTimeEntriesFunc();
+});
 onMounted(async () => {
+    groupTimeEntriesFunc();
 
+})
+async function groupTimeEntriesFunc() {
     const grouped: GroupedTimeEntries = {}
 
     const data = await getTimesheet() as IsSubmitted;
@@ -101,16 +116,16 @@ onMounted(async () => {
 
         const date = getDayJsInstance()(entry.start);
         const year = date.year();
-        const month = String(date.month() + 1).padStart(2, '0');
-        const dayKey = date.format('YYYY-MM-DD');
+        const month = date.format('MMM'); // "Jan", "Feb", "Mar", etc.
+
+        const dayKey = date.format('MM-DD-YYYY');
         const isFirstHalf = date.date() <= 15;
         const startLabel = isFirstHalf ? '1' : '16';
         const endLabel = isFirstHalf
             ? '15'
             : String(date.daysInMonth()) // Get last day of month
 
-        const periodLabel = `${startLabel}-${endLabel}`
-        const biMonthKey = `${year}-${month} (${periodLabel})`
+        const biMonthKey = `${month} ${startLabel} - ${month}  ${endLabel}, ${year}`
 
         if (!grouped[biMonthKey]) {
             grouped[biMonthKey] = {
@@ -148,10 +163,8 @@ onMounted(async () => {
             existingGroup.push({ ...entry, timeEntries: [entry] })
         }
     }
-    console.log(grouped);
     groupedTimeEntries.value = grouped;
-})
-
+}
 function startTimeEntryFromExisting(entry: TimeEntry) {
     props.createTimeEntry({
         project_id: entry.project_id,
@@ -191,15 +204,22 @@ function unselectAllTimeEntries(value: TimeEntriesGroupedByType[]) {
     );
 }
 function getFirstDayKey(days: Record<string, any>) {
-  const keys = Object.keys(days);
-  return keys.length ? keys[0] : null;
+    if (days == null)
+        return null;
+    const keys = Object.keys(days);
+    return keys.length ? keys[0] : null;
 }
 
-function SubmitBTN(date: Date | string) {
+function SubmitBTN(date: Date | string | null) {
+    if (date == null)
+        return;
+    dayjs(date, 'MM-DD-YYYY');
     window.location.href = `/time/submit?date=${date}`;
 }
-function unSubmitBTN(date: Date | string) {
-
+function unSubmitBTN(date: Date | string | null) {
+    if (date == null)
+        return;
+    dayjs(date, 'MM-DD-YYYY');
     window.location.href = `/time/unsubmit?date=${date}`;
 }
 const getTimesheet = async () => {
@@ -214,70 +234,74 @@ const getTimesheet = async () => {
 
     return data;
 }
-onMounted(async () => {
-}); 
 </script>
 
 <template>
 
-    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey">
-        <div class=" bg-gray-800 mt-2 border-1 p-1">
+    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="">
+        <div class=" border border-1 border-gray-700 mt-5 border-b-4">
 
-            <button @click="SubmitBTN(getFirstDayKey(bimonthly.days))" v-if="!bimonthly.isSubmitted"
-                class=" p-2 border-1 mx-2 button text-blue-400">
-                submit
-            </button>
-            <button @click="unSubmitBTN(getFirstDayKey(bimonthly.days))" v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
-                class=" p-2 border-1 mx-2 button text-blue-400">
-                unsubmit
-            </button>{{ bimonthlykey }}
-            <span v-if="bimonthly.isApproved" class="ml-4 bg-green-800 p-2 rounded-md">Approved</span>
-            <span v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
-                class="ml-4 bg-orange-700 p-2 rounded-md">Pending</span>
-        </div>
-        <div v-for="(value, key) in bimonthly.days" :key="key">
+            <div class=" bg-gray-900   border-1 p-1 ">
 
-            <TimeEntryRowHeading :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
-                selectedTimeEntries.includes(timeEntry)
-            )
-                " @select-all="selectAllTimeEntries(value)" @unselect-all="unselectAllTimeEntries(value)">
-            </TimeEntryRowHeading>
-            <template v-for="entry in value" :key="entry.id">
-                <TimeEntryAggregateRow v-if="'timeEntries' in entry && entry.timeEntries.length > 1" :create-project
-                    :can-create-project :enable-estimated-time :selected-time-entries="selectedTimeEntries"
-                    :create-client :projects="projects" :tasks="tasks" :tags="tags" :clients
-                    :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry
-                    :delete-time-entries :create-tag :currency="currency" :time-entry="entry" @selected="
-                        (timeEntries: TimeEntry[]) => {
-                            selectedTimeEntries = [
-                                ...selectedTimeEntries,
-                                ...timeEntries,
-                            ];
-                        }
-                    " @unselected="
-                        (timeEntriesToUnselect: TimeEntry[]) => {
-                            selectedTimeEntries = selectedTimeEntries.filter(
-                                (item: TimeEntry) =>
-                                    !timeEntriesToUnselect.find(
-                                        (filterEntry: TimeEntry) =>
-                                            filterEntry.id === item.id
-                                    )
-                            );
-                        }
-                    "></TimeEntryAggregateRow>
-                <TimeEntryRow v-else :create-client :enable-estimated-time :can-create-project :create-project
-                    :projects="projects" :selected="!!selectedTimeEntries.find(
-                        (filterEntry: TimeEntry) => filterEntry.id === entry.id
-                    )
-                        " :tasks="tasks" :tags="tags" :clients :create-tag :update-time-entry
-                    :on-start-stop-click="() => startTimeEntryFromExisting(entry)"
-                    :delete-time-entry="() => deleteTimeEntries([entry])" :currency="currency"
-                    :time-entry="entry.timeEntries[0]" @selected="selectedTimeEntries.push(entry)" @unselected="
-                        selectedTimeEntries = selectedTimeEntries.filter(
-                            (item: TimeEntry) => item.id !== entry.id
+                <button @click="SubmitBTN(getFirstDayKey(bimonthly.days))" v-if="!bimonthly.isSubmitted"
+                    class=" p-2 border-1 mx-2 button text-blue-400">
+                    submit
+                </button>
+                <button @click="unSubmitBTN(getFirstDayKey(bimonthly.days))"
+                    v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
+                    class=" p-2 border-1 mx-2 button text-blue-400">
+                    unsubmit
+                </button>
+
+                {{ bimonthlykey }}
+                <span v-if="bimonthly.isApproved" class="ml-4 bg-green-800 p-2 rounded-md">Approved</span>
+                <span v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
+                    class="ml-4 bg-orange-700 p-2 rounded-md">Pending</span>
+            </div>
+            <div v-for="(value, key) in bimonthly.days" :key="key" class="mb-5">
+
+                <TimeEntryRowHeading :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
+                    selectedTimeEntries.includes(timeEntry)
+                )
+                    " @select-all="selectAllTimeEntries(value)" @unselect-all="unselectAllTimeEntries(value)">
+                </TimeEntryRowHeading>
+                <template v-for="entry in value" :key="entry.id">
+                    <TimeEntryAggregateRow v-if="'timeEntries' in entry && entry.timeEntries.length > 1" :create-project
+                        :can-create-project :enable-estimated-time :selected-time-entries="selectedTimeEntries"
+                        :create-client :projects="projects" :tasks="tasks" :tags="tags" :clients
+                        :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry
+                        :delete-time-entries :create-tag :currency="currency" :time-entry="entry" @selected="
+                            (timeEntries: TimeEntry[]) => {
+                                selectedTimeEntries = [
+                                    ...selectedTimeEntries,
+                                    ...timeEntries,
+                                ];
+                            }
+                        " @unselected="
+                            (timeEntriesToUnselect: TimeEntry[]) => {
+                                selectedTimeEntries = selectedTimeEntries.filter(
+                                    (item: TimeEntry) =>
+                                        !timeEntriesToUnselect.find(
+                                            (filterEntry: TimeEntry) =>
+                                                filterEntry.id === item.id
+                                        )
+                                );
+                            }
+                        "></TimeEntryAggregateRow>
+                    <TimeEntryRow v-else :create-client :enable-estimated-time :can-create-project :create-project
+                        :projects="projects" :selected="!!selectedTimeEntries.find(
+                            (filterEntry: TimeEntry) => filterEntry.id === entry.id
                         )
-                        "></TimeEntryRow>
-            </template>
+                            " :tasks="tasks" :tags="tags" :clients :create-tag :update-time-entry :loadEntries
+                        :on-start-stop-click="() => startTimeEntryFromExisting(entry)"
+                        :delete-time-entry="() => deleteTimeEntries([entry])" :currency="currency"
+                        :time-entry="entry.timeEntries[0]" @selected="selectedTimeEntries.push(entry)" @unselected="
+                            selectedTimeEntries = selectedTimeEntries.filter(
+                                (item: TimeEntry) => item.id !== entry.id
+                            )
+                            "></TimeEntryRow>
+                </template>
+            </div>
         </div>
     </div>
 </template>

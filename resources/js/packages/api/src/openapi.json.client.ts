@@ -315,6 +315,7 @@ const DateFormat = z.enum([
     'hyphen-separated-dd-mm-yyyy',
     'hyphen-separated-mm-dd-yyyy',
     'hyphen-separated-yyyy-mm-dd',
+    'short-text-month-dd-yyyy',
 ]);
 const IntervalFormat = z.enum([
     'decimal',

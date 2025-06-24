@@ -20,7 +20,8 @@ export type DateFormat =
     | 'slash-separated-dd-mm-yyyy'
     | 'hyphen-separated-dd-mm-yyyy'
     | 'hyphen-separated-mm-dd-yyyy'
-    | 'hyphen-separated-yyyy-mm-dd';
+    | 'hyphen-separated-yyyy-mm-dd'
+    | 'short-text-month-dd-yyyy';
 
 const dateFormatMap: Record<DateFormat, string> = {
     'point-separated-d-m-yyyy': 'D.M.YYYY',
@@ -28,7 +29,8 @@ const dateFormatMap: Record<DateFormat, string> = {
     'slash-separated-dd-mm-yyyy': 'DD/MM/YYYY',
     'hyphen-separated-dd-mm-yyyy': 'DD-MM-YYYY',
     'hyphen-separated-mm-dd-yyyy': 'MM-DD-YYYY',
-    'hyphen-separated-yyyy-mm-dd': 'YYYY-MM-DD'
+    'hyphen-separated-yyyy-mm-dd': 'YYYY-MM-DD',
+    'short-text-month-dd-yyyy': 'MMM D, YYYY',
 };
 
 export type TimeFormat = '12-hours' | '24-hours';
@@ -134,6 +136,9 @@ export function formatDate(date: string, format: DateFormat = 'point-separated-d
         console.warn(
             'Date contains timezone information, use formatDateLocalized instead'
         );
+    }
+    if(format){
+        
     }
     return getDayJsInstance()(date).format(dateFormatMap[format]);
 }

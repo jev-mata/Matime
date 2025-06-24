@@ -80,9 +80,11 @@ watch(isLoadMoreVisible, async (isVisible) => {
 });
 
 onMounted(async () => {
-    await timeEntriesStore.fetchTimeEntries();
+    await loadEntries();
 });
-
+async function loadEntries(): Promise<void> {
+    await timeEntriesStore.fetchTimeEntries();
+}
 const showManualTimeEntryModal = ref(false);
 const projectStore = useProjectsStore();
 const { projects } = storeToRefs(projectStore);
@@ -119,92 +121,61 @@ function deleteSelected() {
 </script>
 
 <template>
-    <TimeEntryCreateModal
-        v-model:show="showManualTimeEntryModal"
-        :enable-estimated-time="isAllowedToPerformPremiumAction()"
-        :create-project="createProject"
-        :create-client="createClient"
-        :create-tag="createTag"
-        :create-time-entry="createTimeEntry"
-        :projects
-        :tasks
-        :tags
-        :clients></TimeEntryCreateModal>
+    <TimeEntryCreateModal v-model:show="showManualTimeEntryModal"
+        :enable-estimated-time="isAllowedToPerformPremiumAction()" :create-project="createProject"
+        :create-client="createClient" :create-tag="createTag" :create-time-entry="createTimeEntry" :projects :tasks
+        :tags :clients></TimeEntryCreateModal>
     <AppLayout title="Dashboard" data-testid="time_view">
-        <MainContainer
-            class="pt-5 lg:pt-8 pb-4 lg:pb-6">
-            <div
-                class="lg:flex items-end lg:divide-x divide-default-background-separator divide-y lg:divide-y-0 space-y-2 lg:space-y-0 lg:space-x-2">
-                <div class="flex-1">
-                    <TimeTracker></TimeTracker>
+        <div class="mx-10">
+
+            <MainContainer class="pt-5 lg:pt-8 pb-4 lg:pb-6 bg-neutral-950 p-5 ">
+                <div
+                    class="lg:flex items-end lg:divide-x divide-default-background-separator divide-y lg:divide-y-0 space-y-2 lg:space-y-0 lg:space-x-2 ">
+                    <div class="flex-1">
+                        <TimeTracker></TimeTracker>
+                    </div>
+                    <div class="pb-2 pt-2 lg:pt-0 lg:pl-4 flex justify-center">
+                        <SecondaryButton class="w-full text-center flex justify-center" :icon="PlusIcon"
+                            @click="showManualTimeEntryModal = true">Manual time entry
+                        </SecondaryButton>
+                    </div>
                 </div>
-                <div class="pb-2 pt-2 lg:pt-0 lg:pl-4 flex justify-center">
-                    <SecondaryButton
-                        class="w-full text-center flex justify-center"
-                        :icon="PlusIcon"
-                        @click="showManualTimeEntryModal = true"
-                        >Manual time entry
-                    </SecondaryButton>
+            </MainContainer>
+            <div class="bg-gray-900 mt-5">
+                <TimeEntryMassActionRow :selected-time-entries="selectedTimeEntries"
+                    :enable-estimated-time="isAllowedToPerformPremiumAction()" :can-create-project="canCreateProjects()"
+                    :all-selected="selectedTimeEntries.length === timeEntries.length" :delete-selected="deleteSelected"
+                    :projects="projects" :tasks="tasks" :tags="tags" :currency="getOrganizationCurrencyString()"
+                    :clients="clients" :update-time-entries="(args) =>
+                        updateTimeEntries(
+                            selectedTimeEntries.map((timeEntry) => timeEntry.id),
+                            args
+                        )
+                        " :create-project="createProject" :create-client="createClient" :create-tag="createTag"
+                    @submit="clearSelectionAndState" @select-all="selectedTimeEntries = [...timeEntries]"
+                    @unselect-all="selectedTimeEntries = []"></TimeEntryMassActionRow>
+            </div>
+            <TimeEntryGroupedTable v-model:selected="selectedTimeEntries" :create-project
+                :enable-estimated-time="isAllowedToPerformPremiumAction()" :can-create-project="canCreateProjects()"
+                :clients :create-client :update-time-entry :update-time-entries :delete-time-entries
+                :create-time-entry="startTimeEntry" :create-tag :projects="projects" :tasks="tasks" :loadEntries
+                :currency="getOrganizationCurrencyString()" :time-entries="timeEntries" :tags="tags">
+            </TimeEntryGroupedTable>
+            <div v-if="timeEntries.length === 0" class="text-center pt-12">
+                <ClockIcon class="w-8 text-icon-default inline pb-2"></ClockIcon>
+                <h3 class="text-text-primary font-semibold">No time entries found</h3>
+                <p class="pb-5">Create your first time entry now!</p>
+            </div>
+            <div ref="loadMoreContainer">
+                <div v-if="loading && !allTimeEntriesLoaded"
+                    class="flex justify-center items-center py-5 text-text-primary font-medium">
+                    <LoadingSpinner></LoadingSpinner>
+                    <span> Loading more time entries... </span>
                 </div>
-            </div>
-        </MainContainer>
-        <TimeEntryMassActionRow
-            :selected-time-entries="selectedTimeEntries"
-            :enable-estimated-time="isAllowedToPerformPremiumAction()"
-            :can-create-project="canCreateProjects()"
-            :all-selected="selectedTimeEntries.length === timeEntries.length"
-            :delete-selected="deleteSelected"
-            :projects="projects"
-            :tasks="tasks"
-            :tags="tags"
-            :currency="getOrganizationCurrencyString()"
-            :clients="clients"
-            :update-time-entries="
-                (args) =>
-                    updateTimeEntries(
-                        selectedTimeEntries.map((timeEntry) => timeEntry.id),
-                        args
-                    )
-            "
-            :create-project="createProject"
-            :create-client="createClient"
-            :create-tag="createTag"
-            @submit="clearSelectionAndState"
-            @select-all="selectedTimeEntries = [...timeEntries]"
-            @unselect-all="selectedTimeEntries = []"></TimeEntryMassActionRow>
-        <TimeEntryGroupedTable
-            v-model:selected="selectedTimeEntries"
-            :create-project
-            :enable-estimated-time="isAllowedToPerformPremiumAction()"
-            :can-create-project="canCreateProjects()"
-            :clients
-            :create-client
-            :update-time-entry
-            :update-time-entries
-            :delete-time-entries
-            :create-time-entry="startTimeEntry"
-            :create-tag
-            :projects="projects"
-            :tasks="tasks"
-            :currency="getOrganizationCurrencyString()"
-            :time-entries="timeEntries"
-            :tags="tags"></TimeEntryGroupedTable>
-        <div v-if="timeEntries.length === 0" class="text-center pt-12">
-            <ClockIcon class="w-8 text-icon-default inline pb-2"></ClockIcon>
-            <h3 class="text-text-primary font-semibold">No time entries found</h3>
-            <p class="pb-5">Create your first time entry now!</p>
-        </div>
-        <div ref="loadMoreContainer">
-            <div
-                v-if="loading && !allTimeEntriesLoaded"
-                class="flex justify-center items-center py-5 text-text-primary font-medium">
-                <LoadingSpinner></LoadingSpinner>
-                <span> Loading more time entries... </span>
-            </div>
-            <div
-                v-else-if="allTimeEntriesLoaded"
-                class="flex justify-center items-center py-5 text-text-secondary font-medium">
-                All time entries are loaded!
+                <div v-else-if="allTimeEntriesLoaded"
+                    class="flex justify-center items-center py-5 text-text-secondary font-medium">
+                    All time entries are loaded!
+                </div>
             </div>
         </div>
     </AppLayout>

@@ -162,6 +162,8 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
             );
             queryClient.invalidateQueries({queryKey: ['timeEntry']});
         }
+        
+            await fetchTimeEntries();
     }
 
     async function createTimeEntry(

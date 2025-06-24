@@ -22,6 +22,10 @@ import TimeTrackerProjectTaskDropdown from '@/packages/ui/src/TimeTracker/TimeTr
 import { Checkbox } from '@/packages/ui/src';
 import { twMerge } from 'tailwind-merge';
 
+import {
+    type TimeEntriesQueryParams,
+} from '@/packages/api/src';
+
 const props = defineProps<{
     timeEntry: TimeEntry;
     indent?: boolean;
@@ -29,6 +33,7 @@ const props = defineProps<{
     tasks: Task[];
     tags: Tag[];
     clients: Client[];
+    loadEntries: () => Promise<void>;
     members?: Member[];
     createTag: (name: string) => Promise<Tag | undefined>;
     createProject: (project: CreateProjectBody) => Promise<Project | undefined>;

@@ -251,7 +251,7 @@ const extensionMenu = computed<ExtensionMenuItem[]>(() =>
             <Banner />
             <BillingBanner v-if="isBillingActivated()" />
 
-            <div class="min-h-screen flex flex-col bg-default-background border-l border-default-background-separator">
+            <div class="min-h-screen flex flex-col bg-neutral-800 border-l border-default-background-separator">
                 <!-- Page Heading -->
                 <header v-if="$slots.header"
                     class="bg-default-background border-b border-default-background-separator shadow">

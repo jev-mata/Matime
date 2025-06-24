@@ -3,11 +3,15 @@
 namespace Extensions\Timesheet\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
+use App\Models\Tag;
 use App\Models\TimeEntry;
+use App\Models\User;
 use Extensions\Timesheet\Models\Timesheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -18,11 +22,12 @@ class TimesheetController extends Controller
      */
     public function index(Request $request)
     {
-        $date = $request->get('date'); 
+        $date = $request->get('date');
+        $date = Carbon::createFromFormat('m-d-Y', $date);
         $period = $this->getBimonthlyPeriod(Carbon::parse($date));
         $range = $this->getBimonthlyRange(Carbon::parse($date));
-
-        $entries = TimeEntry::where('user_id', auth()->id())
+        Log::info($period);
+        $entries = TimeEntry::with(['project', 'task'])->where('user_id', auth()->id())
             ->whereBetween('start', [$range['from'], $range['to']])
             ->get();
 
@@ -32,6 +37,9 @@ class TimesheetController extends Controller
                 'date' => $entry->start?->format('Y-m-d'), // Grouping key
                 'start' => $entry->start?->toDateTimeString(),
                 'end' => $entry->end?->toDateTimeString(),
+                'tags' => $entry->tags,
+                'task' => $entry->task,
+                'project' => $entry->project,
                 'hours' => optional($entry->getDuration()),
                 'description' => $entry->description,
                 'status' => 'Pending',
@@ -53,22 +61,74 @@ class TimesheetController extends Controller
             'totalHours' => $totalFormatted,
             'totalHoursNotForm' => $hours . '.' . $minutes,
             'period' => $range,
+            'isSubmit' => false
+        ]);
+    }
+
+    public function unSubmit(Request $request)
+    {
+        $date = $request->get('date');
+        $date = Carbon::createFromFormat('m-d-Y', $date);
+        $period = $this->getBimonthlyPeriod(Carbon::parse($date));
+        $range = $this->getBimonthlyRange(Carbon::parse($date));
+
+        $entries = TimeEntry::with(['project', 'task'])->where('user_id', auth()->id())
+            ->whereBetween('start', [$range['from'], $range['to']])
+            ->get();
+        $grouped = $entries->map(function ($entry) {
+            return [
+                'id' => $entry->id,
+                'date' => $entry->start?->format('Y-m-d'), // Grouping key
+                'start' => $entry->start?->toDateTimeString(),
+                'end' => $entry->end?->toDateTimeString(),
+                'tags' => Tag::find($entry->tags),
+                'project' => $entry->project,
+                'task' => $entry->task,
+                'hours' => optional($entry->getDuration()),
+                'description' => $entry->description,
+                'status' => 'Pending',
+            ];
+        })->groupBy('date')->map->values(); // Reset keys inside each group
+
+        // Total duration
+        $totalSeconds = $entries->reduce(function ($carry, $entry) {
+            return $carry + optional($entry->getDuration())?->totalSeconds ?? 0;
+        }, 0);
+
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
+        $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
+
+        Log::info($grouped);
+        return Inertia::render('Timesheet::index', [
+            'entries' => $grouped,
+            'totalHours' => $totalFormatted,
+            'totalHoursNotForm' => $hours . '.' . $minutes,
+            'period' => $range,
+            'isSubmit' => true
         ]);
     }
 
     private function getBimonthlyRange(Carbon $date): array
-    {
+    { 
+        $timezone = Auth::user()->timezone;
+        // $timezone = DB::select("SHOW TIMEZONE")[0]->TimeZone ?? 'UTC';
+
+
         if ($date->day <= 15) {
             $from = $date->copy()->startOfMonth()->startOfDay();             // 1st day
             $to = $date->copy()->startOfMonth()->addDays(14)->endOfDay();    // 15th day
         } else {
             $from = $date->copy()->startOfMonth()->addDays(15)->startOfDay(); // 16th
-            $to = $date->copy()->endOfMonth()->endOfDay();                    // end of month (30th or 31st)
+            $to = $date->copy()->endOfMonth()->startOfDay();                    // end of month (30th or 31st)
         }
-
+        Log::info($timezone);
+        Log::info($date);
+        Log::info($from->setTimezone($timezone)->format('Y-m-d'));
+        Log::info($to->format('Y-m-d'));
         return [
-            'from' => $from,
-            'to' => $to,
+            'from' => $from->setTimezone($timezone)->format('Y-m-d'),
+            'to' => $to->setTimezone($timezone)->format('Y-m-d'),
         ];
     }
     public function getBimonthlyPeriod(Carbon $date)
@@ -85,7 +145,7 @@ class TimesheetController extends Controller
                 'date_end' => 'required|date',
                 'hours' => 'required|numeric|min:0.25', // assuming hours are required too
             ]);
- 
+
 
             $data['user_id'] = Auth::user()->id;
             $data['status'] = 'pending';

@@ -20,5 +20,5 @@ Route::middleware([
     'verified',
 ])->prefix('/time')->group(function () {
     Route::get('/submit', [TimesheetController::class, 'index'])->name('timesheet.index');
-    Route::get('/unsubmit', [TimesheetController::class, 'unsubmit'])->name('timesheet.unsubmit');
+    Route::get('/unsubmit', [TimesheetController::class, 'unSubmit'])->name('timesheet.unsubmit');
 });

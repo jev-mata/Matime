@@ -20,6 +20,7 @@ enum DateFormat: string
     case HyphenSeparatedMMDDDYYYY = 'hyphen-separated-mm-dd-yyyy';
 
     case HyphenSeparatedYYYYMMDD = 'hyphen-separated-yyyy-mm-dd';
+    case shortTextMonthDDYYYY = 'short-text-month-dd-yyyy';
 
     public function toCarbonFormat(): string
     {
@@ -30,6 +31,7 @@ enum DateFormat: string
             self::HyphenSeparatedDDMMYYY->value => 'd-m-Y',
             self::HyphenSeparatedMMDDDYYYY->value => 'm-d-Y',
             self::HyphenSeparatedYYYYMMDD->value => 'Y-m-d',
+            self::shortTextMonthDDYYYY->value => 'mmm d, y',
         };
     }
 
