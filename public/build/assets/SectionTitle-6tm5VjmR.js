@@ -1,2 +1,1 @@
 import{_ as o}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{h as c,o as n,f as s,p as e}from"./app-Dzd5B06R.js";const i={},a={class:"md:col-span-1 flex justify-between"},r={class:"px-4 sm:px-0"},d={class:"text-lg font-medium text-text-primary"},l={class:"mt-1 text-sm text-text-secondary"},_={class:"px-4 sm:px-0"};function m(t,p){return n(),c("div",a,[s("div",r,[s("h3",d,[e(t.$slots,"title")]),s("p",l,[e(t.$slots,"description")])]),s("div",_,[e(t.$slots,"aside")])])}const h=o(i,[["render",m]]);export{h as S};
-//# sourceMappingURL=SectionTitle-6tm5VjmR.js.map

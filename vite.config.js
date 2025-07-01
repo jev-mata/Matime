@@ -47,9 +47,17 @@ async function getConfig() {
                 host: 'localhost',
                 https: true, // or use your host machine IP if accessed from LAN
                 port: 5147,
-                clientPort:5147
+                clientPort: 5147
             },
-        }
+        },
+        base: '/build/', // ← important for Laravel + Vite
+        build: {
+            manifest: true,
+            outDir: 'public/build',
+            rollupOptions: {
+                input: [...paths, ...modulePaths],
+            },
+        },
 
 
     });

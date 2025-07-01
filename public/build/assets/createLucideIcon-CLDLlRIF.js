@@ -19,4 +19,3 @@ import{M as c}from"./app-Dzd5B06R.js";function f(e){return e==null}/**
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */const k=(e,t)=>(r,{slots:o})=>c(p,{...r,iconNode:t,name:e},o);export{k as c,f as i};
-//# sourceMappingURL=createLucideIcon-CLDLlRIF.js.map

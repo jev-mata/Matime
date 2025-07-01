@@ -1,2 +1,1 @@
 import{l as f}from"./time-D8Z5bJ3P.js";function $(o,s,r,e,a){const t=f(o,a);switch(r){case"iso-code-before-with-space":return`${s} ${t}`;case"iso-code-after-with-space":return`${t} ${s}`;case"symbol-before":return`${e}${t}`;case"symbol-after":return`${t}${e}`;case"symbol-before-with-space":return`${e} ${t}`;case"symbol-after-with-space":return`${t} ${e}`}}function i(o,s,r,e,a){return $(o/100,s,r,e,a)}export{i as f};
-//# sourceMappingURL=money-042SSt8Q.js.map
