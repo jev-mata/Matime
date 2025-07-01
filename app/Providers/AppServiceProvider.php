@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Nwidart\Modules\Facades\Module;
 
@@ -55,7 +56,9 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
+    {    if (env('APP_ENV') === 'production') {
+        URL::forceScheme('https');
+    }
 
 
         if ($this->app->environment('local')) {
