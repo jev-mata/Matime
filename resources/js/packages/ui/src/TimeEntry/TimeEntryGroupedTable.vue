@@ -90,10 +90,9 @@ function getBimonthlyKey(dateInput: string | Date): string {
 
 
 function isSameBimonthlyPeriod(entryDate: string | Date, submittedEntries: TimesheetRecord[]): boolean {
-    const entryKey = getBimonthlyKey(entryDate);
-
+    const entryKey = getBimonthlyKey(entryDate); 
     return submittedEntries.some((submission) => {
-        const submissionKey = getBimonthlyKey(submission.date_end);
+        const submissionKey = getBimonthlyKey(submission.date_start);
         return submissionKey === entryKey;
     });
 }

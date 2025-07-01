@@ -32,8 +32,7 @@ const props = defineProps<{
     projects: Project[];
     tasks: Task[];
     tags: Tag[];
-    clients: Client[];
-    loadEntries: () => Promise<void>;
+    clients: Client[]; 
     members?: Member[];
     createTag: (name: string) => Promise<Tag | undefined>;
     createProject: (project: CreateProjectBody) => Promise<Project | undefined>;

@@ -29,6 +29,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -65,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(!$this->app->isProduction());
         Model::preventSilentlyDiscardingAttributes(!$this->app->isProduction());
         Model::preventAccessingMissingAttributes(!$this->app->isProduction());
+        $menus = [];
+ 
         Relation::enforceMorphMap([
             'client' => Client::class,
             'failed-job' => FailedJob::class,
@@ -76,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
             'tag' => Tag::class,
             'task' => Task::class,
             'time-entry' => TimeEntry::class,
-            'user' => User::class,
+            'user' => User::class, 
         ]);
         Model::unguard();
 
@@ -111,6 +115,7 @@ class AppServiceProvider extends ServiceProvider
         Route::model('member', Member::class);
         Route::model('invitation', OrganizationInvitation::class);
         Route::model('apiToken', Token::class);
+
 
 
     }

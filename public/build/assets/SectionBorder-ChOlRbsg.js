@@ -1,0 +1,2 @@
+import{_ as r}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{h as s,o as t,f as o}from"./app-Dzd5B06R.js";const c={},a={class:"hidden sm:block"};function d(n,e){return t(),s("div",a,e[0]||(e[0]=[o("div",{class:"py-8"},[o("div",{class:"border-t border-default-background-separator"})],-1)]))}const f=r(c,[["render",d]]);export{f as S};
+//# sourceMappingURL=SectionBorder-ChOlRbsg.js.map

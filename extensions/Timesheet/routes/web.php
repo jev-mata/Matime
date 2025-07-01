@@ -1,7 +1,11 @@
 <?php
 
+use App\Models\Member;
 use Illuminate\Support\Facades\Route;
 use Extensions\Timesheet\Http\Controllers\TimesheetController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +23,9 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->prefix('/time')->group(function () {
+
+
+    Route::get('/approval', [TimesheetController::class, 'approval'])->name('approval.index');
     Route::get('/submit', [TimesheetController::class, 'index'])->name('timesheet.index');
     Route::get('/unsubmit', [TimesheetController::class, 'unSubmit'])->name('timesheet.unsubmit');
 });

@@ -2,7 +2,10 @@
 
 namespace Extensions\Timesheet\Providers;
 
+use App\Models\Member;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -39,12 +42,15 @@ class TimesheetServiceProvider extends ServiceProvider
 
         register_module_menu([
             [
-                'title' => 'Submit',
-                'icon' => 'ClockIcon', // must match a key in your frontend iconMap
-                'route' => 'timesheet.index',
-                'href' => '/time/submit?date='.now(),
+                'title' => 'Approval',
+                'icon' => 'HandThumbUpIcon', // must match a key in your frontend iconMap
+                'route' => 'approval.index',
+                'href' => '/time/approval',
                 'show' => true,
+                'role' => ['manager']
             ],
+
+
         ]);
 
 

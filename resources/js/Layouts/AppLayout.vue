@@ -41,10 +41,11 @@ import UpdateSidebarNotification from '@/Components/UpdateSidebarNotification.vu
 import BillingBanner from '@/Components/Billing/BillingBanner.vue';
 import { useTheme } from '@/utils/theme';
 import { useQuery } from '@tanstack/vue-query';
-import { api } from '@/packages/api/src';
+import { api, type Member } from '@/packages/api/src';
 import { getCurrentOrganizationId } from '@/utils/useUser';
 import LoadingSpinner from '@/packages/ui/src/LoadingSpinner.vue';
 import NavigationSidebarLink from '@/Components/NavigationSidebarLink.vue';
+import { HandThumbDownIcon, HandThumbUpIcon, PaperClipIcon } from '@heroicons/vue/24/solid';
 
 const showSidebarMenu = ref(false);
 const isUnloading = ref(false);
@@ -97,18 +98,20 @@ type ExtensionMenuItem = {
     route?: string;
     href: string;
     show?: boolean;
+    role: string;
 };
 
 
 const iconMap: Record<string, Component> = {
-    ClockIcon,
+    PaperClipIcon,
     DocumentTextIcon,
+    HandThumbUpIcon,
 };
 function resolveIcon(name: string | undefined): Component | undefined {
     return name && iconMap[name] ? iconMap[name] : undefined;
 }
 
- 
+
 
 const page = usePage<{
     auth: {
@@ -120,6 +123,13 @@ const page = usePage<{
 const extensionMenu = computed<ExtensionMenuItem[]>(() =>
     (page.props.extensionMenu as ExtensionMenuItem[]) ?? []
 );
+
+
+const visibleMenu = computed(() => {
+    return extensionMenu.value.filter(item =>
+        item.role === page.props.auth.user.role || item.role === 'any' || page.props.auth.user.role === 'owner'
+    );
+});
 </script>
 
 <template>
@@ -193,11 +203,10 @@ const extensionMenu = computed<ExtensionMenuItem[]>(() =>
                                 isInvoicingActivated() && canViewInvoices()
                             " title="Invoices" :icon="DocumentTextIcon" :current="route().current('invoices')"
                                 href="/invoices"></NavigationSidebarItem>
-
-                            <NavigationSidebarLink v-for="item in extensionMenu" :key="item.title" :title="item.title"
+                            <NavigationSidebarLink v-for="item in visibleMenu" :key="item.title" :title="item.title"
                                 :icon="resolveIcon(item.icon)" :current="route().current(item.route)" :href="item.href"
                                 class="max-w-40" />
-                            <div class="relative"></div>
+
 
 
                         </ul>

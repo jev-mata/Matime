@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\Member;
 use App\Models\Organization;
 use App\Models\User;
-use App\Service\PermissionStore;
+use App\Service\PermissionStore; 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\MessageBag;
 use Inertia\Inertia;
@@ -26,6 +28,7 @@ class ShareInertiaData
     {
         /** @var PermissionStore $permissions */
         $permissions = app(PermissionStore::class);
+
         Inertia::share(array_filter([
             'jetstream' => function () use ($request) {
                 /** @var User|null $user */
@@ -56,7 +59,8 @@ class ShareInertiaData
                     if ($user === null) {
                         return [];
                     }
-
+                    $member = Member::where('user_id', '=', $user->id)->first();
+                    Log::info($member);
                     return array_merge([
                         'id' => $user->id,
                         'name' => $user->name,
@@ -67,29 +71,31 @@ class ShareInertiaData
                         'timezone' => $user->timezone,
                         'week_start' => $user->week_start,
                         'profile_photo_url' => $user->profile_photo_url,
+                        'role' => $member->role,
                         'two_factor_enabled' => Features::enabled(Features::twoFactorAuthentication())
-                            && ! is_null($user->two_factor_secret),
+                            && !is_null($user->two_factor_secret),
                         'current_team' => $user->currentTeam !== null ? [
                             'id' => $user->currentTeam->id,
                             'user_id' => $user->currentTeam->user_id,
                             'name' => $user->currentTeam->name,
                             'personal_team' => $user->currentTeam->personal_team,
                             'currency' => $user->currentTeam->currency,
+
                         ] : null,
                     ], array_filter([
-                        'all_teams' => $user->organizations->map(function (Organization $organization): array {
-                            return [
-                                'id' => $organization->id,
-                                'name' => $organization->name,
-                                'personal_team' => $organization->personal_team,
-                                'currency' => $organization->currency,
-                                'membership' => [
-                                    'role' => $organization->membership->role,
-                                    'id' => $organization->membership->id,
-                                ],
-                            ];
-                        })->all(),
-                    ]));
+                            'all_teams' => $user->organizations->map(function (Organization $organization): array {
+                                return [
+                                    'id' => $organization->id,
+                                    'name' => $organization->name,
+                                    'personal_team' => $organization->personal_team,
+                                    'currency' => $organization->currency,
+                                    'membership' => [
+                                        'role' => $organization->membership->role,
+                                        'id' => $organization->membership->id,
+                                    ],
+                                ];
+                            })->all(),
+                        ]));
                 },
             ],
             'errorBags' => function () {

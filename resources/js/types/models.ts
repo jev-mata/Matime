@@ -89,6 +89,7 @@ export interface User {
     profile_photo_path: string | null;
     created_at: string | null;
     updated_at: string | null;
+    role: string;
     two_factor_secret?: string | null;
     two_factor_recovery_codes?: string | null;
     two_factor_confirmed_at: string | null;

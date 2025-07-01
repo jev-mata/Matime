@@ -60,7 +60,7 @@ function duration(entry: { start: string; end: string }) {
 }
 
 
-const props = defineProps<{ entries: any[]; period: any; totalHours: any, totalHoursNotForm: any; isSubmit: boolean }>()
+const props = defineProps<{ entries: any[]; period: any; totalHours: any, totalHoursNotForm: any; isSubmit: boolean ;isApproved: boolean }>()
 const entries = ref(props.entries)
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('en-US', {
@@ -93,17 +93,17 @@ const form = ref({
 
 
 const submit = async () => {
-  if (props.isSubmit) {
+  if (!props.isSubmit) {
 
-    await axios.post('/api/timesheet/submit', form.value)
+    await axios.post('/api/time/submit', form.value)
     // load()
     console.log('is unSubmit');
   } else {
-    await axios.post('/api/timesheet/unsubmit', form.value)
+    await axios.post('/api/time/unsubmit', form.value)
 
     console.log('isSubmit');
   }
-  // goBack();
+  goBack();
 
 }
 const load = async () => {
@@ -197,7 +197,7 @@ const submitClass = !props.isSubmit ? ' px-4 py-2 bg-green-600 text-white rounde
               <Button @click.prevent="goBack" class="px-4 py-2 bg-blue-600 text-white rounded">
                 Close
               </Button>
-              <Button type="submit" :class="submitClass">{{ props.isSubmit ? 'Unsubmit' :
+              <Button v-if="!props.isApproved" type="submit" :class="submitClass">{{ props.isSubmit ? 'Unsubmit' :
                 'Submit' }}</Button>
             </div>
           </form>

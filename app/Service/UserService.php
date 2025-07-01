@@ -46,20 +46,7 @@ class UserService
             $user->email_verified_at = Carbon::now();
         }
         $user->save();
-
-        $organization = app(OrganizationService::class)->createOrganization(
-            $this->getOrganizationNameForUserName($user->name),
-            $user,
-            true,
-            $currency,
-            $numberFormat,
-            $currencyFormat,
-            $dateFormat,
-            $intervalFormat,
-            $timeFormat,
-        );
-
-        $user->ownedTeams()->save($organization);
+ 
 
         return $user;
     }

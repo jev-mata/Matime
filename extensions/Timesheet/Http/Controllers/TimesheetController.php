@@ -61,7 +61,8 @@ class TimesheetController extends Controller
             'totalHours' => $totalFormatted,
             'totalHoursNotForm' => $hours . '.' . $minutes,
             'period' => $range,
-            'isSubmit' => false
+            'isSubmit' => false,
+            'isApproved' => false
         ]);
     }
 
@@ -98,19 +99,20 @@ class TimesheetController extends Controller
         $hours = floor($totalSeconds / 3600);
         $minutes = floor(($totalSeconds % 3600) / 60);
         $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
-
+        $currentTimesheet = Timesheet::whereBetween('date_start', [$range['from'], $range['to']])->get()->first();
         Log::info($grouped);
         return Inertia::render('Timesheet::index', [
             'entries' => $grouped,
             'totalHours' => $totalFormatted,
             'totalHoursNotForm' => $hours . '.' . $minutes,
             'period' => $range,
-            'isSubmit' => true
+            'isSubmit' => true,
+            'isApproved' => !is_null($currentTimesheet->approved_by)
         ]);
     }
 
     private function getBimonthlyRange(Carbon $date): array
-    { 
+    {
         $timezone = Auth::user()->timezone;
         // $timezone = DB::select("SHOW TIMEZONE")[0]->TimeZone ?? 'UTC';
 
@@ -182,6 +184,57 @@ class TimesheetController extends Controller
         ]);
 
         return response()->json(['message' => 'Approved']);
+    }
+
+    public function approval(Request $request)
+    {
+
+        $user = Auth::user();
+        $organization = $user->currentOrganization;
+
+        // Get all user IDs in the organization
+        $userIds = $organization->users()->pluck('users.id');
+
+        $entries = TimeEntry::with(['project','task'])->whereIn('user_id', $userIds)
+            ->get();
+
+        /////////////////////////
+
+
+        $timesheet = Timesheet::all();
+        $grouped = $entries->map(function ($entry) {
+            return [
+                'id' => $entry->id,
+                'date' => $entry->start?->format('Y-m-d'), // Grouping key
+                'start' => $entry->start?->toDateTimeString(),
+                'end' => $entry->end?->toDateTimeString(),
+                'tags' => Tag::find($entry->tags),
+                'project' => $entry->project,
+                'task' => $entry->task,
+                'hours' => optional($entry->getDuration()),
+                'description' => $entry->description,
+                'status' => 'Pending',
+            ];
+
+
+        })->groupBy('date')->map->values(); // Reset keys inside each group
+         
+
+        // Total duration
+        $totalSeconds = $entries->reduce(function ($carry, $entry) {
+            return $carry + optional($entry->getDuration())?->totalSeconds ?? 0;
+        }, 0);
+
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
+        $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
+        return Inertia::render('Timesheet::approval', [ 
+            'entries' => $grouped,
+            'totalHours' => $totalFormatted,
+            'totalHoursNotForm' => $hours . '.' . $minutes, 
+            'isSubmit' => true,
+            'timesheet' => $timesheet
+        ]);
     }
 
 
