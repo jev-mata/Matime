@@ -44,7 +44,8 @@ async function getConfig() {
             host: '0.0.0.0', // bind to all interfaces
             port: 5147,
             hmr: {
-                host: 'localhost', // or use your host machine IP if accessed from LAN
+                host: 'localhost',
+                https: true, // or use your host machine IP if accessed from LAN
                 port: 5147,
                 clientPort:5147
             },
