@@ -55,7 +55,7 @@ Route::middleware([
 
     Route::get('/projects/{project}', function () {
         return Inertia::render('ProjectShow');
-    })->name('projects.show');
+    })->name(name: 'projects.show');
 
     Route::get('/clients', function () {
         return Inertia::render('Clients');

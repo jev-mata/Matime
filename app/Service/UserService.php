@@ -47,6 +47,19 @@ class UserService
         }
         $user->save();
  
+        $organization = app(OrganizationService::class)->createOrganization(
+            $this->getOrganizationNameForUserName($user->name),
+            $user,
+            true,
+            $currency,
+            $numberFormat,
+            $currencyFormat,
+            $dateFormat,
+            $intervalFormat,
+            $timeFormat,
+        );
+
+        $user->ownedTeams()->save($organization);
 
         return $user;
     }
