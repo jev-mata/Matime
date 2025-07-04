@@ -48,7 +48,8 @@ class ClockifyProjectsImporter extends DefaultImporter
                 }
 
                 if ($record['Task'] !== '') {
-                    $tasks = explode(', ', $record['Task']);
+                    $tasks = preg_split('/, (?=\d+[a-z]?\.|\d+\.)/', $record['Task']);
+
                     foreach ($tasks as $task) {
                         $this->taskImportHelper->getKey([
                             'name' => $task,

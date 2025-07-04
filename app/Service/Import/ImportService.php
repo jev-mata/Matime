@@ -12,6 +12,7 @@ use App\Service\Import\Importers\ReportDto;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -29,7 +30,7 @@ class ImportService
             ->put('import/'.Carbon::now()->toDateString().'-'.$organization->getKey().'-'.Str::uuid(), $data);
 
         $lock = Cache::lock('import:'.$organization->getKey(), config('octane.max_execution_time', 60) + 1);
-
+        Log::info($data);
         if ($lock->get()) {
             try {
                 DB::transaction(function () use (&$importer, &$data, &$timezone): void {
