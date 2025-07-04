@@ -92,9 +92,9 @@ class Project extends Model implements AuditableContract
     protected array $auditExclude = [
         'spent_time',
     ];
-    public function team()
+    public function groups()
     {
-        return $this->belongsTo(Team::class);
+        return $this->belongsTo(Teams::class);
     }
 
     public function getSpentTimeComputed(): ?int

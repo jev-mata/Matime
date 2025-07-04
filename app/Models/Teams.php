@@ -6,7 +6,7 @@ use App\Models\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Team extends Model
+class Teams extends Model
 {
     //
 
@@ -15,7 +15,8 @@ class Team extends Model
 
     protected $fillable = [
         'name',
-    ];
+    ];   
+    protected $table = "team";
     public function organization()
     {
         return $this->belongsTo(Organization::class);

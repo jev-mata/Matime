@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Api\V1\ProjectController;
 use App\Models\Organization;
 use App\Models\Project;
-use App\Models\Team;
+use App\Models\Teams;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +19,7 @@ class TeamController extends Controller
     {
         $currentOrg = User::with('currentOrganization')->where('id', '=', Auth::user()->id)->get()->first();
         $org = Organization::whereId($currentOrg->currentOrganization->id)->get()->first();
-        return Team::with('projects')->where('organization_id', $org->id)->get();
+        return Teams::with('projects')->where('organization_id', $org->id)->get();
     }
     public function show($projectid)
     {
@@ -29,7 +29,7 @@ class TeamController extends Controller
 
         $org = Organization::whereId($currentOrg->currentOrganization->id)->get()->first();
 
-        $teams = Team::with('projects')
+        $teams = Teams::with('projects')
             ->where('organization_id', $org->id)
             ->whereDoesntHave('projects', function ($query) use ($projectid) {
                 $query->where('id', $projectid);
@@ -50,7 +50,7 @@ class TeamController extends Controller
 
         $org = Organization::whereId($currentOrg->currentOrganization->id)->get()->first();
 
-        $teams = Team::with([
+        $teams = Teams::with([
             'projects' => function ($query) use ($projectid) {
                 $query->where('id', '=', $projectid);
             }
@@ -71,9 +71,9 @@ class TeamController extends Controller
     {
         $currentOrg = User::with('currentOrganization')->where('id', '=', Auth::user()->id)->get()->first();
         $org = Organization::with('users')->whereId($currentOrg->currentOrganization->id)->get()->first();
-        $projects = Project::with('team')->get();
+        $projects = Project::with('groups')->get();
 
-        $team = Team::with(['users', 'projects'])->where('organization_id', '=', $currentOrg->currentOrganization->id)->get();
+        $team = Teams::with(['users', 'projects'])->where('organization_id', '=', $currentOrg->currentOrganization->id)->get();
         Log::info($team);
         return response()->json([
             'org_id' => $currentOrg->id,
@@ -83,7 +83,7 @@ class TeamController extends Controller
             'teams' => $team,
         ]);
     }
-    public function assignMembers(Request $request, Team $team)
+    public function assignMembers(Request $request, Teams $team)
     {
         $request->validate([
             'user_ids' => 'required|array',
@@ -94,7 +94,7 @@ class TeamController extends Controller
 
         return response()->json(['success' => true]);
     }
-    public function removeProject(Team $team, Project $project)
+    public function removeProject(Teams $team, Project $project)
     {
         if ($project->team_id !== $team->id) {
             return response()->json(['error' => 'Not assigned to this team'], 400);
@@ -105,7 +105,7 @@ class TeamController extends Controller
 
         return response()->json(['success' => true]);
     }
-    public function removeMember(Team $team, User $user)
+    public function removeMember(Teams $team, User $user)
     {
         $team->users()->detach($user->id);
 
@@ -120,14 +120,14 @@ class TeamController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        return Team::create([
+        return Teams::create([
             'id' => Str::uuid(),
             'name' => $request->name,
             'organization_id' => $org->id,
         ]);
     }
 
-    public function assignProject(Request $request, Team $team)
+    public function assignProject(Request $request, Teams $team)
     {
         $request->validate([
             'project_id' => 'required|exists:projects,id',
