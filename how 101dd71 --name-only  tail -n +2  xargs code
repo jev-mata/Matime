@@ -1,0 +1,41 @@
+[33mcommit 101dd715d279702ee1806283f58b46a0417ff6cc[m
+Author: john-guioguio <190331326+john-guioguio@users.noreply.github.com>
+Date:   Fri Jul 4 17:37:41 2025 +0800
+
+    import fixed comma
+
+[1mdiff --git a/app/Service/Import/ImportService.php b/app/Service/Import/ImportService.php[m
+[1mindex 9410322..dd6d777 100644[m
+[1m--- a/app/Service/Import/ImportService.php[m
+[1m+++ b/app/Service/Import/ImportService.php[m
+[36m@@ -12,6 +12,7 @@[m
+ use Illuminate\Support\Carbon;[m
+ use Illuminate\Support\Facades\Cache;[m
+ use Illuminate\Support\Facades\DB;[m
+[32m+[m[32muse Illuminate\Support\Facades\Log;[m
+ use Illuminate\Support\Facades\Storage;[m
+ use Illuminate\Support\Str;[m
+ [m
+[36m@@ -29,7 +30,7 @@[m [mpublic function import(Organization $organization, string $importerType, string[m
+             ->put('import/'.Carbon::now()->toDateString().'-'.$organization->getKey().'-'.Str::uuid(), $data);[m
+ [m
+         $lock = Cache::lock('import:'.$organization->getKey(), config('octane.max_execution_time', 60) + 1);[m
+[31m-[m
+[32m+[m[32m        Log::info($data);[m
+         if ($lock->get()) {[m
+             try {[m
+                 DB::transaction(function () use (&$importer, &$data, &$timezone): void {[m
+[1mdiff --git a/app/Service/Import/Importers/ClockifyProjectsImporter.php b/app/Service/Import/Importers/ClockifyProjectsImporter.php[m
+[1mindex fa0188f..1b58e06 100644[m
+[1m--- a/app/Service/Import/Importers/ClockifyProjectsImporter.php[m
+[1m+++ b/app/Service/Import/Importers/ClockifyProjectsImporter.php[m
+[36m@@ -48,7 +48,8 @@[m [mpublic function importData(string $data, string $timezone): void[m
+                 }[m
+ [m
+                 if ($record['Task'] !== '') {[m
+[31m-                    $tasks = explode(', ', $record['Task']);[m
+[32m+[m[32m                    $tasks = preg_split('/, (?=\d+[a-z]?\.|\d+\.)/', $record['Task']);[m
+[32m+[m
+                     foreach ($tasks as $task) {[m
+                         $this->taskImportHelper->getKey([[m
+                             'name' => $task,[m
