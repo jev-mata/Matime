@@ -15,20 +15,21 @@ class Teams extends Model
 
     protected $fillable = [
         'name',
-    ];   
-    protected $table = "team";
+    ];
+    protected $table = "teams";
     public function organization()
     {
         return $this->belongsTo(Organization::class);
-    } 
+    }
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'team_user', 'team_id', 'user_id');
     }
+
 
     public function projects()
     {
-        return $this->hasMany(Project::class);
+        return $this->hasMany(Project::class, 'team_id', 'id');
     }
 
 }

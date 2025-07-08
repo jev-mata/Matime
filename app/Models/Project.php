@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Korridor\LaravelComputedAttributes\ComputedAttributes;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use App\Models\Teams as Groups;
 
 /**
  * @property string $id
@@ -94,7 +95,7 @@ class Project extends Model implements AuditableContract
     ];
     public function groups()
     {
-        return $this->belongsTo(Teams::class);
+        return $this->belongsTo(Groups::class,'team_id','id');
     }
 
     public function getSpentTimeComputed(): ?int

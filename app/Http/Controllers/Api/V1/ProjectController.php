@@ -50,7 +50,7 @@ class ProjectController extends Controller
         $user = $this->user();
         $team = auth()->user()->teams()->first();
 
-        $projectsQuery = Project::with('team')
+        $projectsQuery = Project::with('groups')
             ->whereBelongsTo($organization, 'organization');
 
         $ownerId = optional($organization->owner()->first())->id;
