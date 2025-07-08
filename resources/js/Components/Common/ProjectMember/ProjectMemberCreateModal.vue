@@ -146,15 +146,15 @@ function clearGroupSelection() {
         </template>
         <template #footer>
             <SecondaryButton @click="show = false">Cancel</SecondaryButton>
-            <SecondaryButton v-if="selectedGroupName != 'Select Group...'"
+            <SecondaryButton v-if="selectedGroupName.value != 'Select Group...'"
                 @click="clearGroupSelection" class="ml-3">
                 Clear
             </SecondaryButton>
-            <PrimaryButton v-if="(selectedGroupName == 'Select Group...' && selectedGroupName != 'No Group Available')"
+            <PrimaryButton v-if="(selectedGroupName.value == 'Select Group...' && selectedGroupName.value != 'No Group Available')"
                 class="ms-3" :class="{ 'opacity-25': saving }" :disabled="saving" @click="submit">
                 Add Project Member
             </PrimaryButton>
-            <PrimaryButton v-if="(selectedGroupName != 'Select Group...' && selectedGroupName != 'No Group Available')"
+            <PrimaryButton v-if="(selectedGroupName.value != 'Select Group...' && selectedGroupName.value != 'No Group Available')"
                 class="ms-3" :class="{ 'opacity-25': saving }" :disabled="saving" @click="submitGroup">
                 Add Project Group
             </PrimaryButton>

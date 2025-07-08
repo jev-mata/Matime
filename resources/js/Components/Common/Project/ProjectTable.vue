@@ -50,7 +50,7 @@ watch(
     { deep: true, immediate: false }
 );
 
-const getClient = (clientID) => {
+const getClient = (clientID: string) => {
     return clients.value.find(
         (client) => client.id === clientID
     );
@@ -87,7 +87,7 @@ const getClient = (clientID) => {
                     </SecondaryButton>
                 </div>
                 <template v-for="(project, index) in projects" :key="project.id" class="flex w-full flex-row">
-                    <TableRow class="w-full mt-5" v-if="project?.client_id !== projects[index - 1]?.client_id" >
+                    <TableRow class="w-full mt-5" v-if="project?.client_id !== projects[index - 1]?.client_id">
                         <div
                             class="whitespace-nowrap min-w-0 flex items-center space-x-5 3xl:pl-12 py-4 pr-3 text-sm font-medium text-text-primary pl-4 sm:pl-6 lg:pl-8 3xl:pl-12">
                             <div v-if="project.client_id" class="overflow-ellipsis overflow-hidden">
