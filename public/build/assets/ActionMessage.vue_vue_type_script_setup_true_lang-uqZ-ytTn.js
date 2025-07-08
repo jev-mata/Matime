@@ -1,0 +1,2 @@
+import{d as s,h as t,o,e as n,W as c,w as i,G as r,K as l,f as d,p}from"./app-DUID27fb.js";const _={class:"text-sm text-text-secondary"},f=s({__name:"ActionMessage",props:{on:Boolean},setup(e){return(a,m)=>(o(),t("div",null,[n(c,{"leave-active-class":"transition ease-in duration-1000","leave-from-class":"opacity-100","leave-to-class":"opacity-0"},{default:i(()=>[r(d("div",_,[p(a.$slots,"default")],512),[[l,e.on]])]),_:3})]))}});export{f as _};
+//# sourceMappingURL=ActionMessage.vue_vue_type_script_setup_true_lang-uqZ-ytTn.js.map

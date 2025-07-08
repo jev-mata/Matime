@@ -1,0 +1,2 @@
+import{e as m,c as n}from"./index-D03bkDOQ.js";import{c,D as s}from"./app-DUID27fb.js";const t=m("theme","system");s(t,()=>{location.reload()});const e=n(),o=c(()=>t.value==="system"?(console.log(e.value),e.value==="no-preference"?"dark":e.value):t.value);function d(){document.documentElement.classList.add(o.value),s(o,(r,a)=>{document.documentElement.classList.remove(a),document.documentElement.classList.add(r)})}export{t,d as u};
+//# sourceMappingURL=theme-idUPXIqc.js.map
