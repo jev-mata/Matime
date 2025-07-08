@@ -131,8 +131,7 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
                 ? Storage::disk($this->profilePhotoDisk())->url($this->profile_photo_path)
                 : $this->defaultProfilePhotoUrl();
         });
-    }
-
+    } 
     public function canAccessPanel(Panel $panel): bool
     {
         return in_array($this->email, config('auth.super_admins', []), true) && $this->hasVerifiedEmail();

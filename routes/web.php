@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\HomeController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Laravel\Jetstream\Http\Controllers\TeamInvitationController;
+use Inertia\Inertia; 
 use Laravel\Jetstream\Jetstream;
 use League\OAuth2\Client\Provider\Google;
 
@@ -20,7 +20,7 @@ use League\OAuth2\Client\Provider\Google;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/ 
+*/
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -95,7 +95,7 @@ Route::middleware([
     Route::post('/get/current/org', [TeamController::class, 'getOrg']);
     Route::post('/teams/{team}/assign-members', [TeamController::class, 'assignMembers']);
 
-    Route::get('/team-invitations/{invitation}', [TeamInvitationController::class, 'accept'])
-        ->name('team-invitations.accept')
-        ->middleware('signed'); // ✅ Ensures URL signature is valid
+    Route::get('/team-invitations/{invitation}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
+    Route::post('/team-invitations/{invitation}', [TeamInvitationController::class, 'accept'])
+        ->name('team-invitations.accept');
 });

@@ -1,2 +1,0 @@
-import{t as n}from"./bundle-mjs-D696Ktp4.js";import{d as r,h as s,o as t,n as l,u as p,t as m,p as c}from"./app-DUID27fb.js";const i={key:0},u={key:1},k=r({__name:"InputLabel",props:{value:{},class:{}},setup(a){const o=a;return(e,_)=>(t(),s("label",{class:l(p(n)("block font-medium text-sm text-text-primary",o.class))},[e.value?(t(),s("span",i,m(e.value),1)):(t(),s("span",u,[c(e.$slots,"default")]))],2))}});export{k as _};
-//# sourceMappingURL=InputLabel.vue_vue_type_script_setup_true_lang-BZNuSpdv.js.map

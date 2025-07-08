@@ -40,8 +40,7 @@ use League\OAuth2\Client\Provider\Google;
 
 Route::prefix('v1')->name('v1.')->group(static function (): void {
     Route::middleware([
-        'auth:api',
-        'verified',
+        'auth:api', 
     ])->group(static function (): void {
         // Organization routes
         Route::name('organizations.')->group(static function (): void {
