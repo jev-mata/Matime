@@ -73,9 +73,10 @@ const groupOptions = computed(() =>
 );
 
 // For display
-const selectedGroupName = computed(() => {
+const selectedGroupName = computed<string>(() => {
     return projectGroupMember.value.find(group => group.id === selectedGroupId.value)?.name || 'Select Group...';
 });
+
 const projectNameInput = ref<HTMLInputElement | null>(null);
 
 useFocus(projectNameInput, { initialValue: true });
@@ -145,18 +146,15 @@ function clearGroupSelection() {
             </div>
         </template>
         <template #footer>
-            <SecondaryButton @click="show = false">Cancel</SecondaryButton>
-            // @ts-ignore
+            <SecondaryButton @click="show = false">Cancel</SecondaryButton> 
             <SecondaryButton v-if="selectedGroupName != 'Select Group...'"
                 @click="clearGroupSelection" class="ml-3">
                 Clear
-            </SecondaryButton>
-            // @ts-ignore
+            </SecondaryButton> 
             <PrimaryButton v-if="(selectedGroupName == 'Select Group...' && selectedGroupName != 'No Group Available')"
                 class="ms-3" :class="{ 'opacity-25': saving }" :disabled="saving" @click="submit">
                 Add Project Member
-            </PrimaryButton>
-            // @ts-ignore
+            </PrimaryButton> 
             <PrimaryButton v-if="(selectedGroupName != 'Select Group...' && selectedGroupName != 'No Group Available')"
                 class="ms-3" :class="{ 'opacity-25': saving }" :disabled="saving" @click="submitGroup">
                 Add Project Group
