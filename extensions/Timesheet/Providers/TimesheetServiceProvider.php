@@ -33,25 +33,9 @@ class TimesheetServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
 
 
-        if (!function_exists('register_module_menu')) {
-            function register_module_menu(array $items)
-            {
-                app('module_menus')->push(...$items); // unpack array of items
-            }
+        if (file_exists($path = __DIR__ . '/../helpers.php')) {
+            require_once $path;
         }
-
-        register_module_menu([
-            [
-                'title' => 'Approval',
-                'icon' => 'HandThumbUpIcon', // must match a key in your frontend iconMap
-                'route' => 'approval.index',
-                'href' => '/time/approval',
-                'show' => true,
-                'role' => ['manager']
-            ],
-
-
-        ]);
 
 
     }

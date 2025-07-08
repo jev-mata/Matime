@@ -23,8 +23,7 @@ class UserTimeEntryController extends Controller
      */
     public function myActive(): JsonResource
     {
-        $user = $this->user();
-
+        $user = $this->user(); 
         $activeTimeEntriesOfUser = TimeEntry::query()
             ->whereBelongsTo($user, 'user')
             ->whereNull('end')

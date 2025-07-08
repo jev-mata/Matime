@@ -81,6 +81,7 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
         'name',
         'email',
         'password',
+        'current_team_id'
     ];
 
     /**
@@ -163,6 +164,10 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
     public function timeEntries(): HasMany
     {
         return $this->hasMany(TimeEntry::class);
+    }
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class);
     }
 
     /**

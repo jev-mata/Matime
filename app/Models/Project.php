@@ -92,6 +92,10 @@ class Project extends Model implements AuditableContract
     protected array $auditExclude = [
         'spent_time',
     ];
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
 
     public function getSpentTimeComputed(): ?int
     {
@@ -195,7 +199,7 @@ class Project extends Model implements AuditableContract
     protected function isArchived(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes) => isset($attributes['archived_at']),
+            get: fn(mixed $value, array $attributes) => isset($attributes['archived_at']),
         );
     }
 }

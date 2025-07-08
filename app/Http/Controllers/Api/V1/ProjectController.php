@@ -14,6 +14,7 @@ use App\Http\Resources\V1\Project\ProjectResource;
 use App\Models\Organization;
 use App\Models\Project;
 use App\Models\ProjectMember;
+use App\Models\Team;
 use App\Models\TimeEntry;
 use App\Service\BillableRateService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -21,6 +22,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -46,11 +48,25 @@ class ProjectController extends Controller
         $this->checkPermission($organization, 'projects:view');
         $canViewAllProjects = $this->hasPermission($organization, 'projects:view:all');
         $user = $this->user();
+        $team = auth()->user()->teams()->first();
 
-        $projectsQuery = Project::query()
+        $projectsQuery = Project::with('team')
             ->whereBelongsTo($organization, 'organization');
 
-        if (! $canViewAllProjects) {
+        $ownerId = optional($organization->owner()->first())->id;
+        $userId = auth()->id(); 
+
+        if ($ownerId && $ownerId === $userId) {
+            // Owner can see all projects — do nothing
+        } elseif ($team) {
+            $projectsQuery->where('team_id', $team->id);
+        } else {
+            // User is not the owner and has no team — return nothing
+            $projectsQuery->whereRaw('1=0');
+        }
+
+
+        if (!$canViewAllProjects) {
             $projectsQuery->visibleByEmployee($user);
         }
         $filterArchived = $request->getFilterArchived();
@@ -61,7 +77,6 @@ class ProjectController extends Controller
         }
 
         $projects = $projectsQuery->paginate(config('app.pagination_per_page_default'));
-
         $showBillableRate = $this->member($organization)->role !== Role::Employee->value || $organization->employees_can_see_billable_rates;
 
         return new ProjectCollection($projects, $showBillableRate);

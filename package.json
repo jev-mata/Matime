@@ -65,6 +65,7 @@
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
         "vue-echarts": "^7.0.3",
+        "vue-multiselect": "^3.2.0",
         "vue-router": "^4.5.1"
     },
     "overrides": {

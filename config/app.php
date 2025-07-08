@@ -195,7 +195,8 @@ return [
         App\Providers\Filament\AdminPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
-        App\Providers\JetstreamServiceProvider::class,
+        App\Providers\JetstreamServiceProvider::class, 
+
         // Warning: Do not add TelescopeServiceProvider here since it is already conditionally registered in AppServiceProvider
     ])->toArray(),
 

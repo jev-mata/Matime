@@ -196,7 +196,7 @@ const shownTasks = computed(() => {
                     </CardTitle>
                     <Card>
                         <ProjectMemberTable
-                            :project-members="projectMembers"
+                            :project-members="projectMembers"  
                             :project-id="projectId"></ProjectMemberTable>
                     </Card>
                 </div>

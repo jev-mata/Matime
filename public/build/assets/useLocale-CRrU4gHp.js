@@ -1,1 +1,0 @@
-import{o as r}from"./utils-CCwwB18o.js";import{r as n,c as u}from"./app-Dzd5B06R.js";function a(e){const t=r({locale:n("en")});return u(()=>{var o;return(e==null?void 0:e.value)||((o=t.locale)==null?void 0:o.value)||"en"})}export{a as u};

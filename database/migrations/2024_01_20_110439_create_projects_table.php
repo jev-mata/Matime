@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -20,6 +19,7 @@ return new class extends Migration
             $table->integer('billable_rate')->unsigned()->nullable();
             $table->boolean('is_public')->default(false);
             $table->uuid('client_id')->nullable();
+            $table->foreignUuid('team_id')->nullable()->constrained()->onDelete('set null');
             $table->foreign('client_id')
                 ->references('id')
                 ->on('clients')

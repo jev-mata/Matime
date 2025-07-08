@@ -19,10 +19,12 @@ const props = withDefaults(
     defineProps<{
         hiddenMembers?: ProjectMember[];
         disabled?: boolean;
+        placeholder:string
     }>(),
     {
         hiddenMembers: () => [] as ProjectMember[],
         disabled: false,
+        placeholder:""
     }
 );
 
@@ -68,7 +70,7 @@ const currentValue = computed(() => {
                 <div v-if="currentValue" class="flex-1 truncate">
                     {{ currentValue }}
                 </div>
-                <div v-else class="flex-1">Select a member...</div>
+                <div v-else class="flex-1">{{placeholder}}</div>
                 <ChevronDownIcon class="w-4 text-text-secondary"></ChevronDownIcon>
             </Badge>
         </template>

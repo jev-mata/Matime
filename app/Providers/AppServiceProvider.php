@@ -31,12 +31,17 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
+use League\OAuth2\Client\Provider\Google;
 use Nwidart\Modules\Facades\Module;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\Smtp\Auth\OAuth2Authenticator;
+use Symfony\Component\Mailer\Transport\Smtp\Auth\OAuth2\OAuth2Token;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -56,9 +61,11 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {    if (env('APP_ENV') === 'production') {
-        URL::forceScheme('https');
-    }
+    {
+ 
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
 
 
         if ($this->app->environment('local')) {
@@ -71,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
         Model::preventSilentlyDiscardingAttributes(!$this->app->isProduction());
         Model::preventAccessingMissingAttributes(!$this->app->isProduction());
         $menus = [];
- 
+
         Relation::enforceMorphMap([
             'client' => Client::class,
             'failed-job' => FailedJob::class,
@@ -83,7 +90,7 @@ class AppServiceProvider extends ServiceProvider
             'tag' => Tag::class,
             'task' => Task::class,
             'time-entry' => TimeEntry::class,
-            'user' => User::class, 
+            'user' => User::class,
         ]);
         Model::unguard();
 

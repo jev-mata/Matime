@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\TimeEntryController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserMembershipController;
 use App\Http\Controllers\Api\V1\UserTimeEntryController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -34,6 +35,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+use League\OAuth2\Client\Provider\Google;
+
 
 Route::prefix('v1')->name('v1.')->group(static function (): void {
     Route::middleware([
@@ -45,6 +48,8 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
             Route::get('/organizations/{organization}', [OrganizationController::class, 'show'])->name('show');
             Route::put('/organizations/{organization}', [OrganizationController::class, 'update'])->name('update');
         });
+
+
 
         // Member routes
         Route::name('members.')->prefix('/organizations/{organization}')->group(static function (): void {
@@ -181,7 +186,7 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
         Route::get('/reports', [PublicReportController::class, 'show'])->name('reports.show');
     });
 });
- 
+
 /**
  * Fallback routes, to prevent a rendered HTML page in /api/* routes
  * The / route is also included since the fallback is not triggered on the root route
