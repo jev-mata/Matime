@@ -7,9 +7,8 @@ use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\HomeController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia; 
+use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;
-use League\OAuth2\Client\Provider\Google;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +26,10 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/shared-report', function () {
     return Inertia::render('SharedReport');
 })->name('shared-report');
+ 
+Route::get('/invitations/{invitationId}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
+Route::post('/invitations/{invitationId}', [TeamInvitationController::class, 'accept'])
+    ->name('team-invitations.accept');
 
 Route::middleware([
     'auth:web',
@@ -97,7 +100,4 @@ Route::middleware([
 
 });
 
-    Route::get('/team-invitations/{invitation}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
-    Route::post('/team-invitations/{invitation}', [TeamInvitationController::class, 'accept'])
-        ->name('team-invitations.accept');
-    // Route::get('/team-invitation/view', [TeamInvitationController::class, 'showAcceptPage']);
+// Route::get('/team-invitation/view', [TeamInvitationController::class, 'showAcceptPage']);

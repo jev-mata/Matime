@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Laravel\Jetstream\Contracts\AddsTeamMembers;
 use Laravel\Jetstream\Jetstream;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class TeamInvitationController extends Controller
 {
     /**
@@ -25,28 +25,26 @@ class TeamInvitationController extends Controller
      */
     public function showAcceptPage($invitationId)
     {
-        $invitation = Jetstream::teamInvitationModel()::whereKey($invitationId)->with('team')->firstOrFail();
+        try {
+            Log::info($invitationId);
+            $invitation = Jetstream::teamInvitationModel()::whereKey($invitationId)
+                ->with('team')
+                ->firstOrFail();
 
-        return Inertia::render('Auth/AcceptInvitation', [
-            'invitation' => [
-                'id' => $invitation->id,
-                'email' => $invitation->email,
-                'role' => $invitation->role,
-                'team' => [
-                    'name' => $invitation->team->name,
+            return Inertia::render('Auth/AcceptInvitation', [
+                'invitation' => [
+                    'id' => $invitation->id,
+                    'email' => $invitation->email,
+                    'role' => $invitation->role,
+                    'team' => [
+                        'name' => $invitation->team->name,
+                    ],
                 ],
-            ],
-        ]);
-        // return Inertia::render('Auth/AcceptInvitation', [
-        //     'invitation' => [
-        //         'id' => "",
-        //         'email' => "",
-        //         'role' => "",
-        //         'team' => [
-        //             'name' => "",
-        //         ],
-        //     ],
-        // ]);
+            ]);
+        } catch (ModelNotFoundException $e) {
+            Log::info($e->getMessage());
+            return Inertia::render('Errors/InvalidInvitation');
+        }
     }
     public function accept(Request $request, $invitationId)
     {
