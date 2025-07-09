@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SecondaryButton from '@/packages/ui/src/Buttons/SecondaryButton.vue';
 import DialogModal from '@/packages/ui/src/DialogModal.vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type {
     CreateProjectMemberBody,
     ProjectMember,
@@ -42,6 +42,8 @@ const groupBillableRate = ref<number | null>(null); // stores rate separately
 async function getGroupNotMember() {
     const { data } = await axios.get(`/organizations/teams/projects/${props.projectId}`);
     projectGroupMember.value = data.team.length > 0 ? data.team : [{ id: null, name: 'No Group Available', billable_rate: null }]; // team from your sample response
+    
+    show.value = false;
 }
 
 onMounted(getGroupNotMember);
@@ -53,16 +55,14 @@ async function submit() {
         billable_rate: null,
     };
 }
-
+ 
 async function submitGroup() {
     console.log(selectedGroupId.value);
     const url = `/teams/${selectedGroupId.value}/projects/${props.projectId}`;
     console.log(url);
     const { data } = await axios.post(url);
     clearGroupSelection();
-    console.log(data);
-    emit('refresh');
-    getGroupNotMember();
+    console.log(data); 
 
 }
 const groupOptions = computed(() =>

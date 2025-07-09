@@ -57,22 +57,27 @@ class ProjectController extends Controller
 
         $ownerId = optional($organization->owner()->first())->id;
         $userId = auth()->id();
- 
-        if ($ownerId && $ownerId === $userId) {
-            // Owner can see all projects — do nothing
-        } elseif ($team->groups->first()) {
-            $projectsQuery = $projectsQuery->whereHas('groups', function ($query) use ($team) {
-                $query->where('team_id', $team->groups->first()->id);
-            }); 
 
-        } else {
-            // User is not the owner and has no team — return nothing
-            $projectsQuery->whereRaw('1=0');
+        if ($ownerId !== $userId) {
+            $groupIds = $team->groups->pluck('id');
+            if ($groupIds->isNotEmpty()) {
+                $projectIDs = $projectsQuery->whereHas(
+                    'groups',
+                    fn($query) =>
+                    $query->whereIn('id', $groupIds)
+                )->orderBy('name')->pluck('id');
+                $projectsQuery = Project::with('groups')
+                    ->whereIn('id', $projectIDs) // ✅ correct
+                    ->orderBy('name');
+            } else {
+                // User has no groups, return empty result
+                $projectsQuery->whereRaw('1 = 0');
+            }
         }
 
-        if (!$canViewAllProjects) {
-            $projectsQuery->visibleByEmployee($user);
-        }
+        // if (!$canViewAllProjects) {
+        //     $projectsQuery->visibleByEmployee($user);
+        // }
         $filterArchived = $request->getFilterArchived();
         if ($filterArchived === 'true') {
             $projectsQuery->whereNotNull('archived_at');

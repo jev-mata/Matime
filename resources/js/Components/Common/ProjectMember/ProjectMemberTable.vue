@@ -34,7 +34,7 @@ type group = {
     billable_rate: number | null;
     role: string | null;
 };
-const projectGroupMember = ref<group[]>([]); // now holds array of groups
+const projectGroupMember = ref<group[]>([]); // now holds array of groups 
 
 async function getGroupMember() {
     const { data } = await axios.get(`/organizations/projects/teams/${projectId}`);
@@ -42,8 +42,7 @@ async function getGroupMember() {
 }
 onMounted(() => {
     getGroupMember();
-});
-
+}); 
 async function deleteProjectMember(teamid: string) {
 
     console.log(teamid);

@@ -133,7 +133,7 @@ const showEditProjectModal = ref(false);
         </div>
         <div 
             class="relative whitespace-nowrap flex items-center pl-3 text-right text-sm font-medium pr-4 sm:pr-6 lg:pr-8 3xl:pr-12">
-            <ProjectMoreOptionsDropdown  v-if="!isAllowedToPerformPremiumAction()"
+            <ProjectMoreOptionsDropdown  
                 :project="project"
                 @edit="showEditProjectModal = true"
                 @archive="archiveProject"

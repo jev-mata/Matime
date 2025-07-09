@@ -255,24 +255,29 @@ export default {
     display: none;
     pointer-events: none;
 }
+
 .bg-panel {
 
     background-color: #04070c !important;
 }
+
 .visually-enabled.multiselect--disabled {
     background-color: white;
     opacity: 1;
-    pointer-events: none; /* Still prevents interaction */ 
-    color: #111827; /* Optional: normal text */
+    pointer-events: none;
+    /* Still prevents interaction */
+    color: #111827;
+    /* Optional: normal text */
 }
 
 /* Optional: fix the cursor */
 .visually-enabled.multiselect--disabled .multiselect__single,
 .visually-enabled.multiselect--disabled .multiselect__tags {
     cursor: default;
-    color: #111827; /* Normal dark text */
+    color: #111827;
+    /* Normal dark text */
 }
-</style> 
+</style>
 <template>
     <div class="flow-root max-w-[100vw] overflow-x-auto p-4" style="min-height: 80vh;">
         <div class="inline-block min-w-full align-middle bg-panel p-5 rounded-md">
@@ -295,8 +300,9 @@ export default {
             <table class="w-full">
                 <thead>
                     <tr>
-                        <th class="text-left px-4 py-2">Name</th>
-                        <th class="text-left px-4 py-2">Access</th>
+                        <th class="text-left px-4 py-2">Group</th>
+                        <th class="text-left px-4 py-2">Members</th>
+                        <th class="text-left px-4 py-2">Projects</th>
                         <th class="text-left px-4 py-2">Managers</th>
                     </tr>
                 </thead>
@@ -347,15 +353,6 @@ export default {
                         </div> -->
                             </div>
                         </td>
-                        <!-- <div>
-                        <label class="text-sm font-medium">Assign Projects:</label>
-                        <Multiselect :model-value="selectedProject[team.id]"
-                            @update:modelValue="onProjectChange($event, team)" :options="projects" :multiple="true"
-                            :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                            placeholder="Search and select projects" label="name" track-by="id" class="mt-1" />
-
- 
-                    </div> -->
                         <td class="px-4 py-2 align-top">
                             <div>
                                 <Multiselect :model-value="selectedUsers[team.id]"
@@ -368,6 +365,14 @@ export default {
                             </div>
                         </td>
 
+                        <div>
+                            <Multiselect :model-value="selectedProject[team.id]"
+                                @update:modelValue="onProjectChange($event, team)" :options="projects" :multiple="true"
+                                :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+                                placeholder="Search and select projects" label="name" track-by="id" class="mt-1" />
+
+
+                        </div>
                         <td class="px-4 py-2 align-top">
                             <Multiselect :model-value="selectedManagers[team.id]"
                                 @update:modelValue="onUsersChanged($event, team)" :options="managers" :multiple="true"
