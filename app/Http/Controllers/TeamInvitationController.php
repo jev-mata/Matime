@@ -23,11 +23,11 @@ class TeamInvitationController extends Controller
      * @param  int  $invitationId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function showAcceptPage($invitationId)
+    public function showAcceptPage($invitation)
     {
         try {
-            Log::info($invitationId);
-            $invitation = Jetstream::teamInvitationModel()::whereKey($invitationId)
+            $invitationID = $invitation;
+            $invitation = Jetstream::teamInvitationModel()::whereKey($invitationID)
                 ->with('team')
                 ->firstOrFail();
 
@@ -46,10 +46,10 @@ class TeamInvitationController extends Controller
             return Inertia::render('Errors/InvalidInvitation');
         }
     }
-    public function accept(Request $request, $invitationId)
+    public function accept(Request $request, $invitation)
     {
-        Log::info('accepting...');
-        $invitation = Jetstream::teamInvitationModel()::whereKey($invitationId)->firstOrFail();
+        $invitationID = $invitation; 
+        $invitation = Jetstream::teamInvitationModel()::whereKey($invitationID)->firstOrFail();
 
         $request->validate([
             'name' => 'required|string|max:255',

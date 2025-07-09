@@ -29,8 +29,8 @@ Route::get('/shared-report', function () {
 Route::middleware([
     'signed'
 ])->group(function (): void {
-    Route::get('/invitations/{invitationId}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
-    Route::post('/invitations/{invitationId}', [TeamInvitationController::class, 'accept'])
+    Route::get('/invitations/{invitation}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
+    Route::post('/invitations/{invitation}', [TeamInvitationController::class, 'accept'])
         ->name('team-invitations.accept');
 });
 Route::middleware([
