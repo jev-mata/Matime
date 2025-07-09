@@ -99,3 +99,5 @@ Route::middleware([
     Route::post('/team-invitations/{invitation}', [TeamInvitationController::class, 'accept'])
         ->name('team-invitations.accept');
 });
+
+    // Route::get('/team-invitation/view', [TeamInvitationController::class, 'showAcceptPage']);

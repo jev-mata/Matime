@@ -1,19 +1,20 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import InputLabel from '@/packages/ui/src/Input/InputLabel.vue'
-import TextInput from '@/packages/ui/src/Input/TextInput.vue'
+import TextInput from '@/packages/ui/src/Input/TextInput.vue';
 import InputError from '@/packages/ui/src/Input/InputError.vue'
 import PrimaryButton from '@/packages/ui/src/Buttons/PrimaryButton.vue'
-import { ref } from 'vue'
 
+import AuthenticationCard from '@/Components/AuthenticationCard.vue';
+import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 const props = defineProps({
     invitation: Object,
 })
 
 const form = useForm({
     name: '',
-    password: '',
+    password: null,
     password_confirmation: '',
 })
 
@@ -25,39 +26,58 @@ const submit = () => {
 </script>
 
 <template>
-    <div class="p-10 bg-gray-900 text-gray-200" style="height: 100vh;">
-        <div class="p-10 mx-auto" style="width: 50%;">
+    <AuthenticationCard>
+        <template #logo>
+            <AuthenticationCardLogo />
+        </template>
 
-            <div class="mb-4 text-gray-600 text-sm">
-                You’ve been invited to join the <strong>{{ invitation.team.name }}</strong> team as a <strong>{{
-                    invitation.role }}</strong> using email <strong>{{ invitation.email }}</strong>.
+        <template #actions>
+            <Link class="py-8 text-text-secondary text-sm font-medium opacity-90 hover:opacity-100 transition"
+                :href="route('register')">
+            No account yet? <span class="text-text-primary">Register here!</span>
+            </Link>
+        </template>
+
+        <div class="mb-6 text-gray-300 text-md pb-4">
+            You’ve been invited to join the <strong>{{ invitation.team.name }}</strong> team as a <strong>{{
+                invitation.role }}</strong> using email <strong>{{ invitation.email }}</strong>
+        </div>
+
+        <form @submit.prevent="submit" class="mt-6 space-y-4 w-full" autocomplete="off">
+            <input type="text" name="fake_username" autocomplete="username" style="display: none;" />
+            <input type="password" name="fake_password" autocomplete="new-password" style="display: none;" />
+
+            <div>
+                <InputLabel for="name" value="Your Name" />
+                <TextInput v-model="form.name" id="name" type="text" class="mt-1 block w-full " autocomplete="off"
+                    placeholder="Complete Name" required autofocus />
+                <InputError :message="form.errors.name" class="mt-2" />
             </div>
 
-            <form @submit.prevent="submit" class="mt-6 space-y-4">
-                <div>
-                    <InputLabel for="name" value="Your Name" />
-                    <TextInput v-model="form.name" id="name" type="text" class="mt-1 block w-full" required autofocus />
-                    <InputError :message="form.errors.name" class="mt-2" />
-                </div>
+            <div>
+                <InputLabel for="name" value="Email" />
+                <TextInput type="email" class="mt-1 block w-full " :value="invitation.email" required autofocus disabled
+                    autocomplete="new-name" />
+            </div>
+            <div>
+                <InputLabel for="password" value="Password" />
+                <TextInput v-model="form.password" id="password" type="password" class="mt-1 block w-full " required
+                    autocomplete="off" placeholder="Password" />
+                <InputError :message="form.errors.password" class="mt-2" />
+            </div>
 
-                <div>
-                    <InputLabel for="password" value="Password" />
-                    <TextInput v-model="form.password" id="password" type="password" class="mt-1 block w-full"
-                        required />
-                    <InputError :message="form.errors.password" class="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel for="password_confirmation" value="Confirm Password" />
-                    <TextInput v-model="form.password_confirmation" id="password_confirmation" type="password"
-                        class="mt-1 block w-full" required />
-                    <InputError :message="form.errors.password_confirmation" class="mt-2" />
-                </div>
-
+            <div>
+                <InputLabel for="password_confirmation" value="Confirm Password" />
+                <TextInput v-model="form.password_confirmation" id="password_confirmation" type="password"
+                    autocomplete="new-name" placeholder="Confirm Password" class="mt-1 block w-full " required />
+                <InputError :message="form.errors.password_confirmation" class="mt-2" />
+            </div>
+            <div class="w-full flex justify-center">
                 <PrimaryButton class="mt-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Accept Invitation
                 </PrimaryButton>
-            </form>
-        </div>
-    </div>
+            </div>
+
+        </form>
+    </AuthenticationCard>
 </template>

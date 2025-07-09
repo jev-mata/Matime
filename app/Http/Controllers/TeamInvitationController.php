@@ -37,6 +37,16 @@ class TeamInvitationController extends Controller
                 ],
             ],
         ]);
+        // return Inertia::render('Auth/AcceptInvitation', [
+        //     'invitation' => [
+        //         'id' => "",
+        //         'email' => "",
+        //         'role' => "",
+        //         'team' => [
+        //             'name' => "",
+        //         ],
+        //     ],
+        // ]);
     }
     public function accept(Request $request, $invitationId)
     {
@@ -55,9 +65,9 @@ class TeamInvitationController extends Controller
                 'name' => $request->name,
                 'email' => $invitation->email,
                 'password' => Hash::make($request->password),
-                // 'email_verified_at' => now(),
                 'timezone' => 'Asia/Manila', // 👈 add this line
             ]);
+            $user->sendEmailVerificationNotification();
         }
 
         Auth::login($user);
