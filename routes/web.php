@@ -95,9 +95,9 @@ Route::middleware([
     Route::post('/get/current/org', [TeamController::class, 'getOrg']);
     Route::post('/teams/{team}/assign-members', [TeamController::class, 'assignMembers']);
 
+});
+
     Route::get('/team-invitations/{invitation}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
     Route::post('/team-invitations/{invitation}', [TeamInvitationController::class, 'accept'])
         ->name('team-invitations.accept');
-});
-
     // Route::get('/team-invitation/view', [TeamInvitationController::class, 'showAcceptPage']);
