@@ -30,6 +30,7 @@ class TeamInvitationController extends Controller
             $invitation = Jetstream::teamInvitationModel()::whereKey($invitationID)
                 ->with('team')
                 ->firstOrFail();
+            $user = User::where('email', '=', $invitation->email)->first();
 
             return Inertia::render('Auth/AcceptInvitation', [
                 'invitation' => [
@@ -40,6 +41,7 @@ class TeamInvitationController extends Controller
                         'name' => $invitation->team->name,
                     ],
                 ],
+                'user' => $user
             ]);
         } catch (ModelNotFoundException $e) {
             Log::info($e->getMessage());
@@ -48,7 +50,7 @@ class TeamInvitationController extends Controller
     }
     public function accept(Request $request, $invitation)
     {
-        $invitationID = $invitation; 
+        $invitationID = $invitation;
         $invitation = Jetstream::teamInvitationModel()::whereKey($invitationID)->firstOrFail();
 
         $request->validate([

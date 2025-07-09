@@ -10,6 +10,7 @@ import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 const props = defineProps({
     invitation: Object,
+    user: Object,
 })
 
 const form = useForm({
@@ -30,13 +31,7 @@ const submit = () => {
         <template #logo>
             <AuthenticationCardLogo />
         </template>
-
-        <template #actions>
-            <Link class="py-8 text-text-secondary text-sm font-medium opacity-90 hover:opacity-100 transition"
-                :href="route('register')">
-            No account yet? <span class="text-text-primary">Register here!</span>
-            </Link>
-        </template>
+ 
 
         <div class="mb-6 text-gray-300 text-md pb-4">
             You’ve been invited to join the <strong>{{ invitation.team.name }}</strong> team as a <strong>{{
@@ -47,21 +42,21 @@ const submit = () => {
             <input type="text" name="fake_username" autocomplete="username" style="display: none;" />
             <input type="password" name="fake_password" autocomplete="new-password" style="display: none;" />
 
-            <div>
+            <div v-if="props.user">
                 <InputLabel for="name" value="Your Name" />
                 <TextInput v-model="form.name" id="name" type="text" class="mt-1 block w-full " autocomplete="off"
                     placeholder="Complete Name" required autofocus />
                 <InputError :message="form.errors.name" class="mt-2" />
             </div>
- 
-            <div>
+
+            <div v-if="props.user">
                 <InputLabel for="password" value="Password" />
                 <TextInput v-model="form.password" id="password" type="password" class="mt-1 block w-full " required
                     autocomplete="off" placeholder="Password" />
                 <InputError :message="form.errors.password" class="mt-2" />
             </div>
 
-            <div>
+            <div v-if="props.user">
                 <InputLabel for="password_confirmation" value="Confirm Password" />
                 <TextInput v-model="form.password_confirmation" id="password_confirmation" type="password"
                     autocomplete="new-name" placeholder="Confirm Password" class="mt-1 block w-full " required />
