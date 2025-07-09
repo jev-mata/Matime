@@ -27,8 +27,7 @@ Route::get('/shared-report', function () {
     return Inertia::render('SharedReport');
 })->name('shared-report');
 Route::middleware([
-    'guest',
-    'auth:web'
+    'guest', 
 ])->group(function (): void {
     Route::get('/invitations/{invitation}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
     Route::post('/invitations/{invitation}', [TeamInvitationController::class, 'accept'])
