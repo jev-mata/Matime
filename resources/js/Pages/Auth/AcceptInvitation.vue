@@ -53,12 +53,7 @@ const submit = () => {
                     placeholder="Complete Name" required autofocus />
                 <InputError :message="form.errors.name" class="mt-2" />
             </div>
-
-            <div>
-                <InputLabel for="name" value="Email" />
-                <TextInput type="email" class="mt-1 block w-full " :value="invitation.email" required autofocus disabled
-                    autocomplete="new-name" />
-            </div>
+ 
             <div>
                 <InputLabel for="password" value="Password" />
                 <TextInput v-model="form.password" id="password" type="password" class="mt-1 block w-full " required
