@@ -57,11 +57,7 @@ class ProjectController extends Controller
 
         $ownerId = optional($organization->owner()->first())->id;
         $userId = auth()->id();
-
-        // Log::info($projectsQuery->get());
-
-        Log::info($team);
-        Log::info($team->groups->first()->id);
+ 
         if ($ownerId && $ownerId === $userId) {
             // Owner can see all projects — do nothing
         } elseif ($team) {

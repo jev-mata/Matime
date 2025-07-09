@@ -3,8 +3,8 @@
     "description": "",
     "authors": [
         {
-            "name": "Nicolas Widart",
-            "email": "n.widart@gmail.com"
+            "name": "Jev Guio",
+            "email": "jevguio@gmail.com"
         }
     ],
     "extra": {
@@ -16,10 +16,8 @@
         }
     },
     "autoload": {
-        "psr-4": {
-            "Extensions\\Timesheet\\": "app/",
-            "Extensions\\Timesheet\\Database\\Factories\\": "database/factories/",
-            "Extensions\\Timesheet\\Database\\Seeders\\": "database/seeders/"
+        "psr-4": { 
+            "Extensions\\Timesheet\\": "extensions/Timesheet/"
         }
     },
     "autoload-dev": {
