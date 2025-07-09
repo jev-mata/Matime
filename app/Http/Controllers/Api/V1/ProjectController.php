@@ -60,11 +60,10 @@ class ProjectController extends Controller
  
         if ($ownerId && $ownerId === $userId) {
             // Owner can see all projects — do nothing
-        } elseif ($team) {
+        } elseif ($team->groups->first()) {
             $projectsQuery = $projectsQuery->whereHas('groups', function ($query) use ($team) {
                 $query->where('team_id', $team->groups->first()->id);
-            });
-            Log::info($projectsQuery->get());
+            }); 
 
         } else {
             // User is not the owner and has no team — return nothing

@@ -45,7 +45,7 @@ import { isAllowedToPerformPremiumAction } from '@/utils/billing';
 watch(
     () => props.projects,
     (newVal) => {
-        console.log('Projects changed:', newVal);
+        
     },
     { deep: true, immediate: false }
 );
