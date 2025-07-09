@@ -66,14 +66,15 @@ const showEditModal = ref(false);
 </script>
 
 <template>
-    <ProjectMemberCreateModal v-model:show="createProjectMember" :existing-members="projectMembers" @refresh="reinit" 
+    <ProjectMemberCreateModal v-model:show="createProjectMember" :existing-members="projectMembers" @refresh="reinit"
         :project-id="projectId"></ProjectMemberCreateModal>
     <div class="flow-root">
         <div class="inline-block min-w-full align-middle">
             <div data-testid="project_member_table" class="grid min-w-full"
                 style="grid-template-columns: 1fr 150px 150px 80px">
                 <ProjectMemberTableHeading></ProjectMemberTableHeading>
-                <div v-if="projectMembers.length === 0" class="col-span-5 py-24 text-center">
+                <div v-if="projectMembers.length === 0 && projectGroupMember.length === 0"
+                    class="col-span-5 py-24 text-center">
                     <UserGroupIcon class="w-8 text-icon-default inline pb-2"></UserGroupIcon>
                     <h3 class="text-text-primary font-semibold">No project members</h3>
                     <p class="pb-5">Add the first project member!</p>

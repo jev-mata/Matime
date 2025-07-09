@@ -16,11 +16,13 @@ use App\Models\Project;
 use App\Models\ProjectMember;
 use App\Models\Team;
 use App\Models\TimeEntry;
+use App\Models\User;
 use App\Service\BillableRateService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -48,23 +50,30 @@ class ProjectController extends Controller
         $this->checkPermission($organization, 'projects:view');
         $canViewAllProjects = $this->hasPermission($organization, 'projects:view:all');
         $user = $this->user();
-        $team = auth()->user()->teams()->first();
+        $team = User::with('groups')->where('id', '=', Auth::user()->id)->first();
 
         $projectsQuery = Project::with('groups')
             ->whereBelongsTo($organization, 'organization');
 
         $ownerId = optional($organization->owner()->first())->id;
-        $userId = auth()->id(); 
+        $userId = auth()->id();
 
+        // Log::info($projectsQuery->get());
+
+        Log::info($team);
+        Log::info($team->groups->first()->id);
         if ($ownerId && $ownerId === $userId) {
             // Owner can see all projects — do nothing
         } elseif ($team) {
-            $projectsQuery->where('team_id', $team->id);
+            $projectsQuery = $projectsQuery->whereHas('groups', function ($query) use ($team) {
+                $query->where('team_id', $team->groups->first()->id);
+            });
+            Log::info($projectsQuery->get());
+
         } else {
             // User is not the owner and has no team — return nothing
             $projectsQuery->whereRaw('1=0');
         }
-
 
         if (!$canViewAllProjects) {
             $projectsQuery->visibleByEmployee($user);

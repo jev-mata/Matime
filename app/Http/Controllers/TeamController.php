@@ -9,6 +9,7 @@ use App\Models\Teams;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -73,14 +74,31 @@ class TeamController extends Controller
         $org = Organization::with('users')->whereId($currentOrg->currentOrganization->id)->get()->first();
         $projects = Project::with('groups')->get();
 
+
+
         $team = Teams::with(['users', 'projects'])->where('organization_id', '=', $currentOrg->currentOrganization->id)->get();
-        Log::info($team);
+
+
+        $teamsWithManagers = Teams::with([
+            'users' => function ($query) use ($currentOrg) {
+                $query->whereHas('organizationMember', function ($q) use ($currentOrg) {
+                    $q->where('organization_id', $currentOrg->currentOrganization->id)
+                        ->where('role', 'manager');
+                });
+            }
+        ])
+            ->where('organization_id', $currentOrg->currentOrganization->id)
+            ->get();
+
+
+        Log::info($teamsWithManagers);
         return response()->json([
             'org_id' => $currentOrg->id,
             'org' => $org,
             'user' => $org->users,
             'projects' => $projects,
             'teams' => $team,
+            'managers' => $teamsWithManagers,
         ]);
     }
     public function assignMembers(Request $request, Teams $team)

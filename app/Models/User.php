@@ -30,6 +30,7 @@ use Laravel\Passport\AuthCode;
 use Laravel\Passport\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
+use App\Models\Teams as Groups;
 /**
  * @property string $id
  * @property string $name
@@ -131,7 +132,7 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
                 ? Storage::disk($this->profilePhotoDisk())->url($this->profile_photo_path)
                 : $this->defaultProfilePhotoUrl();
         });
-    } 
+    }
     public function canAccessPanel(Panel $panel): bool
     {
         return in_array($this->email, config('auth.super_admins', []), true) && $this->hasVerifiedEmail();
@@ -140,6 +141,10 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
     public function canBeImpersonated(): bool
     {
         return $this->is_placeholder === false;
+    }
+    public function organizationMember()
+    {
+        return $this->hasOne(Member::class, 'user_id');
     }
 
     /**
@@ -166,8 +171,9 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
     }
     public function groups()
     {
-        return $this->belongsToMany(Teams::class);
+        return $this->belongsToMany(Groups::class, 'team_user', 'user_id', 'team_id');
     }
+
 
     /**
      * @return BelongsTo<Organization, User>

@@ -73,7 +73,7 @@ const groupOptions = computed(() =>
 );
 
 // For display
-const selectedGroupName = computed<string>(() => {
+const selectedGroupName = computed<string|'Select Group...'|'No Group Available'>(() => {
     return projectGroupMember.value.find(group => group.id === selectedGroupId.value)?.name || 'Select Group...';
 });
 
@@ -151,7 +151,7 @@ function clearGroupSelection() {
                 @click="clearGroupSelection" class="ml-3">
                 Clear
             </SecondaryButton> 
-            <PrimaryButton v-if="(selectedGroupName == 'Select Group...' && selectedGroupName != 'No Group Available')"
+            <PrimaryButton v-if="selectedGroupName == 'Select Group...'"
                 class="ms-3" :class="{ 'opacity-25': saving }" :disabled="saving" @click="submit">
                 Add Project Member
             </PrimaryButton> 

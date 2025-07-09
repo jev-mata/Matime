@@ -17,7 +17,7 @@ import { useProjectsStore } from '@/utils/useProjects';
 import { useClientsStore } from '@/utils/useClients';
 import { storeToRefs } from 'pinia';
 import { getOrganizationCurrencyString } from '@/utils/money';
-
+ 
 import TableRow from '@/Components/TableRow.vue';
 const props = defineProps<{
     projects: Project[];
@@ -87,14 +87,18 @@ const getClient = (clientID: string) => {
                     </SecondaryButton>
                 </div>
                 <template v-for="(project, index) in projects" :key="project.id" class="flex w-full flex-row">
-                    <TableRow class="w-full mt-5" v-if="project?.client_id !== projects[index - 1]?.client_id">
+                    <TableRow  class="w-full mt-5" v-if="project?.client_id !== projects[index - 1]?.client_id && !isAllowedToPerformPremiumAction()">
                         <div
                             class="whitespace-nowrap min-w-0 flex items-center space-x-5 3xl:pl-12 py-4 pr-3 text-sm font-medium text-text-primary pl-4 sm:pl-6 lg:pl-8 3xl:pl-12">
                             <div v-if="project.client_id" class="overflow-ellipsis overflow-hidden">
-                                {{ getClient(project?.client_id)?.name }}
+                                <div class="whitespace-nowrap min-w-0 px-3 py-4 text-sm text-text-secondary">
+                                    <div v-if="getClient(project?.client_id)" class="overflow-ellipsis overflow-hidden">
+                                        {{ getClient(project?.client_id)?.name }}
+                                    </div>
+                                    <div v-else>No client</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="whitespace-nowrap min-w-0 px-3 py-4 text-sm text-text-secondary"></div>
+                        </div> 
 
                         <div class="whitespace-nowrap px-3 py-4 text-sm text-text-secondary">
                         </div>
