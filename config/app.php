@@ -23,7 +23,7 @@ return [
     |
     */
 
-    'name' => 'solidtime',
+    'name' =>env('COMPANY'),
 
     'version' => env('APP_VERSION'),
 
