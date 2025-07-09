@@ -26,11 +26,13 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/shared-report', function () {
     return Inertia::render('SharedReport');
 })->name('shared-report');
- 
-Route::get('/invitations/{invitationId}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
-Route::post('/invitations/{invitationId}', [TeamInvitationController::class, 'accept'])
-    ->name('team-invitations.accept');
-
+Route::middleware([
+    'signed'
+])->group(function (): void {
+    Route::get('/invitations/{invitationId}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
+    Route::post('/invitations/{invitationId}', [TeamInvitationController::class, 'accept'])
+        ->name('team-invitations.accept');
+});
 Route::middleware([
     'auth:web',
     config('jetstream.auth_session'),
