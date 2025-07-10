@@ -70,7 +70,7 @@ const submit = async () => {
   goBack();
 
 }
-function formatDate(date: string) {
+function formatDate(date: number) {
   return new Date(date).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -81,7 +81,7 @@ function formatDate(date: string) {
 const formattedFrom = computed(() => formatDate2(page.props.from))
 const formattedTo = computed(() => formatDate2(page.props.to))
 
-function formatTime(dateString) {
+function formatTime(dateString: string) {
   return dateString ? dayjs(dateString).format('hh:mm:ss A') : '';
 }
 function duration(entry: { start: string; end: string }) {

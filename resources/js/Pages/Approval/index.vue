@@ -62,7 +62,7 @@ function duration(entry: { start: string; end: string }) {
 
 const props = defineProps<{ entries: any[]; period: any; totalHours: any, totalHoursNotForm: any; isSubmit: boolean ;isApproved: boolean }>()
 const entries = ref(props.entries)
-function formatDate(date: string) {
+function formatDate(date: number) {
   return new Date(date).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -111,7 +111,7 @@ const load = async () => {
 
 }
 
-function formatTime(dateString) {
+function formatTime(dateString:string) {
   return dateString ? dayjs(dateString).format('hh:mm:ss A') : '';
 }
 onMounted(() => {
