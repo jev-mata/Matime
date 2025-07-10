@@ -52,7 +52,7 @@ class ProjectController extends Controller
         $user = $this->user();
         $team = User::with('groups')->where('id', '=', Auth::user()->id)->first();
 
-        $projectsQuery = Project::with(['groups','client'])->orderBy('client_id')
+        $projectsQuery = Project::with(['groups', 'client'])->orderBy('client_id')
             ->whereBelongsTo($organization, 'organization');
 
         $ownerId = optional($organization->owner()->first())->id;
@@ -72,14 +72,19 @@ class ProjectController extends Controller
                 $projectsQuery->whereRaw('1 = 0');
             }
         }
-
         $projectsQuery->orderByRaw("
-        CASE 
-            WHEN name ~ '^[0-9]+' THEN (regexp_match(name, '^[0-9]+'))[1]::int
-            ELSE NULL
-        END
-    ")->orderBy('name');  
-    
+    CASE 
+        WHEN name ~ '^[0-9]+' THEN (regexp_match(name, '^[0-9]+'))[1]::int
+        ELSE NULL
+    END
+")->orderByRaw("
+    CASE 
+        WHEN name ~ '^[0-9]+' THEN NULL
+        ELSE name
+    END
+");
+
+
         // if (!$canViewAllProjects) {
         //     $projectsQuery->visibleByEmployee($user);
         // }

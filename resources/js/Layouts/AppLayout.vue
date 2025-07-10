@@ -260,7 +260,7 @@ const visibleMenu = computed(() => {
             <Banner />
             <BillingBanner v-if="isBillingActivated()" />
 
-            <div class="min-h-screen flex flex-col bg-neutral-800 border-l border-default-background-separator">
+            <div class="min-h-screen flex flex-col dark:bg-neutral-800 bg-neutral-200 border-l border-default-background-separator">
                 <!-- Page Heading -->
                 <header v-if="$slots.header"
                     class="bg-default-background border-b border-default-background-separator shadow">
