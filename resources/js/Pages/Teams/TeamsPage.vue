@@ -17,13 +17,37 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import Modal from '@/packages/ui/src/Modal.vue';
 const props = defineProps<{ organizationId: string }>();
+interface User {
+    id: string;
+    name: string;
+    // add more if needed
+}
+
+interface Project {
+    id: string;
+    name: string;
+    // add more if needed
+}
+
+interface Team {
+    id: string;
+    name: string;
+    users: User[];
+    projects: Project[];
+}
+
+interface Manager {
+    id: string;
+    users: User[];
+}
+
+const users = ref<User[]>([]);
+const projects = ref<Project[]>([]);
+const teams = ref<Team[]>([]);
+const managers = ref<User[]>([]);
 
 const newTeamName = ref('');
 const currentOrganization = ref('');
-const teams = ref<any[]>([]);
-const projects = ref<any[]>([]);
-const users = ref<any[]>([]);
-const managers = ref<any[]>([]);
 const search = ref('');
 
 const selectedProject = reactive<Record<string, any[]>>({});
@@ -77,7 +101,7 @@ async function fetchCurrentOrg() {
         selectedProject[team.id] = [...team.projects];
     });
 
-    res.data.managers.forEach(manager => {
+    res.data.managers.forEach((manager: Manager) => {
         selectedManagers[manager.id] = [...manager.users];
         managers.value.push(...manager.users);
     });
@@ -90,7 +114,7 @@ async function createTeam() {
     await fetchCurrentOrg();
 }
 
-async function assignProject(teamId: string, projectId: string[]) {
+async function assignProject(teamId: string, projectId: string) {
     await axios.post(`/teams/${teamId}/assign-project`, { project_id: projectId });
     await fetchCurrentOrg();
 }
@@ -242,7 +266,7 @@ const openDelete = ref(false)
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent class="min-w-[150px]" align="end">
                                         <DropdownMenuItem :aria-label="'Edit Group ' + team.name"
-                                            data-testid="project_edit"
+                                            data-testid="project_edit" @click="openEdit = true"
                                             class="flex items-center space-x-3 cursor-pointer">
                                             <PencilSquareIcon class="w-5 text-icon-active" />
                                             <span>Edit</span>
@@ -266,10 +290,13 @@ const openDelete = ref(false)
 
     <Modal :show="openEdit" @close="openEdit = false">
         <template #default>
-            <h2 class="text-lg font-bold mb-2">Hello from Modal!</h2>
-            <p class="text-gray-600 dark:text-gray-300">
-                This is a simple modal using the Dialog wrapper.
-            </p>
+            <div>
+
+                <h2 class="text-lg font-bold mb-2">Hello from Modal!</h2>
+                <p class="text-gray-600 dark:text-gray-300">
+                    This is a simple modal using the Dialog wrapper.
+                </p>
+            </div>
         </template>
 
         <template #footer>
@@ -279,4 +306,3 @@ const openDelete = ref(false)
         </template>
     </Modal>
 </template>
- 
