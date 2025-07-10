@@ -65,9 +65,8 @@ class ProjectController extends Controller
                     'groups',
                     fn($query) =>
                     $query->whereIn('id', $groupIds)
-                )->orderBy('name')->pluck('id');
-                $projectsQuery = Project::with('groups')
-                    ->whereIn('id', $projectIDs) // ✅ correct
+                )->with('tasks')->orderBy('name')->pluck('id');
+                $projectsQuery = $projectsQuery->whereIn('id', $projectIDs) // ✅ correct
                     ->orderBy('name');
             } else {
                 // User has no groups, return empty result

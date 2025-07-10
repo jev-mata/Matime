@@ -51,9 +51,9 @@ class TaskController extends Controller
             $query->where('project_id', '=', $projectId);
         }
 
-        if (! $canViewAllTasks) {
-            $query->visibleByEmployee($user);
-        }
+        // if (! $canViewAllTasks) {
+        //     $query->visibleByEmployee($user);
+        // }
         $doneFilter = $request->getFilterDone();
         if ($doneFilter === 'true') {
             $query->whereNotNull('done_at');

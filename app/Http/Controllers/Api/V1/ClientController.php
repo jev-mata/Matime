@@ -36,8 +36,7 @@ class ClientController extends Controller
      * @operationId getClients
      */
     public function index(Organization $organization, ClientIndexRequest $request): ClientCollection
-    {
-        $this->checkPermission($organization, 'clients:view');
+    { 
 
         $clientsQuery = Client::query()
             ->whereBelongsTo($organization, 'organization')
@@ -54,7 +53,22 @@ class ClientController extends Controller
 
         return new ClientCollection($clients);
     }
+    public function indexall(Organization $organization, ClientIndexRequest $request)
+    {
 
+        $clientsQuery = Client::query()
+            ->whereBelongsTo($organization, 'organization')
+            ->orderBy('created_at', 'desc');
+
+        $filterArchived = $request->getFilterArchived();
+        if ($filterArchived === 'true') {
+            $clientsQuery->whereNotNull('archived_at');
+        } elseif ($filterArchived === 'false') {
+            $clientsQuery->whereNull('archived_at');
+        }
+
+        return response()->json($clientsQuery->get());
+    }
     /**
      * Create client
      *

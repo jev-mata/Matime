@@ -6,6 +6,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\HomeController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;
@@ -27,7 +28,7 @@ Route::get('/shared-report', function () {
     return Inertia::render('SharedReport');
 })->name('shared-report');
 Route::middleware([
-    'web', 
+    'web',
 ])->group(function (): void {
     Route::get('/invitations/{invitation}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
     Route::post('/invitations/{invitation}', [TeamInvitationController::class, 'accept'])
@@ -66,7 +67,22 @@ Route::middleware([
     })->name(name: 'projects.show');
 
     Route::get('/clients', function () {
+        $user = Auth::user();
+        $currentOrgId = $user->currentOrganization->id;
+
+        $organization = $user->organizations()
+            ->where('organization_id', $currentOrgId)
+            ->first();
+
+        $role = $organization?->membership->role;
+
+        if ($role === 'employee') {
+            return redirect()->route('dashboard');
+        }
+
         return Inertia::render('Clients');
+
+
     })->name('clients');
 
     Route::get('/members', function () {
