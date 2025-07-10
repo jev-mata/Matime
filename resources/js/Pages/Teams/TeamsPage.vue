@@ -15,8 +15,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
-import Modal from '@/packages/ui/src/Modal.vue';
-const props = defineProps<{ organizationId: string }>();
+import Modal from '@/packages/ui/src/Modal.vue'; 
 interface User {
     id: string;
     name: string;
@@ -146,6 +145,7 @@ onMounted(() => {
 const getKeyFromItem = (item: any) => item.id;
 const getNameForItem = (item: any) => item.name;
 
+const openEdit = ref(false)
 const openEdit = ref(false)
 const openDelete = ref(false)
 </script>
@@ -290,19 +290,22 @@ const openDelete = ref(false)
 
     <Modal :show="openEdit" @close="openEdit = false">
         <template #default>
-            <div>
+            <div class="p-5">
 
-                <h2 class="text-lg font-bold mb-2">Hello from Modal!</h2>
-                <p class="text-gray-600 dark:text-gray-300">
-                    This is a simple modal using the Dialog wrapper.
-                </p>
+                <h2 class="text-lg font-bold mb-2">Edit Group Name</h2>
+                <input type="text" id="GroupName" placeholder="Enter a Group Name" class="w-full rounded">
             </div>
         </template>
 
         <template #footer>
-            <button @click="openEdit = false" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">
-                Close
-            </button>
+            <div class="p-5">
+                <button @click="openEdit = false" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">
+                    Cancel
+                </button>
+                <button @click="openEdit = false" class="bg-blue-800 text-white px-4 py-2 ml-2 rounded hover:bg-gray-700">
+                    Save
+                </button>
+            </div>
         </template>
     </Modal>
 </template>

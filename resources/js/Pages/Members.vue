@@ -43,7 +43,7 @@ const activeTab = ref<'all' | 'invitations' | 'teams'>('all');
         </MainContainer>
         <MemberTable v-if="activeTab === 'all'"></MemberTable>
         <InvitationTable v-if="activeTab === 'invitations'"></InvitationTable>
-        <TeamsPage v-if="activeTab === 'teams'">
+        <TeamsPage v-if="activeTab === 'teams'"  >
         </TeamsPage>
     </AppLayout>
 </template>
