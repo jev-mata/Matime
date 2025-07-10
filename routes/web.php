@@ -109,6 +109,8 @@ Route::middleware([
 
     Route::delete('/teams/{team}/projects/{project}', [TeamController::class, 'removeProject']);
     Route::delete('/teams/{team}/members/{user}', [TeamController::class, 'removeMember']);
+    Route::delete('/teams/{team}', [TeamController::class, 'removeGroup']);
+    Route::post('/teams/{team}/name/{name}', [TeamController::class, 'updateGroup']);
 
     Route::post('/teams/{teamid}/projects/{projectid}', [TeamController::class, 'assignTeam2Project']);
 

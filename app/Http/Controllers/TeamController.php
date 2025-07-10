@@ -130,6 +130,23 @@ class TeamController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function removeGroup(Teams $team)
+    {
+        $team->delete();
+        session()->flash('message', 'Team successfully removed!');
+
+        return response()->json(['success' => true]);
+    }
+    public function updateGroup(Teams $team, $name)
+    { 
+
+        $team->name = $name;
+        $team->save();
+        session()->flash('message', 'Team successfully removed!');
+
+        return response()->json(['success' => true]);
+    }
+
     public function store(Request $request)
     {
         $currentOrg = User::with('currentOrganization')->where('id', '=', Auth::user()->id)->get()->first();
