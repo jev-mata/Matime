@@ -7,6 +7,7 @@ import { themeSetting } from "@/utils/theme";
 
 const preferredColor = usePreferredColorScheme()
 
+const appName = import.meta.env.VITE_APP_NAME ?? 'this system';
 </script>
 
 <template>
@@ -14,18 +15,14 @@ const preferredColor = usePreferredColorScheme()
         <template #title> Theme</template>
 
         <template #description>
-            Choose how you want solidtime to look on your device
+            Choose how you want {{ appName }} to look on your device
         </template>
 
         <template #form>
 
             <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="theme" value="Theme" />
-                <select
-                    id="theme"
-                    v-model="themeSetting"
-                    name="theme"
-                    required
+                <select id="theme" v-model="themeSetting" name="theme" required
                     class="mt-1 block w-full border-input-border bg-input-background text-text-primary focus:border-input-border-active rounded-md shadow-sm">
                     <option value="system">System</option>
                     <option value="light">Light</option>
@@ -40,6 +37,4 @@ const preferredColor = usePreferredColorScheme()
 
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
