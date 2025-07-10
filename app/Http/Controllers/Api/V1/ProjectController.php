@@ -74,15 +74,11 @@ class ProjectController extends Controller
         }
         $projectsQuery->orderByRaw("
     CASE 
-        WHEN name ~ '^[0-9]+' THEN (regexp_match(name, '^[0-9]+'))[1]::int
+        WHEN name IS NOT NULL AND name ~ '^[0-9]+' 
+            THEN CAST((regexp_match(name, '^[0-9]+'))[1] AS INTEGER)
         ELSE NULL
     END
-")->orderByRaw("
-    CASE 
-        WHEN name ~ '^[0-9]+' THEN NULL
-        ELSE name
-    END
-");
+")->orderBy('name');
 
 
         // if (!$canViewAllProjects) {
