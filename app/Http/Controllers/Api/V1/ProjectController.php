@@ -112,7 +112,6 @@ class ProjectController extends Controller
         $projects = $project->load('organization');
 
         // Group by client name and apply natural sort on names
-        $grouped = $projects->groupBy('client.name')->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
 
 
         return new ProjectResource($projects, true);

@@ -223,7 +223,7 @@ function unSubmitBTN(date: Date | string | null) {
 }
 const getTimesheet = async () => {
 
-    const response = await axios.get('/api/time/showAll', {
+    const response = await axios.get('/api/v1/time/showAll', {
         withCredentials: true,
         headers: {
             Accept: 'application/json',
