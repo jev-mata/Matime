@@ -145,9 +145,8 @@ onMounted(() => {
 const getKeyFromItem = (item: any) => item.id;
 const getNameForItem = (item: any) => item.name;
 
-const openEdit = ref(false)
-const openEdit = ref(false)
-const openDelete = ref(false)
+const openEdit = ref(false);
+const openDelete = ref(false);
 </script>
 
 <template>
