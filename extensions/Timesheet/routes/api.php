@@ -25,10 +25,4 @@ Route::middleware([
     'auth:api', 
     'verified',
 ])->prefix('/time')->group(function () {
-    Route::get('/', [TimesheetController::class, 'index']);
-    Route::get('/show', [TimesheetController::class, 'show']);
-    Route::get('/showAll', [TimesheetController::class, 'showAll']);
-    Route::post('/submit', [TimesheetController::class, 'store']);
-    Route::post('{timesheet}/approve', [TimesheetController::class, 'approve']);
-    Route::post('{timesheet}/reject', [TimesheetController::class, 'reject']);
 });

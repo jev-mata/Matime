@@ -33,20 +33,22 @@ class TimesheetServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
 
 
-        if (function_exists('register_module_menu')) {
-            register_module_menu([
-                [
-                    'title' => 'Approval',
-                    'icon' => 'HandThumbUpIcon',
-                    'route' => 'approval.index',
-                    'href' => '/time/approval',
-                    'show' => true,
-                    'role' => ['manager'],
-                ],
-            ]);
-        }
+        // if (file_exists("extensions\Timesheet\helpers.php")) {
+        //     require_once 'extensions/Timesheet/helpers.php';
+        // }
 
-
+        // if (function_exists('register_module_menu')) {
+        //     register_module_menu([
+        //         [
+        //             'title' => 'Approval',
+        //             'icon' => 'HandThumbUpIcon',
+        //             'route' => 'approval.index',
+        //             'href' => '/time/approval',
+        //             'show' => true,
+        //             'role' => ['manager'],
+        //         ],
+        //     ]);
+        // }
     }
 
     /**

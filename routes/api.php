@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserMembershipController;
 use App\Http\Controllers\Api\V1\UserTimeEntryController;
 use App\Http\Controllers\TeamController;
+use Extensions\Timesheet\Http\Controllers\TimesheetController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -40,7 +41,7 @@ use League\OAuth2\Client\Provider\Google;
 
 Route::prefix('v1')->name('v1.')->group(static function (): void {
     Route::middleware([
-        'auth:api', 
+        'auth:api',
     ])->group(static function (): void {
         // Organization routes
         Route::name('organizations.')->group(static function (): void {
@@ -48,8 +49,15 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
             Route::put('/organizations/{organization}', [OrganizationController::class, 'update'])->name('update');
         });
 
+        Route::name('time.')->prefix('/time')->group(static function (): void {
 
-
+            Route::get('/', [TimesheetController::class, 'index'])->name('index');
+            Route::get('/show', [TimesheetController::class, 'show'])->name('show');
+            Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll');
+            Route::post('/submit', [TimesheetController::class, 'store'])->name('store');
+            Route::post('{timesheet}/approve', [TimesheetController::class, 'approve'])->name('approve');
+            Route::post('{timesheet}/reject', [TimesheetController::class, 'reject'])->name('reject');
+        });
         // Member routes
         Route::name('members.')->prefix('/organizations/{organization}')->group(static function (): void {
             Route::get('/members', [MemberController::class, 'index'])->name('index');

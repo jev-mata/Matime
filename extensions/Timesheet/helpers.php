@@ -8,5 +8,4 @@ if (!function_exists('register_module_menu')) {
     {
         app('module_menus')->push(...$items);
     }
-}
-dd(timesheet_helper());
+} 

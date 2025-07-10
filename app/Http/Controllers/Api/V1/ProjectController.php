@@ -52,7 +52,7 @@ class ProjectController extends Controller
         $user = $this->user();
         $team = User::with('groups')->where('id', '=', Auth::user()->id)->first();
 
-        $projectsQuery = Project::with('groups')
+        $projectsQuery = Project::with(['groups','client'])->orderBy('client_id')
             ->whereBelongsTo($organization, 'organization');
 
         $ownerId = optional($organization->owner()->first())->id;
@@ -66,14 +66,20 @@ class ProjectController extends Controller
                     fn($query) =>
                     $query->whereIn('id', $groupIds)
                 )->with('tasks')->orderBy('name')->pluck('id');
-                $projectsQuery = $projectsQuery->whereIn('id', $projectIDs) // ✅ correct
-                    ->orderBy('name');
+                $projectsQuery = $projectsQuery->whereIn('id', $projectIDs); // ✅ correct
             } else {
                 // User has no groups, return empty result
                 $projectsQuery->whereRaw('1 = 0');
             }
         }
 
+        $projectsQuery->orderByRaw("
+        CASE 
+            WHEN name ~ '^[0-9]+' THEN (regexp_match(name, '^[0-9]+'))[1]::int
+            ELSE NULL
+        END
+    ")->orderBy('name');  
+    
         // if (!$canViewAllProjects) {
         //     $projectsQuery->visibleByEmployee($user);
         // }
@@ -103,10 +109,13 @@ class ProjectController extends Controller
 
         // Note: There is currently no need to check if a user is a member of the project,
         // since this is only relevant for users with the role "employee" and they can not access this endpoint.
+        $projects = $project->load('organization');
 
-        $project->load('organization');
+        // Group by client name and apply natural sort on names
+        $grouped = $projects->groupBy('client.name')->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
 
-        return new ProjectResource($project, true);
+
+        return new ProjectResource($projects, true);
     }
 
     /**

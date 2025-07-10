@@ -16,17 +16,11 @@
     "autoload": {
         "psr-4": {
             "Extensions\\Timesheet\\": "extensions/Timesheet/"
-        },
-        "files": [
-            "extensions/Timesheet/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
             "Extensions\\Timesheet\\Tests\\": "tests/"
-        },
-        "files": [
-            "extensions/Timesheet/helpers.php"
-        ]
+        }
     }
 }
