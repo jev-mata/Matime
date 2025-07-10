@@ -1,10 +1,19 @@
 <script>
 import axios from 'axios';
-import Multiselect from 'vue-multiselect';
-import 'vue-multiselect/dist/vue-multiselect.min.css';
+import Multiselect from '@vueform/multiselect';
+import ProjectMultiselectDropdown from '@/Components/Common/Project/ProjectMultiselectDropdown.vue';
+import MemberMultiselectDropdown from '@/Components/Common/Member/MemberMultiselectDropdown.vue';
+import ReportingFilterBadge from '@/Components/Common/Reporting/ReportingFilterBadge.vue';
+import { FolderIcon } from '@heroicons/vue/16/solid';
 
+import MultiselectDropdown from '@/packages/ui/src/Input/MultiselectDropdown.vue';
+import {
+    UserGroupIcon,
+} from '@heroicons/vue/20/solid';
 export default {
-    components: { Multiselect },
+    components: {
+        Multiselect, MultiselectDropdown
+    },
     props: ['organizationId'],
     data() {
         return {
@@ -175,107 +184,22 @@ export default {
         this.fetchCurrentOrg();
     },
 };
+
+export const FolderIcons = () => h(FolderIcon)
+export const UserGroupIcons = () => h(UserGroupIcon)
+export function getKeyFromItem(item) {
+    return item.id;
+}
+
+export function getNameForItem(item) {
+    return item.name;
+} 
 </script>
 
-<style scoped>
-.multiselect {
-    --tw-bg-opacity: 1;
-    background-color: #1f2937 !important;
-    /* Tailwind's bg-gray-800 */
-    /* gray-800 */
-    /* gray-600 */
-    color: white;
-    border-radius: 0.375rem;
-}
-
-.multiselect__control {
-    background-color: #1f2937 !important;
-    /* Tailwind's bg-gray-800 */
-    border-color: #4b5563;
-    /* Tailwind's border-gray-600 */
-    color: #d1d5db;
-    /* Tailwind's text-gray-300 */
-}
-
-.multiselect__content-wrapper {
-    background-color: #1f2937 !important;
-    /* dropdown */
-    color: #d1d5db;
-    /* dropdown items text color */
-}
-
-.multiselect__option--highlight {
-    background-color: #2563eb !important;
-    /* Tailwind blue-600 */
-    color: white;
-}
-</style>
 <style>
-/* Force override styles */
-.multiselect {
-    background-color: #1f2937 !important;
-    /* bg-gray-800 */
-    border-color: #4b5563 !important;
-    /* border-gray-600 */
-    color: #d1d5db !important;
-    /* text-gray-300 */
-}
-
-.multiselect__tag {
-
-    background-color: #094d00 !important;
-}
-
-.multiselect__tag-icon::after {
-
-    color: #ffffff !important;
-}
-
-.multiselect__input,
-.multiselect__single,
-.multiselect__tags,
-.multiselect__option {
-    background-color: #1f2937 !important;
-    color: #d1d5db !important;
-    border-color: #1f2937 !important;
-}
-
-.multiselect__content-wrapper {
-    background-color: #1f2937 !important;
-    border-color: #4b5563 !important;
-}
-
-/* Hide the dropdown arrow */
-.no-arrow .multiselect__select {
-    display: none;
-}
-
-/* Hide the 'x' on each selected tag */
-.no-remove .multiselect__tag-icon {
-    display: none;
-    pointer-events: none;
-}
-
 .bg-panel {
 
     background-color: #04070c !important;
-}
-
-.visually-enabled.multiselect--disabled {
-    background-color: white;
-    opacity: 1;
-    pointer-events: none;
-    /* Still prevents interaction */
-    color: #111827;
-    /* Optional: normal text */
-}
-
-/* Optional: fix the cursor */
-.visually-enabled.multiselect--disabled .multiselect__single,
-.visually-enabled.multiselect--disabled .multiselect__tags {
-    cursor: default;
-    color: #111827;
-    /* Normal dark text */
 }
 </style>
 <template>
@@ -355,30 +279,45 @@ export default {
                         </td>
                         <td class="px-4 py-2 align-top">
                             <div>
-                                <Multiselect :model-value="selectedUsers[team.id]"
+
+                                <MemberMultiselectDropdown v-model="selectedMembers"
+                                    @submit="updateFilteredTimeEntries">
+                                    <template #trigger>
+                                        <ReportingFilterBadge :count="selectedMembers.length"
+                                            :active="selectedMembers.length > 0" title="Members" :icon="UserGroupIcon">
+                                        </ReportingFilterBadge>
+                                    </template>
+                                </MemberMultiselectDropdown>
+                                <ProjectMultiselectDropdown v-model="selectedProjects"
+                                    @submit="updateFilteredTimeEntries">
+                                    <template #trigger>
+                                        <ReportingFilterBadge :count="selectedProjects.length"
+                                            :active="selectedProjects.length > 0" title="Projects" :icon="FolderIcon">
+                                        </ReportingFilterBadge>
+                                    </template>
+                                </ProjectMultiselectDropdown>
+                                <!-- <MultiselectDropdown :model-value="selectedUsers[team.id]"
                                     @update:modelValue="onUsersChanged($event, team)" :options="users" :multiple="true"
                                     :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                                    placeholder="Search and select users" label="name" track-by="id" class="mt-1" />
-
-
-                                <!-- Optional Save Button -->
+                                    placeholder="Search and select users" label="name" track-by="id" class="mt-1">
+                                </MultiselectDropdown> -->
                             </div>
                         </td>
 
                         <div>
-                            <Multiselect :model-value="selectedProject[team.id]"
+                            <MultiselectDropdown :model-value="selectedProject[team.id]"
                                 @update:modelValue="onProjectChange($event, team)" :options="projects" :multiple="true"
                                 :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                                placeholder="Search and select projects" label="name" track-by="id" class="mt-1" />
-
+                                placeholder="Search and select projects" label="name" track-by="id" class="mt-1">
+                            </MultiselectDropdown>
 
                         </div>
                         <td class="px-4 py-2 align-top">
                             <Multiselect :model-value="selectedManagers[team.id]"
                                 @update:modelValue="onUsersChanged($event, team)" :options="managers" :multiple="true"
                                 :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                                placeholder="No Manager Assigned" label="name" track-by="id" :disabled="true"
-                                class="mt-1 no-arrow no-remove visually-enabled" />
+                                :hide-selected="true" placeholder="No Manager Assigned" label="name" track-by="id"
+                                :disabled="true" class="mt-1 no-arrow no-remove visually-enabled" />
 
 
                         </td>

@@ -60,7 +60,12 @@ class TaskController extends Controller
         } elseif ($doneFilter === 'false') {
             $query->whereNull('done_at');
         }
-
+        $query->orderByRaw("
+        CASE 
+            WHEN name ~ '^[0-9]+' THEN (regexp_match(name, '^[0-9]+'))[1]::int
+            ELSE NULL
+        END
+    ")->orderBy('name');
         $tasks = $query->paginate(config('app.pagination_per_page_default'));
 
         return new TaskCollection($tasks);

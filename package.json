@@ -49,6 +49,7 @@
         "@tanstack/vue-table": "^8.21.2",
         "@vue/eslint-config-prettier": "^10.2.0",
         "@vue/eslint-config-typescript": "^14.3.0",
+        "@vueform/multiselect": "^2.6.11",
         "@vueuse/core": "^12.5.0",
         "@vueuse/integrations": "^12.5.0",
         "class-variance-authority": "^0.7.1",
@@ -65,7 +66,6 @@
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
         "vue-echarts": "^7.0.3",
-        "vue-multiselect": "^3.2.0",
         "vue-router": "^4.5.1"
     },
     "overrides": {
