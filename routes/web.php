@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
+use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\HomeController;
-use Extensions\Timesheet\Http\Controllers\TimesheetController;
+use App\Models\Timesheet; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

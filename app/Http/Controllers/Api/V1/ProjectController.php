@@ -57,8 +57,9 @@ class ProjectController extends Controller
 
         $ownerId = optional($organization->owner()->first())->id;
         $userId = auth()->id();
-
-        if ($ownerId !== $userId) {
+        if ($this->member($organization)->role === Role::Admin->value) {
+            Log::info("admin");
+        } else if ($ownerId !== $userId) {
             $groupIds = $team->groups->pluck('id');
             if ($groupIds->isNotEmpty()) {
                 $projectIDs = $projectsQuery->whereHas(

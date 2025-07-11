@@ -22,7 +22,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserMembershipController;
 use App\Http\Controllers\Api\V1\UserTimeEntryController;
 use App\Http\Controllers\TeamController;
-use Extensions\Timesheet\Http\Controllers\TimesheetController;
+use App\Http\Controllers\TimesheetController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -35,8 +35,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
 |
-*/
-use League\OAuth2\Client\Provider\Google;
+*/ 
 
 
 Route::prefix('v1')->name('v1.')->group(static function (): void {

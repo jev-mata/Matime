@@ -13,6 +13,7 @@ import axios from "axios";
 import { ref } from "vue";
 import dayjs from "dayjs";
 import ProjectBadge from "@/packages/ui/src/Project/ProjectBadge.vue";
+import Modal from "@/packages/ui/src/Modal.vue";
 
 const queryClient = useQueryClient();
 const refreshDashboardData = () => {
@@ -102,20 +103,19 @@ function duration(entry: { start: string; end: string }) {
 
 <template>
   <AppLayout title="Dashboard" data-testid="dashboard_view">
-
+ 
     <div
       class="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pt-3 sm:pt-5 pb-4 sm:pb-6  items-stretch">
-      <div @click.self="goBack" class="fixed inset-0 z-50 flex items-center justify-center"
-        style="background-color: rgba(0,0,0,0.8);">
+      <div  class="fixed inset-0 z-50 flex items-center justify-center">
 
         <!-- Modal -->
-        <div class=" my-1 p-5 border-2 bg-background " style="width: 55%;">
+        <div class=" my-1 p-5 border-2 bg-quaternary " style="width: 55%;">
           <div class="col-span-full my-1 py-1">
             <h2 class="text-lg font-semibold mb-1">My Entries</h2>
             <div class="text-md mb-2">{{ formattedFrom }} - {{ formattedTo }}</div>
             <div class="max-h-20 overflow-y-scroll " style="max-height: 50vh;">
               <div v-for="(entries, date2) in page.props.entries" :key="date2" class="mt-4 mb-4 border">
-                <h2 class="font-semibold text-md py-2 px-3 bg-gray-900 text-gray-300">{{ formatDate(date2) }}</h2>
+                <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">{{ formatDate(date2) }}</h2>
 
                 <ul class="">
                   <li v-for="entry in entries" :key="entry.id" class="flex flex-row px-3 rounded border py-2">

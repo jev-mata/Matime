@@ -1,13 +1,13 @@
 <?php
 
-namespace Extensions\Timesheet\Http\Controllers;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+ 
 use App\Models\Organization;
 use App\Models\Tag;
 use App\Models\TimeEntry;
 use App\Models\User;
-use Extensions\Timesheet\Models\Timesheet;
+use App\Models\Timesheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;

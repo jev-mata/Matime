@@ -61,7 +61,6 @@ class TaskController extends Controller
             $query->whereNull('done_at');
         } 
 
-
         $tasks = $query->paginate(config('app.pagination_per_page_default'));
 
         return new TaskCollection($tasks);
