@@ -6,6 +6,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\HomeController;
+use Extensions\Timesheet\Http\Controllers\TimesheetController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -117,7 +118,15 @@ Route::middleware([
     Route::post('/teams/{team}/assign-project', [TeamController::class, 'assignProject']);
     Route::post('/get/current/org', [TeamController::class, 'getOrg']);
     Route::post('/teams/{team}/assign-members', [TeamController::class, 'assignMembers']);
+    Route::name('approval.')->prefix('/approval')->group(static function (): void {
 
+        Route::get('/', [TimesheetController::class, 'approval'])->name('index');
+        Route::get('/show', [TimesheetController::class, 'show'])->name('show');
+        Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll');
+        Route::post('/submit', [TimesheetController::class, 'store'])->name('store');  
+        Route::post('{timesheet}/approve', [TimesheetController::class, 'approve'])->name('approve');
+        Route::post('{timesheet}/reject', [TimesheetController::class, 'reject'])->name('reject');
+    });
 });
 
 // Route::get('/team-invitation/view', [TeamInvitationController::class, 'showAcceptPage']);

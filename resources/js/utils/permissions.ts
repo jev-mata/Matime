@@ -15,8 +15,7 @@ function currentUserHasPermission(permission: string) {
 
 export function canUpdateOrganization() {
     return currentUserHasPermission('organizations:update');
-}
-
+}  
 export function canViewProjects() {
     return currentUserHasPermission('projects:view');
 }

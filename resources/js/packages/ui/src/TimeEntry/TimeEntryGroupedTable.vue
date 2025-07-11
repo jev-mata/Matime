@@ -238,17 +238,17 @@ const getTimesheet = async () => {
 <template>
 
     <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="">
-        <div class=" border border-1 border-gray-700 mt-5 border-b-4">
+        <div class=" border border-1 border-tertiary mt-5 border-b-4">
 
-            <div class=" bg-gray-900   border-1 p-1 ">
+            <div class=" bg-default-background   border-1 p-1 ">
 
                 <button @click="SubmitBTN(getFirstDayKey(bimonthly.days))" v-if="!bimonthly.isSubmitted"
-                    class=" p-2 border-1 mx-2 button text-blue-400">
+                    class=" p-2 border-1 mx-2 button text-blue-500">
                     submit
                 </button>
                 <button @click="unSubmitBTN(getFirstDayKey(bimonthly.days))"
                     v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
-                    class=" p-2 border-1 mx-2 button text-blue-400">
+                    class=" p-2 border-1 mx-2 button text-blue-500">
                     unsubmit
                 </button>
 

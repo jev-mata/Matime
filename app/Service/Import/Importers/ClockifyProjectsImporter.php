@@ -46,9 +46,8 @@ class ClockifyProjectsImporter extends DefaultImporter
                         'estimated_time' => $record['Estimated (h)'] !== '' && is_numeric($record['Estimated (h)']) ? (int) ($record['Estimated (h)'] * 3600) : null,
                     ]);
                 }
-
-                if ($record['Task'] !== '') {
-                    $tasks = preg_split('/, (?=\d+[a-z]?\.|\d+\.)/', $record['Task']);
+                if (!empty($record['CleanedTasks'])) {
+                    $tasks = json_decode($record['CleanedTasks'], true); // convert JSON string to PHP array
 
                     foreach ($tasks as $task) {
                         $this->taskImportHelper->getKey([
@@ -58,6 +57,7 @@ class ClockifyProjectsImporter extends DefaultImporter
                         ]);
                     }
                 }
+
             }
         } catch (ImportException $exception) {
             throw $exception;
@@ -85,8 +85,8 @@ class ClockifyProjectsImporter extends DefaultImporter
             'Task',
         ];
         foreach ($requiredFields as $requiredField) {
-            if (! in_array($requiredField, $header, true)) {
-                throw new ImportException('Invalid CSV header, missing field: '.$requiredField);
+            if (!in_array($requiredField, $header, true)) {
+                throw new ImportException('Invalid CSV header, missing field: ' . $requiredField);
             }
         }
     }

@@ -228,7 +228,7 @@ class TimesheetController extends Controller
         $hours = floor($totalSeconds / 3600);
         $minutes = floor(($totalSeconds % 3600) / 60);
         $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
-        return Inertia::render('Timesheet::approval', [ 
+        return Inertia::render('Approval/approval', [ 
             'entries' => $grouped,
             'totalHours' => $totalFormatted,
             'totalHoursNotForm' => $hours . '.' . $minutes, 
@@ -236,6 +236,8 @@ class TimesheetController extends Controller
             'timesheet' => $timesheet
         ]);
     }
+
+     
 
 
     public function reject($id)

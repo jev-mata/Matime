@@ -49,7 +49,7 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
             Route::put('/organizations/{organization}', [OrganizationController::class, 'update'])->name('update');
         });
 
-        Route::name('time.')->prefix('/time')->group(static function (): void {
+        Route::name('approval.')->prefix('/time')->group(static function (): void {
 
             Route::get('/', [TimesheetController::class, 'index'])->name('index');
             Route::get('/show', [TimesheetController::class, 'show'])->name('show');

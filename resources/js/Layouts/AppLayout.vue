@@ -124,12 +124,9 @@ const extensionMenu = computed<ExtensionMenuItem[]>(() =>
     (page.props.extensionMenu as ExtensionMenuItem[]) ?? []
 );
 
-
-const visibleMenu = computed(() => {
-    return extensionMenu.value.filter(item =>
-        item.role === page.props.auth.user.role || item.role === 'any' || page.props.auth.user.role === 'owner'
-    );
-});
+const canApprove = () => {
+    return true;
+}
 </script>
 
 <template>
@@ -203,9 +200,9 @@ const visibleMenu = computed(() => {
                                 isInvoicingActivated() && canViewInvoices()
                             " title="Invoices" :icon="DocumentTextIcon" :current="route().current('invoices')"
                                 href="/invoices"></NavigationSidebarItem>
-                            <NavigationSidebarLink v-for="item in visibleMenu" :key="item.title" :title="item.title"
-                                :icon="resolveIcon(item.icon)" :current="route().current(item.route)" :href="item.href"
-                                class="max-w-40" />
+                            <NavigationSidebarItem v-if="canApprove()
+                            " title="Approval" :icon="HandThumbUpIcon" :current="route().current('approval.index')"
+                                :href="route('approval.index')"></NavigationSidebarItem>
 
 
 

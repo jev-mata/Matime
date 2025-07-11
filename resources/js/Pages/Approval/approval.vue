@@ -12,6 +12,7 @@ import { computed } from "vue";
 import axios from "axios";
 import { ref } from "vue";
 import dayjs from "dayjs";
+import ProjectBadge from "@/packages/ui/src/Project/ProjectBadge.vue";
 
 const queryClient = useQueryClient();
 const refreshDashboardData = () => {
@@ -102,13 +103,13 @@ function duration(entry: { start: string; end: string }) {
 <template>
   <AppLayout title="Dashboard" data-testid="dashboard_view">
 
-    <MainContainer
-      class="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pt-3 sm:pt-5 pb-4 sm:pb-6 border-b border-default-background-separator items-stretch">
+    <div
+      class="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pt-3 sm:pt-5 pb-4 sm:pb-6  items-stretch">
       <div @click.self="goBack" class="fixed inset-0 z-50 flex items-center justify-center"
         style="background-color: rgba(0,0,0,0.8);">
 
         <!-- Modal -->
-        <div class=" my-1 p-5 border-2 " style="width: 55%;">
+        <div class=" my-1 p-5 border-2 bg-background " style="width: 55%;">
           <div class="col-span-full my-1 py-1">
             <h2 class="text-lg font-semibold mb-1">My Entries</h2>
             <div class="text-md mb-2">{{ formattedFrom }} - {{ formattedTo }}</div>
@@ -176,6 +177,6 @@ function duration(entry: { start: string; end: string }) {
         </div>
       </div>
 
-    </MainContainer>
+    </div>
   </AppLayout>
 </template>
