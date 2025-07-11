@@ -132,6 +132,16 @@ async function createTag(tag: string) {
 }
 
 const { tags } = storeToRefs(useTagsStore());
+
+const sortedTasks = computed(() => {
+  const collator = new Intl.Collator(undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  });
+
+  // Copy first, then sort
+  return [...tasks.value].sort((a, b) => collator.compare(a.name, b.name));
+});
 </script>
 
 <template>
@@ -144,7 +154,7 @@ const { tags } = storeToRefs(useTagsStore());
 
         <TimeTrackerControls v-model:current-time-entry="currentTimeEntry" v-model:live-timer="now" :create-project
             :enable-estimated-time="isAllowedToPerformPremiumAction()" :can-create-project="canCreateProjects()"
-            :create-client :clients :tags :tasks :projects :create-tag :is-active
+            :create-client :clients :tags :tasks="sortedTasks" :projects :create-tag :is-active
             :currency="getOrganizationCurrencyString()" @start-live-timer="startLiveTimer"
             @stop-live-timer="stopLiveTimer" @start-timer="setActiveState(true)" @stop-timer="setActiveState(false)"
             @update-time-entry="updateTimeEntry"></TimeTrackerControls>

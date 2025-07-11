@@ -59,14 +59,8 @@ class TaskController extends Controller
             $query->whereNotNull('done_at');
         } elseif ($doneFilter === 'false') {
             $query->whereNull('done_at');
-        }
-        $query->orderByRaw("
-    CASE 
-        WHEN name IS NOT NULL AND name ~ '^[0-9]+' 
-            THEN CAST((regexp_match(name, '^[0-9]+'))[1] AS INTEGER)
-        ELSE NULL
-    END
-")->orderBy('name');
+        } 
+
 
         $tasks = $query->paginate(config('app.pagination_per_page_default'));
 

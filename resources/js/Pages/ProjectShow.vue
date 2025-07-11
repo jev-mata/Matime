@@ -57,6 +57,7 @@ onMounted(() => {
         useProjectMembersStore().fetchProjectMembers(projectId);
     }
     useTasksStore().fetchTasks();
+    
 });
 
 const showEditProjectModal = ref(false);
@@ -77,34 +78,25 @@ const shownTasks = computed(() => {
 
 <template>
     <AppLayout title="Projects" data-testid="projects_view">
-        <MainContainer
-            class="py-5 border-b border-default-background-separator flex justify-between items-center">
+        <MainContainer class="py-5 border-b border-default-background-separator flex justify-between items-center">
             <nav class="flex" aria-label="Breadcrumb">
                 <ol role="list" class="flex items-center space-x-2">
                     <li>
                         <div class="flex items-center space-x-6">
-                            <Link
-                                :href="route('projects')"
-                                class="flex items-center space-x-2.5">
-                                <FolderIcon
-                                    class="w-6 text-icon-default"></FolderIcon>
-                                <span class="font-medium">Projects</span>
+                            <Link :href="route('projects')" class="flex items-center space-x-2.5">
+                            <FolderIcon class="w-6 text-icon-default"></FolderIcon>
+                            <span class="font-medium">Projects</span>
                             </Link>
                         </div>
                     </li>
                     <li>
-                        <div
-                            class="flex items-center space-x-3 text-text-primary font-semibold text-base">
-                            <ChevronRightIcon
-                                class="h-5 w-5 flex-shrink-0 text-text-secondary"
-                                aria-hidden="true" />
+                        <div class="flex items-center space-x-3 text-text-primary font-semibold text-base">
+                            <ChevronRightIcon class="h-5 w-5 flex-shrink-0 text-text-secondary" aria-hidden="true" />
                             <div class="flex space-x-3 items-center">
-                                <div
-                                    :style="{
-                                        backgroundColor: project?.color,
-                                        boxShadow: `var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) ${project?.color}30`,
-                                    }"
-                                    class="w-3 h-3 rounded-full"></div>
+                                <div :style="{
+                                    backgroundColor: project?.color,
+                                    boxShadow: `var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) ${project?.color}30`,
+                                }" class="w-3 h-3 rounded-full"></div>
                                 <span>{{ project?.name }}</span>
                             </div>
                         </div>
@@ -123,24 +115,19 @@ const shownTasks = computed(() => {
                         }}
                         / h
                     </Badge>
-                    <Badge
-                        v-if="project?.is_billable && !project?.billable_rate">
+                    <Badge v-if="project?.is_billable && !project?.billable_rate">
                         Default Rate
                     </Badge>
                     <Badge v-if="!project?.is_billable"> Non-Billable </Badge>
                 </div>
             </nav>
             <div>
-                <SecondaryButton
-                    v-if="canCreateProjects()"
-                    :icon="PencilSquareIcon"
+                <SecondaryButton v-if="canCreateProjects()" :icon="PencilSquareIcon"
                     @click="showEditProjectModal = true">
                     Edit Project
                 </SecondaryButton>
-                <ProjectEditModal
-                    v-if="project"
-                    v-model:show="showEditProjectModal"
-                    :original-project="project"></ProjectEditModal>
+                <ProjectEditModal v-if="project" v-model:show="showEditProjectModal" :original-project="project">
+                </ProjectEditModal>
             </div>
         </MainContainer>
         <MainContainer>
@@ -148,56 +135,40 @@ const shownTasks = computed(() => {
                 <div>
                     <CardTitle title="Tasks" :icon="CheckCircleIcon">
                         <template #actions>
-                            <div
-                                class="w-full items-center flex justify-between">
+                            <div class="w-full items-center flex justify-between">
                                 <div class="pl-6">
                                     <TabBar v-model="activeTab">
-                                        <TabBarItem value="active"
-                                            >Active
+                                        <TabBarItem value="active">Active
                                         </TabBarItem>
-                                        <TabBarItem value="done"
-                                            >Done
+                                        <TabBarItem value="done">Done
                                         </TabBarItem>
                                     </TabBar>
                                 </div>
-                                <SecondaryButton
-                                    v-if="canCreateTasks()"
-                                    :icon="PlusIcon"
-                                    @click="createTask = true"
-                                    >Create Task
+                                <SecondaryButton v-if="canCreateTasks()" :icon="PlusIcon" @click="createTask = true">
+                                    Create Task
                                 </SecondaryButton>
-                                <TaskCreateModal
-                                    v-model:show="createTask"
-                                    :project-id="projectId"></TaskCreateModal>
+                                <TaskCreateModal v-model:show="createTask" :project-id="projectId"></TaskCreateModal>
                             </div>
                         </template>
                     </CardTitle>
                     <Card>
-                        <TaskTable
-                            :tasks="shownTasks"
-                            :project-id="projectId"></TaskTable>
+                        <TaskTable :tasks="shownTasks" :project-id="projectId"></TaskTable>
                     </Card>
                 </div>
                 <div v-if="canViewProjectMembers()">
                     <CardTitle title="Project Members" :icon="UserGroupIcon">
                         <template #actions>
-                            <SecondaryButton
-                                :icon="PlusIcon"
-                                @click="createProjectMember = true">
+                            <SecondaryButton :icon="PlusIcon" @click="createProjectMember = true">
                                 Add Member
                             </SecondaryButton>
-                            <ProjectMemberCreateModal
-                                v-model:show="createProjectMember"
-                                :project-id="projectId"
-                                :existing-members="
-                                    projectMembers
-                                "></ProjectMemberCreateModal>
+                            <ProjectMemberCreateModal v-model:show="createProjectMember" :project-id="projectId"
+                                :existing-members="projectMembers
+                                    "></ProjectMemberCreateModal>
                         </template>
                     </CardTitle>
                     <Card>
-                        <ProjectMemberTable
-                            :project-members="projectMembers"  
-                            :project-id="projectId"></ProjectMemberTable>
+                        <ProjectMemberTable :project-members="projectMembers" :project-id="projectId">
+                        </ProjectMemberTable>
                     </Card>
                 </div>
             </div>
