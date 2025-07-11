@@ -114,17 +114,14 @@ class TeamController extends Controller
     }
     public function removeProject(Teams $team, Project $project)
     {
-        if ($project->team_id !== $team->id) {
-            return response()->json(['error' => 'Not assigned to this team'], 400);
-        }
 
-        $project->team_id = null;
-        $project->save();
+        $team->projects()->detach([$project->id]); // many-to-many attach
 
         return response()->json(['success' => true]);
     }
     public function removeMember(Teams $team, User $user)
     {
+
         $team->users()->detach($user->id);
 
         return response()->json(['success' => true]);

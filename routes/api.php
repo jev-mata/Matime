@@ -52,8 +52,7 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
 
             Route::get('/', [TimesheetController::class, 'index'])->name('index');
             Route::get('/show', [TimesheetController::class, 'show'])->name('show');
-            Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll');
-            Route::post('/submit', [TimesheetController::class, 'store'])->name('store');
+            Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll'); 
             Route::post('{timesheet}/approve', [TimesheetController::class, 'approve'])->name('approve');
             Route::post('{timesheet}/reject', [TimesheetController::class, 'reject'])->name('reject');
         });

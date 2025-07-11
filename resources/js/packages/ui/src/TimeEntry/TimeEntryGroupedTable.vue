@@ -21,6 +21,7 @@ import TimeEntryRow from '@/packages/ui/src/TimeEntry/TimeEntryRow.vue';
 import type { TimeEntriesGroupedByType } from '@/types/time-entries';
 import axios from 'axios';
 
+import Submit from '@/Pages/Timesheet/Submit.vue';
 import {
     type TimeEntriesQueryParams,
 } from '@/packages/api/src';
@@ -55,6 +56,19 @@ type GroupedTimeEntries = Record<
         days: Record<string, TimeEntriesGroupedByType[]>; // daily breakdown
     }
 >
+
+export interface PreviewSheet {
+    entries: any[]
+    totalHours: string
+    totalHoursNotForm: any
+    isSubmit: boolean
+    period: {
+        from: string
+        to: string
+    }
+    timesheet: any[]
+    isApproved: boolean
+}
 export type TimesheetRecord = {
     id: string;
     user_id: string;
@@ -90,7 +104,7 @@ function getBimonthlyKey(dateInput: string | Date): string {
 
 
 function isSameBimonthlyPeriod(entryDate: string | Date, submittedEntries: TimesheetRecord[]): boolean {
-    const entryKey = getBimonthlyKey(entryDate); 
+    const entryKey = getBimonthlyKey(entryDate);
     return submittedEntries.some((submission) => {
         const submissionKey = getBimonthlyKey(submission.date_start);
         return submissionKey === entryKey;
@@ -209,18 +223,44 @@ function getFirstDayKey(days: Record<string, any>) {
     return keys.length ? keys[0] : null;
 }
 
-function SubmitBTN(date: Date | string | null) {
+async function SubmitBTN(date: Date | string | null) {
     if (date == null)
         return;
-    dayjs(date, 'MM-DD-YYYY');
-    window.location.href = `/time/submit?date=${date}`;
+
+
+    try {
+        const response = await axios.get(
+            `/timesheet/submit?date=${date}`,
+            {
+                withCredentials: true,
+                headers: {
+                    Accept: 'application/json',
+                },
+            }
+        );
+
+        previewSheets.value = response.data;
+        console.log('response.data:', response.data);
+    } catch (error) {
+        console.error('Unsubmit failed:', error);
+        // Optionally show a toast or alert
+    }
 }
-function unSubmitBTN(date: Date | string | null) {
-    if (date == null)
-        return;
-    dayjs(date, 'MM-DD-YYYY');
-    window.location.href = `/time/unsubmit?date=${date}`;
+async function unSubmitBTN(date: Date | string | null) {
+    if (date == null) return;
+
+    try {
+        const response = await axios.post(
+            `/timesheet/unsubmit?date=${date}`
+        );
+        getTimesheet();
+        console.log('response.data:', response.data);
+    } catch (error) {
+        console.error('Unsubmit failed:', error);
+        // Optionally show a toast or alert
+    }
 }
+
 const getTimesheet = async () => {
 
     const response = await axios.get('/api/v1/time/showAll', {
@@ -233,6 +273,15 @@ const getTimesheet = async () => {
 
     return data;
 }
+
+function clearClick() {
+
+    previewSheets.value = null
+}
+
+const previewSheets = ref<PreviewSheet | null>(null);
+
+
 </script>
 
 <template>
@@ -303,6 +352,7 @@ const getTimesheet = async () => {
             </div>
         </div>
     </div>
+    <Submit v-if="previewSheets" v-bind="previewSheets" @clear="clearClick" @getTimesheet="getTimesheet"></Submit>
 </template>
 
 <style scoped></style>

@@ -65,8 +65,62 @@ class TimesheetController extends Controller
             'isApproved' => false
         ]);
     }
+    public function SubmitView(Request $request)
+    {
+        $date = $request->get('date');
+        $date = Carbon::createFromFormat('m-d-Y', $date);
+        $period = $this->getBimonthlyPeriod(Carbon::parse($date));
+        $range = $this->getBimonthlyRange(Carbon::parse($date));
+        Log::info($period);
+        $entries = TimeEntry::with(['project', 'task'])->where('user_id', auth()->id())
+            ->whereBetween('start', [$range['from'], $range['to']])
+            ->get();
 
-    public function unSubmit(Request $request)
+        $grouped = $entries->map(function ($entry) {
+            return [
+                'id' => $entry->id,
+                'date' => $entry->start?->format('Y-m-d'), // Grouping key
+                'start' => $entry->start?->toDateTimeString(),
+                'end' => $entry->end?->toDateTimeString(),
+                'tags' => $entry->tags,
+                'task' => $entry->task,
+                'project' => $entry->project,
+                'hours' => optional($entry->getDuration()),
+                'description' => $entry->description,
+                'status' => 'Pending',
+            ];
+        })->groupBy('date')->map->values(); // Reset keys inside each group
+
+        // Total duration
+        $totalSeconds = $entries->reduce(function ($carry, $entry) {
+            return $carry + optional($entry->getDuration())?->totalSeconds ?? 0;
+        }, 0);
+
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
+        $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
+
+        Log::info($grouped);
+        // return Inertia::render('Approval/approval', [
+        //     'entries' => $grouped,
+        //     'totalHours' => $totalFormatted,
+        //     'totalHoursNotForm' => $hours . '.' . $minutes,
+        //     'period' => $range,
+        //     'isSubmit' => false,
+        //     'isApproved' => false
+        // ]);
+        return response()->json([
+            'entries' => $grouped,
+            'totalHours' => $totalFormatted,
+            'totalHoursNotForm' => $hours . '.' . $minutes,
+            'period' => $range,
+            'isSubmit' => false,
+            'isApproved' => false,
+        ]);
+
+    }
+
+    public function unSubmitView(Request $request)
     {
         $date = $request->get('date');
         $date = Carbon::createFromFormat('m-d-Y', $date);
@@ -101,13 +155,22 @@ class TimesheetController extends Controller
         $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
         $currentTimesheet = Timesheet::whereBetween('date_start', [$range['from'], $range['to']])->get()->first();
         Log::info($grouped);
-        return Inertia::render('Timesheet::index', [
+        // return Inertia::render('Timesheet::index', [
+        //     'entries' => $grouped,
+        //     'totalHours' => $totalFormatted,
+        //     'totalHoursNotForm' => $hours . '.' . $minutes,
+        //     'period' => $range,
+        //     'isSubmit' => true,
+        //     'isApproved' => !is_null($currentTimesheet->approved_by)
+        // ]);
+
+        return response()->json([
             'entries' => $grouped,
             'totalHours' => $totalFormatted,
             'totalHoursNotForm' => $hours . '.' . $minutes,
             'period' => $range,
-            'isSubmit' => true,
-            'isApproved' => !is_null($currentTimesheet->approved_by)
+            'isSubmit' => false,
+            'isApproved' => false,
         ]);
     }
 
@@ -142,6 +205,7 @@ class TimesheetController extends Controller
     public function store(Request $request)
     {
         try {
+            Log::info($request);
             $data = $request->validate([
                 'date_start' => 'required|date',
                 'date_end' => 'required|date',
@@ -162,8 +226,7 @@ class TimesheetController extends Controller
             $timesheet = Timesheet::create($data);
 
             return response()->json([
-                'message' => 'Timesheet entry created successfully.',
-                'data' => $timesheet,
+                'message' => 'Timesheet entry created successfully.', 
             ], 201);
         } catch (\Throwable $e) {
             \Log::error('Timesheet store error', ['error' => $e->getMessage()]);
@@ -175,6 +238,44 @@ class TimesheetController extends Controller
         }
     }
 
+    public function destroy(Request $request)
+    {
+        try {
+            Log::info($request);
+            $data = $request->validate([
+                'date' => 'required|date',
+            ]);
+
+            $userId = Auth::id();
+            $targetDate = $data['date'];
+
+            $timesheets = Timesheet::where('user_id', $userId)
+                ->whereDate('date_start', '<=', $targetDate)
+                ->whereDate('date_end', '>=', $targetDate)
+                ->get();
+
+            if ($timesheets->isEmpty()) {
+                return response()->json([
+                    'message' => 'No matching timesheets found.',
+                ], 404);
+            }
+
+            // Delete all matching entries
+            foreach ($timesheets as $ts) {
+                $ts->delete();
+            }
+            return response()->json([
+                'message' => 'Timesheet unsubmitted successfully.',
+            ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('Timesheet store error', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'message' => 'Failed to create timesheet entry.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
     public function approve(Timesheet $timesheet)
     {
         $timesheet->update([
@@ -191,10 +292,10 @@ class TimesheetController extends Controller
 
         $user = Auth::user();
         $organization = $user->currentOrganization;
-        $groups = $user->groups();
- 
- 
-        return Inertia::render('Approval/index', [ 
+        $groups = $user->groups()->with('users')->get();
+
+
+        return Inertia::render('Timesheet/index', [
             'groups' => $groups
         ]);
     }
@@ -320,8 +421,4 @@ class TimesheetController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        //
-    }
 }

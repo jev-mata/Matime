@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
+    Dialog,
+    DialogContent,
+    DialogFooter,
 } from '@/Components/ui/dialog'
 import { computed } from 'vue'
 
@@ -36,7 +36,13 @@ const maxWidthClass = computed(() => {
         lg: 'sm:max-w-lg',
         xl: 'sm:max-w-xl',
         '2xl': 'sm:max-w-2xl',
-    }[props.maxWidth];
+        '3xl': 'sm:max-w-3xl',
+        '4xl': 'sm:max-w-4xl',
+        '5xl': 'sm:max-w-5xl',
+        '6xl': 'sm:max-w-6xl',
+        '7xl': 'sm:max-w-7xl',
+        full: 'sm:max-w-full',
+    }[props.maxWidth] ?? 'sm:max-w-2xl';
 });
 </script>
 

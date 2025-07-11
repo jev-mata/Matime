@@ -7,7 +7,7 @@ use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\HomeController;
-use App\Models\Timesheet; 
+use App\Models\Timesheet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -124,9 +124,15 @@ Route::middleware([
         Route::get('/', [TimesheetController::class, 'approval'])->name('index');
         Route::get('/show', [TimesheetController::class, 'show'])->name('show');
         Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll');
-        Route::post('/submit', [TimesheetController::class, 'store'])->name('store');  
+        Route::post('/submit', [TimesheetController::class, 'submit'])->name('store');
         Route::post('{timesheet}/approve', [TimesheetController::class, 'approve'])->name('approve');
         Route::post('{timesheet}/reject', [TimesheetController::class, 'reject'])->name('reject');
+    });
+    Route::name('approval.')->prefix('/timesheet')->group(static function (): void {
+        Route::get('/submit', [TimesheetController::class, 'submitView'])->name('submit.get');
+        Route::get('/unsubmit', [TimesheetController::class, 'unsubmitView'])->name('unsubmit.get');
+        Route::post('/submit', [TimesheetController::class, 'store'])->name('submit.post');
+        Route::post('/unsubmit', [TimesheetController::class, 'destroy'])->name('unsubmit.post');
     });
 });
 
