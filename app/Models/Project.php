@@ -93,9 +93,18 @@ class Project extends Model implements AuditableContract
     protected array $auditExclude = [
         'spent_time',
     ];
+    // public function groups()
+    // {
+    //     return $this->belongsTo(Groups::class, 'team_id', 'id');
+    // }
     public function groups()
     {
-        return $this->belongsTo(Groups::class,'team_id','id');
+        return $this->belongsToMany(
+            Groups::class,
+            'team_project',
+            'projects_id',
+            'team_id'
+        )->withTimestamps();
     }
 
     public function getSpentTimeComputed(): ?int
@@ -180,6 +189,7 @@ class Project extends Model implements AuditableContract
     {
         return $this->hasMany(TimeEntry::class, 'project_id');
     }
+
 
     /**
      * @param  Builder<Project>  $builder

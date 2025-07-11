@@ -25,11 +25,16 @@ class Teams extends Model
     {
         return $this->belongsToMany(User::class, 'team_user', 'team_id', 'user_id');
     }
-    
+
 
     public function projects()
     {
-        return $this->hasMany(Project::class, 'team_id', 'id');
+        return $this->belongsToMany(
+            Project::class,      // related
+            'team_project',      // pivot table
+            'team_id',           // FK on pivot pointing to this model
+            'projects_id'         // FK on pivot pointing to related model
+        )->withTimestamps();
     }
 
 }

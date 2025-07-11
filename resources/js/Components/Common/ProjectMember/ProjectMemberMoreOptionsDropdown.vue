@@ -13,7 +13,7 @@ import {
 
 const emit = defineEmits<{
     delete: [];
-    edit: [];
+    editProjectMember: [];
 }>();
 const props = defineProps<{
     projectMember: ProjectMember;
@@ -52,7 +52,7 @@ const currentMember = computed(() => {
             <DropdownMenuItem
                 :aria-label="'Edit Project Member ' + currentMember?.name"
                 class="flex items-center space-x-3 cursor-pointer"
-                @click.prevent="emit('edit')">
+                @click.prevent="emit('editProjectMember')">
                 <PencilSquareIcon class="w-5 text-icon-active" />
                 <span>Edit</span>
             </DropdownMenuItem>

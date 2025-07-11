@@ -113,7 +113,7 @@ const showEditModal = ref(false);
                         <div
                             class="relative whitespace-nowrap flex items-center pl-3 text-right text-sm font-medium sm:pr-0 pr-4 sm:pr-6 lg:pr-8 3xl:pr-12">
                             <ProjectMemberMoreOptionsDropdown :project-member="projectMember"
-                                @delete="deleteProjectMember(projectMember.id)" @edit="editProjectMember">
+                                @delete="deleteProjectMember(projectMember.id)" @editProjectMember="editProjectMember">
                             </ProjectMemberMoreOptionsDropdown>
                         </div>
                     </TableRow>

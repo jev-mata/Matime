@@ -55,6 +55,8 @@ const getClient = (clientID: string) => {
         (client) => client.id === clientID
     );
 }
+
+
 </script>
 
 <template>

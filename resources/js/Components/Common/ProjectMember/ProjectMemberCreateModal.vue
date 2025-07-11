@@ -42,9 +42,16 @@ const groupBillableRate = ref<number | null>(null); // stores rate separately
 async function getGroupNotMember() {
     const { data } = await axios.get(`/organizations/teams/projects/${props.projectId}`);
     projectGroupMember.value = data.team.length > 0 ? data.team : [{ id: null, name: 'No Group Available', billable_rate: null }]; // team from your sample response
-    
-    show.value = false;
+ 
 }
+watch(
+    () => show.value,
+    (value) => {
+        if (value) {
+            getGroupNotMember();
+        }
+    }
+);
 
 onMounted(getGroupNotMember);
 async function submit() {
@@ -55,15 +62,17 @@ async function submit() {
         billable_rate: null,
     };
 }
- 
+
 async function submitGroup() {
     console.log(selectedGroupId.value);
     const url = `/teams/${selectedGroupId.value}/projects/${props.projectId}`;
     console.log(url);
+    show.value = false;
     const { data } = await axios.post(url);
     clearGroupSelection();
-    console.log(data); 
-
+    console.log(data);
+    getGroupNotMember();
+    emit('refresh');
 }
 const groupOptions = computed(() =>
     projectGroupMember.value.map(group => ({
@@ -73,7 +82,7 @@ const groupOptions = computed(() =>
 );
 
 // For display
-const selectedGroupName = computed<string|'Select Group...'|'No Group Available'>(() => {
+const selectedGroupName = computed<string | 'Select Group...' | 'No Group Available'>(() => {
     return projectGroupMember.value.find(group => group.id === selectedGroupId.value)?.name || 'Select Group...';
 });
 
@@ -146,15 +155,14 @@ function clearGroupSelection() {
             </div>
         </template>
         <template #footer>
-            <SecondaryButton @click="show = false">Cancel</SecondaryButton> 
-            <SecondaryButton v-if="selectedGroupName != 'Select Group...'"
-                @click="clearGroupSelection" class="ml-3">
+            <SecondaryButton @click="show = false">Cancel</SecondaryButton>
+            <SecondaryButton v-if="selectedGroupName != 'Select Group...'" @click="clearGroupSelection" class="ml-3">
                 Clear
-            </SecondaryButton> 
-            <PrimaryButton v-if="selectedGroupName == 'Select Group...'"
-                class="ms-3" :class="{ 'opacity-25': saving }" :disabled="saving" @click="submit">
+            </SecondaryButton>
+            <PrimaryButton v-if="selectedGroupName == 'Select Group...'" class="ms-3" :class="{ 'opacity-25': saving }"
+                :disabled="saving" @click="submit">
                 Add Project Member
-            </PrimaryButton> 
+            </PrimaryButton>
             <PrimaryButton v-if="(selectedGroupName != 'Select Group...' && selectedGroupName != 'No Group Available')"
                 class="ms-3" :class="{ 'opacity-25': saving }" :disabled="saving" @click="submitGroup">
                 Add Project Group

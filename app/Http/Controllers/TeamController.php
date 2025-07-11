@@ -138,7 +138,7 @@ class TeamController extends Controller
         return response()->json(['success' => true]);
     }
     public function updateGroup(Teams $team, $name)
-    { 
+    {
 
         $team->name = $name;
         $team->save();
@@ -168,18 +168,14 @@ class TeamController extends Controller
             'project_id' => 'required|exists:projects,id',
         ]);
 
-        $project = Project::find($request->project_id);
-        $project->team_id = $team->id;
-        $project->save();
-
+        $team = Teams::findOrFail($team->id);
+        $team->projects()->syncWithoutDetaching([$request->project_id]); // many-to-many attach 
         return response()->json(['success' => true]);
     }
-    public function assignTeam2Project($teamid, $projectid)
+    public function assignTeam2Project($teamId, $projectId)
     {
-
-        $project = Project::find($projectid);
-        $project->team_id = $teamid;
-        $project->save();
+        $team = Teams::findOrFail($teamId);
+        $team->projects()->syncWithoutDetaching([$projectId]); // many-to-many attach
 
         return response()->json(['success' => true]);
     }
