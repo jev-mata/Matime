@@ -63,5 +63,6 @@ const shownClients = computed(() => {
             <ClientCreateModal v-model:show="createClient"></ClientCreateModal>
         </MainContainer>
         <ClientTable :clients="shownClients"></ClientTable>
+        
     </AppLayout>
 </template>

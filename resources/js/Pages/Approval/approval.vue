@@ -38,7 +38,7 @@ const page = usePage<{
   from: string;
   to: string;
   timesheet: any[];
-
+  groups:any[];
 }>();
 
 function goBack() {

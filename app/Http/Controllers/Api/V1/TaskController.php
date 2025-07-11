@@ -59,8 +59,8 @@ class TaskController extends Controller
             $query->whereNotNull('done_at');
         } elseif ($doneFilter === 'false') {
             $query->whereNull('done_at');
-        } 
-
+        }
+        $query->orderBy('name');
         $tasks = $query->paginate(config('app.pagination_per_page_default'));
 
         return new TaskCollection($tasks);

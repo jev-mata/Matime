@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
- 
+
 use App\Models\Organization;
 use App\Models\Tag;
 use App\Models\TimeEntry;
@@ -191,17 +191,37 @@ class TimesheetController extends Controller
 
         $user = Auth::user();
         $organization = $user->currentOrganization;
+        $groups = $user->groups();
+ 
+ 
+        return Inertia::render('Approval/index', [ 
+            'groups' => $groups
+        ]);
+    }
+
+
+
+    public function approvalSelected(Request $request)
+    {
+
+        $user = Auth::user();
+        $organization = $user->currentOrganization;
+        $groups = $user->groups();
 
         // Get all user IDs in the organization
         $userIds = $organization->users()->pluck('users.id');
 
-        $entries = TimeEntry::with(['project','task'])->whereIn('user_id', $userIds)
+        $entries = TimeEntry::with(['project', 'task'])->whereIn('user_id', $userIds)
             ->get();
+
 
         /////////////////////////
 
 
-        $timesheet = Timesheet::all();
+
+        $timesheet = Timesheet::whereIn('user_id', $userIds)
+            ->get();
+        ;
         $grouped = $entries->map(function ($entry) {
             return [
                 'id' => $entry->id,
@@ -218,7 +238,7 @@ class TimesheetController extends Controller
 
 
         })->groupBy('date')->map->values(); // Reset keys inside each group
-         
+
 
         // Total duration
         $totalSeconds = $entries->reduce(function ($carry, $entry) {
@@ -228,16 +248,17 @@ class TimesheetController extends Controller
         $hours = floor($totalSeconds / 3600);
         $minutes = floor(($totalSeconds % 3600) / 60);
         $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
-        return Inertia::render('Approval/approval', [ 
+        return Inertia::render('Approval/approval', [
             'entries' => $grouped,
             'totalHours' => $totalFormatted,
-            'totalHoursNotForm' => $hours . '.' . $minutes, 
+            'totalHoursNotForm' => $hours . '.' . $minutes,
             'isSubmit' => true,
-            'timesheet' => $timesheet
+            'timesheet' => $timesheet,
+            'groups' => $groups
         ]);
     }
 
-     
+
 
 
     public function reject($id)
