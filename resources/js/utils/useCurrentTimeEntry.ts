@@ -27,6 +27,8 @@ const emptyTimeEntry = {
     tags: [],
     billable: false,
     organization_id: '',
+    approval: '',
+    approved_by: '',
 } as TimeEntry;
 
 export const useCurrentTimeEntryStore = defineStore('currentTimeEntry', () => {
@@ -76,7 +78,7 @@ export const useCurrentTimeEntryStore = defineStore('currentTimeEntry', () => {
                         currentTimeEntry.value = { ...emptyTimeEntry };
                     }
                 }
-            } catch{
+            } catch {
                 currentTimeEntry.value = { ...emptyTimeEntry };
             }
         } else {
