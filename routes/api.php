@@ -51,6 +51,7 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
         Route::name('approval.')->prefix('/time')->group(static function (): void {
 
             Route::get('/', [TimesheetController::class, 'index'])->name('index');
+            Route::get('/permission', [TimesheetController::class, 'permission'])->name('permission');
             Route::get('/show', [TimesheetController::class, 'show'])->name('show');
             Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll'); 
             Route::post('{timesheet}/approve', [TimesheetController::class, 'approve'])->name('approve');
@@ -111,7 +112,7 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
 
         // Time entry routes
         Route::name('time-entries.')->prefix('/organizations/{organization}')->group(static function (): void {
-            Route::get('/time-entries', [TimeEntryController::class, 'index'])->name('index');
+            Route::get('/time-entries', [TimeEntryController::class, 'index'])->name('index'); 
             Route::get('/time-entries/export', [TimeEntryController::class, 'indexExport'])->name('index-export');
             Route::get('/time-entries/aggregate', [TimeEntryController::class, 'aggregate'])->name('aggregate');
             Route::get('/time-entries/aggregate/export', [TimeEntryController::class, 'aggregateExport'])->name('aggregate-export');

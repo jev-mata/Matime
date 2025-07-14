@@ -30,6 +30,7 @@ import TimeEntryMassActionRow from '@/packages/ui/src/TimeEntry/TimeEntryMassAct
 import type { UpdateMultipleTimeEntriesChangeset } from '@/packages/api/src';
 import { isAllowedToPerformPremiumAction } from '@/utils/billing';
 import { canCreateProjects } from '@/utils/permissions';
+import axios from 'axios';
 
 const timeEntriesStore = useTimeEntriesStore();
 const { timeEntries, allTimeEntriesLoaded } = storeToRefs(timeEntriesStore);
@@ -67,7 +68,22 @@ function deleteTimeEntries(timeEntries: TimeEntry[]) {
     useTimeEntriesStore().deleteTimeEntries(timeEntries);
     fetchTimeEntries();
 }
+const fetchCurrentTimeEntries = async () => {
+    try {
+        const response = await axios.get(route('approval.all'), {
+            withCredentials: true, // if you're using Sanctum/cookies
+            headers: {
+                Accept: 'application/json',
+            },
+        });
 
+        console.log('Time entries:', response.data);
+        return response.data as TimeEntry[]; // this will be your time entry array
+    } catch (error) {
+        console.error('Failed to fetch time entries:', error);
+        return [];
+    }
+};
 watch(isLoadMoreVisible, async (isVisible) => {
     if (
         isVisible &&
@@ -79,9 +95,14 @@ watch(isLoadMoreVisible, async (isVisible) => {
     }
 });
 
+const timeCurrentEntries = ref<TimeEntry[]>([]);   // initialise with empty array
+async function loadCurrentEntries() {
+    timeCurrentEntries.value = await fetchCurrentTimeEntries();
+}
 onMounted(async () => {
-    await loadEntries();
+    await loadEntries();    
 });
+
 async function loadEntries(): Promise<void> {
     await timeEntriesStore.fetchTimeEntries();
 }
@@ -159,7 +180,8 @@ function deleteSelected() {
                 :enable-estimated-time="isAllowedToPerformPremiumAction()" :can-create-project="canCreateProjects()"
                 :clients :create-client :update-time-entry :update-time-entries :delete-time-entries
                 :create-time-entry="startTimeEntry" :create-tag :projects="projects" :tasks="tasks" :loadEntries
-                :currency="getOrganizationCurrencyString()" :time-entries="timeEntries" :tags="tags">
+                :currency="getOrganizationCurrencyString()" :time-entries="timeEntries" :tags="tags"
+                :fetchTimeEntries="fetchTimeEntries">
             </TimeEntryGroupedTable>
             <div v-if="timeEntries.length === 0" class="text-center pt-12">
                 <ClockIcon class="w-8 text-icon-default inline pb-2"></ClockIcon>

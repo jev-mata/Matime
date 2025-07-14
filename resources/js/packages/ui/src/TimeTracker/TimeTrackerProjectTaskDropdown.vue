@@ -68,7 +68,7 @@ const props = withDefaults(
         emptyPlaceholder?: string;
         allowReset?: boolean;
         enableEstimatedTime: boolean;
-        canCreateProject: boolean;
+        canCreateProject?: boolean;
         class?: string;
     }>(),
     {

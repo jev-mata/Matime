@@ -169,10 +169,15 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
     {
         return $this->hasMany(TimeEntry::class);
     }
-    
+
     public function groups()
     {
         return $this->belongsToMany(Groups::class, 'team_user', 'user_id', 'team_id');
+    }
+
+    public function Timesheets()
+    {
+        return $this->hasMany(Timesheet::class, 'user_id', 'id');
     }
 
 

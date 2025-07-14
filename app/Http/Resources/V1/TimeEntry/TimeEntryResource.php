@@ -47,6 +47,8 @@ class TimeEntryResource extends BaseResource
             'tags' => $this->resource->tags ?? [],
             /** @var bool $billable Whether time entry is billable */
             'billable' => $this->resource->billable,
+            'approval' => $this->resource->approval,
+            'approved_by' => $this->resource->approved_by,
         ];
     }
 }

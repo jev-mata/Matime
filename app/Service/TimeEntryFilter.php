@@ -197,6 +197,7 @@ class TimeEntryFilter
         return $this;
     }
 
+
     /**
      * @return Builder<TimeEntry>
      */

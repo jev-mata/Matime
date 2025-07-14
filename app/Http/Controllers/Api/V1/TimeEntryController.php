@@ -93,10 +93,9 @@ class TimeEntryController extends Controller
             $limit = 1000;
         }
         $timeEntriesQuery->limit($limit);
-        $timeEntriesQuery->skip($request->getOffset());
+        // $timeEntriesQuery->skip($request->getOffset());
 
         $timeEntries = $timeEntriesQuery->get();
-
         if ($timeEntries->count() === $limit && $request->getOnlyFullDates()) {
             $user = $this->user();
             $timezone = app(TimezoneService::class)->getTimezoneFromUser($user);
@@ -113,7 +112,7 @@ class TimeEntryController extends Controller
             });
 
             if ($timeEntries->count() === 0) {
-                Log::warning('User has has more than '.$limit.' time entries on one date', [
+                Log::warning('User has has more than ' . $limit . ' time entries on one date', [
                     'date' => $lastDate->toDateString(),
                     'user_id' => $request->input('user_id'),
                     'auth_user_id' => Auth::id(),
@@ -134,12 +133,13 @@ class TimeEntryController extends Controller
                 ],
             ]);
     }
-private function getBimonthlyPeriod(\Carbon\Carbon $date): string
-{
-    return $date->day <= 15
-        ? $date->format('Y-m') . '-1'
-        : $date->format('Y-m') . '-2';
-}
+    private function getBimonthlyPeriod(\Carbon\Carbon $date): string
+    {
+        return $date->day <= 15
+            ? $date->format('Y-m') . '-1'
+            : $date->format('Y-m') . '-2';
+    }
+
 
     /**
      * @return Builder<TimeEntry>
@@ -149,7 +149,6 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
         $timeEntriesQuery = TimeEntry::query()
             ->whereBelongsTo($organization, 'organization')
             ->orderBy('start', 'desc');
-
         $filter = new TimeEntryFilter($timeEntriesQuery);
         $filter->addStartFilter($request->input('start'));
         $filter->addEndFilter($request->input('end'));
@@ -183,7 +182,7 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
         }
         $debug = $request->getDebug();
         $format = $request->getFormatValue();
-        if ($format === ExportFormat::PDF && ! $this->canAccessPremiumFeatures($organization)) {
+        if ($format === ExportFormat::PDF && !$this->canAccessPremiumFeatures($organization)) {
             throw new FeatureIsNotAvailableInFreePlanApiException;
         }
         $user = $this->user();
@@ -198,15 +197,15 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
             'user',
             'tagsRelation',
         ]);
-        $filename = 'time-entries-export-'.now()->format('Y-m-d_H-i-s').'.'.$format->getFileExtension();
+        $filename = 'time-entries-export-' . now()->format('Y-m-d_H-i-s') . '.' . $format->getFileExtension();
         $folderPath = 'exports';
-        $path = $folderPath.'/'.$filename;
+        $path = $folderPath . '/' . $filename;
         $localizationService = LocalizationService::forOrganization($organization);
         if ($format === ExportFormat::CSV) {
             $export = new TimeEntriesDetailedCsvExport(config('filesystems.private'), $folderPath, $filename, $timeEntriesQuery, 1000, $timezone);
             $export->export();
         } elseif ($format === ExportFormat::PDF) {
-            if (config('services.gotenberg.url') === null && ! $debug) {
+            if (config('services.gotenberg.url') === null && !$debug) {
                 throw new PdfRendererIsNotConfiguredException;
             }
             $viewFile = file_get_contents(resource_path('views/reports/time-entry-index/pdf.blade.php'));
@@ -369,7 +368,7 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
             $this->checkPermission($organization, 'time-entries:view:all');
         }
         $format = $request->getFormatValue();
-        if ($format === ExportFormat::PDF && ! $this->canAccessPremiumFeatures($organization)) {
+        if ($format === ExportFormat::PDF && !$this->canAccessPremiumFeatures($organization)) {
             throw new FeatureIsNotAvailableInFreePlanApiException;
         }
         $debug = $request->getDebug();
@@ -406,12 +405,12 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
         $timezone = app(TimezoneService::class)->getTimezoneFromUser($this->user());
         $localizationService = LocalizationService::forOrganization($organization);
 
-        $filename = 'time-entries-report-'.now()->format('Y-m-d_H-i-s').'.'.$format->getFileExtension();
+        $filename = 'time-entries-report-' . now()->format('Y-m-d_H-i-s') . '.' . $format->getFileExtension();
         $folderPath = 'exports';
-        $path = $folderPath.'/'.$filename;
+        $path = $folderPath . '/' . $filename;
 
         if ($format === ExportFormat::PDF) {
-            if (config('services.gotenberg.url') === null && ! $debug) {
+            if (config('services.gotenberg.url') === null && !$debug) {
                 throw new PdfRendererIsNotConfiguredException;
             }
             $client = new Client([
@@ -454,7 +453,8 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
                 ->margins(0.39, 0.78, 0.39, 0.39)
                 ->paperSize('8.27', '11.7') // A4
                 ->footer(Stream::string('footer', $footerHtml))
-                ->assets(Stream::path(resource_path('pdf/echarts.min.js'), 'echarts.min.js'),
+                ->assets(
+                    Stream::path(resource_path('pdf/echarts.min.js'), 'echarts.min.js'),
                     Stream::path(resource_path('pdf/Outfit-VariableFont_wght.ttf'), 'outfit.ttf'),
                 )
                 ->html(Stream::string('body', $html));
@@ -633,7 +633,7 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
             $changes['description'] = $request->input('changes.description') ?? '';
         }
 
-        if (isset($changes['member_id']) && ! $canAccessAll && $this->member($organization)->getKey() !== $changes['member_id']) {
+        if (isset($changes['member_id']) && !$canAccessAll && $this->member($organization)->getKey() !== $changes['member_id']) {
             throw new AuthorizationException;
         }
 
@@ -663,7 +663,7 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
 
                 continue;
             }
-            if (! $canAccessAll && $timeEntry->user_id !== Auth::id()) {
+            if (!$canAccessAll && $timeEntry->user_id !== Auth::id()) {
                 $error->push($id);
 
                 continue;
@@ -770,7 +770,7 @@ private function getBimonthlyPeriod(\Carbon\Carbon $date): string
                 continue;
             }
 
-            if (! $canDeleteAll && $timeEntry->user_id !== Auth::id()) {
+            if (!$canDeleteAll && $timeEntry->user_id !== Auth::id()) {
                 $error->push($id);
 
                 continue;

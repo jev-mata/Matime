@@ -431,6 +431,8 @@ const TimeEntryAggregationType = z.enum([
     'client',
     'billable',
     'description',
+    'approval',
+    'approved_by'
 ]);
 const TimeEntryAggregationTypeInterval = z.enum([
     'day',
@@ -687,6 +689,8 @@ const TimeEntryResource = z
         user_id: z.string(),
         tags: z.array(z.string()),
         billable: z.boolean(),
+        approval: z.string(),
+        approved_by: z.string(),
     })
     .passthrough();
 const TimeEntryStoreRequest = z
@@ -3734,6 +3738,16 @@ Users with the permission &#x60;time-entries:view:own&#x60; can only use this en
                 type: 'Query',
                 schema: z.array(z.string()).min(1).optional(),
             },
+            {
+                name: 'approval',
+                type: 'Query',
+                schema: z.array(z.string()).min(1).optional(),
+            },
+            {
+                name: 'approved_by',
+                type: 'Query',
+                schema: z.array(z.string()).min(1).optional(),
+            },
         ],
         response: z
             .object({
@@ -4049,6 +4063,8 @@ If the group parameters are all set to &#x60;null&#x60; or are all missing, the 
                         'client',
                         'billable',
                         'description',
+                        'approval',
+                        'approved_by',
                     ])
                     .optional(),
             },
@@ -4067,6 +4083,8 @@ If the group parameters are all set to &#x60;null&#x60; or are all missing, the 
                         'client',
                         'billable',
                         'description',
+                        'approval',
+                        'approved_by',
                     ])
                     .optional(),
             },
@@ -4238,6 +4256,8 @@ If the group parameters are all set to &#x60;null&#x60; or are all missing, the 
                     'client',
                     'billable',
                     'description',
+                    'approval',
+                    'approved_by',
                 ]),
             },
             {
@@ -4254,6 +4274,8 @@ If the group parameters are all set to &#x60;null&#x60; or are all missing, the 
                     'client',
                     'billable',
                     'description',
+                    'approval',
+                    'approved_by',
                 ]),
             },
             {
@@ -4323,6 +4345,16 @@ If the group parameters are all set to &#x60;null&#x60; or are all missing, the 
             },
             {
                 name: 'task_ids',
+                type: 'Query',
+                schema: z.array(z.string()).min(1).optional(),
+            },
+            {
+                name: 'approval',
+                type: 'Query',
+                schema: z.array(z.string()).min(1).optional(),
+            },
+            {
+                name: 'approved_by',
                 type: 'Query',
                 schema: z.array(z.string()).min(1).optional(),
             },
@@ -4445,6 +4477,16 @@ If the group parameters are all set to &#x60;null&#x60; or are all missing, the 
             },
             {
                 name: 'task_ids',
+                type: 'Query',
+                schema: z.array(z.string().uuid()).min(1).optional(),
+            },
+            {
+                name: 'approval',
+                type: 'Query',
+                schema: z.array(z.string().uuid()).min(1).optional(),
+            },
+            {
+                name: 'approved_by',
                 type: 'Query',
                 schema: z.array(z.string().uuid()).min(1).optional(),
             },

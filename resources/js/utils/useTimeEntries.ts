@@ -79,6 +79,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
             );
             if (timeEntriesResponse?.data) {
                 timeEntries.value = timeEntriesResponse.data;
+                console.log(timeEntriesResponse.data);
             }
         }
     }

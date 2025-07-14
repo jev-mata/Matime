@@ -30,6 +30,8 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property bool $billable
  * @property array $tags
  * @property string $user_id
+ * @property string $approval
+ * @property string $approved_by
  * @property string $member_id
  * @property bool $is_imported
  * @property Carbon|null $still_active_email_sent_at
@@ -75,6 +77,8 @@ class TimeEntry extends Model implements AuditableContract
         'billable_rate' => 'int',
         'is_imported' => 'bool',
         'still_active_email_sent_at' => 'datetime',
+        'approval' => 'string',
+        'approved_by' => 'string',
     ];
 
     /**
@@ -95,7 +99,7 @@ class TimeEntry extends Model implements AuditableContract
      */
     protected array $auditExclude = [
         'billable_rate',
-    ]; 
+    ];
     public function getBillableRateComputed(): ?int
     {
         return app(BillableRateService::class)->getBillableRateForTimeEntry($this);

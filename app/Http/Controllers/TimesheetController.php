@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\Member;
 use App\Models\Organization;
 use App\Models\Tag;
+use App\Models\Teams;
 use App\Models\TimeEntry;
 use App\Models\User;
 use App\Models\Timesheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,357 +22,96 @@ class TimesheetController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function permission()
     {
-        $date = $request->get('date');
-        $date = Carbon::createFromFormat('m-d-Y', $date);
-        $period = $this->getBimonthlyPeriod(Carbon::parse($date));
-        $range = $this->getBimonthlyRange(Carbon::parse($date));
-        Log::info($period);
-        $entries = TimeEntry::with(['project', 'task'])->where('user_id', auth()->id())
-            ->whereBetween('start', [$range['from'], $range['to']])
+        $org = $this->currentOrganization();
+        $mem = $this->member($org);
+        $isManager = $mem->role !== 'employee';
+        Log::info($mem);
+        Log::info($isManager);
+        $teamIds = Auth::user()->groups()->pluck('teams.id');
+
+        $timesheets = TimeEntry::with('user.groups')
+            ->where('approval', '=', 'submitted')
+            ->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds))
             ->get();
 
-        $grouped = $entries->map(function ($entry) {
-            return [
-                'id' => $entry->id,
-                'date' => $entry->start?->format('Y-m-d'), // Grouping key
-                'start' => $entry->start?->toDateTimeString(),
-                'end' => $entry->end?->toDateTimeString(),
-                'tags' => $entry->tags,
-                'task' => $entry->task,
-                'project' => $entry->project,
-                'hours' => optional($entry->getDuration()),
-                'description' => $entry->description,
-                'status' => 'Pending',
-            ];
-        })->groupBy('date')->map->values(); // Reset keys inside each group
+        $grouped = $timesheets
+            ->groupBy(function ($t) {
+                $d = Carbon::parse($t->start);
+                $half = $d->day <= 15 ? 1 : 2;
+                return $d->format('Y-m') . '-' . $half;
+            })
+            ->map(function ($entriesByPeriod) {
+                return $entriesByPeriod
+                    ->groupBy('user_id')
+                    ->map(function ($entriesByUser) {
+                        $user = $entriesByUser->first()->user;
+                        $totalMinutes = $entriesByUser->sum(function ($entry) {
+                            return Carbon::parse($entry->start)->diffInMinutes(Carbon::parse($entry->end));
+                        });
+                        return [
+                            'user' => $user->only(['id', 'name']) + ['groups' => $user->groups],
+                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
+                        ];
+                    })->values();
+            });
 
-        // Total duration
-        $totalSeconds = $entries->reduce(function ($carry, $entry) {
-            return $carry + optional($entry->getDuration())?->totalSeconds ?? 0;
-        }, 0);
-
-        $hours = floor($totalSeconds / 3600);
-        $minutes = floor(($totalSeconds % 3600) / 60);
-        $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
-
-        Log::info($grouped);
-        return Inertia::render('Timesheet::index', [
-            'entries' => $grouped,
-            'totalHours' => $totalFormatted,
-            'totalHoursNotForm' => $hours . '.' . $minutes,
-            'period' => $range,
-            'isSubmit' => false,
-            'isApproved' => false
-        ]);
+        return response()->json(
+            [
+                "isManager" => $isManager,
+                "remain" => count($grouped),
+            ]
+        );
     }
-    public function SubmitView(Request $request)
+
+    public function getAllTimeEntries()
     {
-        $date = $request->get('date');
-        $date = Carbon::createFromFormat('m-d-Y', $date);
-        $period = $this->getBimonthlyPeriod(Carbon::parse($date));
-        $range = $this->getBimonthlyRange(Carbon::parse($date));
-        Log::info($period);
-        $entries = TimeEntry::with(['project', 'task'])->where('user_id', auth()->id())
-            ->whereBetween('start', [$range['from'], $range['to']])
-            ->get();
 
-        $grouped = $entries->map(function ($entry) {
-            return [
-                'id' => $entry->id,
-                'date' => $entry->start?->format('Y-m-d'), // Grouping key
-                'start' => $entry->start?->toDateTimeString(),
-                'end' => $entry->end?->toDateTimeString(),
-                'tags' => $entry->tags,
-                'task' => $entry->task,
-                'project' => $entry->project,
-                'hours' => optional($entry->getDuration()),
-                'description' => $entry->description,
-                'status' => 'Pending',
-            ];
-        })->groupBy('date')->map->values(); // Reset keys inside each group
-
-        // Total duration
-        $totalSeconds = $entries->reduce(function ($carry, $entry) {
-            return $carry + optional($entry->getDuration())?->totalSeconds ?? 0;
-        }, 0);
-
-        $hours = floor($totalSeconds / 3600);
-        $minutes = floor(($totalSeconds % 3600) / 60);
-        $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
-
-        Log::info($grouped);
-        // return Inertia::render('Approval/approval', [
-        //     'entries' => $grouped,
-        //     'totalHours' => $totalFormatted,
-        //     'totalHoursNotForm' => $hours . '.' . $minutes,
-        //     'period' => $range,
-        //     'isSubmit' => false,
-        //     'isApproved' => false
-        // ]);
-        return response()->json([
-            'entries' => $grouped,
-            'totalHours' => $totalFormatted,
-            'totalHoursNotForm' => $hours . '.' . $minutes,
-            'period' => $range,
-            'isSubmit' => false,
-            'isApproved' => false,
-        ]);
-
+        $curOrg = $this->currentOrganization();
+        $entries = TimeEntry::where('user_id', '=', Auth::user()->id)->where('organization_id', '=', $curOrg->id)->get();
+        Log::info($entries);
+        return response()->json($entries);
     }
-
-    public function unSubmitView(Request $request)
-    {
-        $date = $request->get('date');
-        $date = Carbon::createFromFormat('m-d-Y', $date);
-        $period = $this->getBimonthlyPeriod(Carbon::parse($date));
-        $range = $this->getBimonthlyRange(Carbon::parse($date));
-
-        $entries = TimeEntry::with(['project', 'task'])->where('user_id', auth()->id())
-            ->whereBetween('start', [$range['from'], $range['to']])
-            ->get();
-        $grouped = $entries->map(function ($entry) {
-            return [
-                'id' => $entry->id,
-                'date' => $entry->start?->format('Y-m-d'), // Grouping key
-                'start' => $entry->start?->toDateTimeString(),
-                'end' => $entry->end?->toDateTimeString(),
-                'tags' => Tag::find($entry->tags),
-                'project' => $entry->project,
-                'task' => $entry->task,
-                'hours' => optional($entry->getDuration()),
-                'description' => $entry->description,
-                'status' => 'Pending',
-            ];
-        })->groupBy('date')->map->values(); // Reset keys inside each group
-
-        // Total duration
-        $totalSeconds = $entries->reduce(function ($carry, $entry) {
-            return $carry + optional($entry->getDuration())?->totalSeconds ?? 0;
-        }, 0);
-
-        $hours = floor($totalSeconds / 3600);
-        $minutes = floor(($totalSeconds % 3600) / 60);
-        $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
-        $currentTimesheet = Timesheet::whereBetween('date_start', [$range['from'], $range['to']])->get()->first();
-        Log::info($grouped);
-        // return Inertia::render('Timesheet::index', [
-        //     'entries' => $grouped,
-        //     'totalHours' => $totalFormatted,
-        //     'totalHoursNotForm' => $hours . '.' . $minutes,
-        //     'period' => $range,
-        //     'isSubmit' => true,
-        //     'isApproved' => !is_null($currentTimesheet->approved_by)
-        // ]);
-
-        return response()->json([
-            'entries' => $grouped,
-            'totalHours' => $totalFormatted,
-            'totalHoursNotForm' => $hours . '.' . $minutes,
-            'period' => $range,
-            'isSubmit' => false,
-            'isApproved' => false,
-        ]);
-    }
-
-    private function getBimonthlyRange(Carbon $date): array
-    {
-        $timezone = Auth::user()->timezone;
-        // $timezone = DB::select("SHOW TIMEZONE")[0]->TimeZone ?? 'UTC';
-
-
-        if ($date->day <= 15) {
-            $from = $date->copy()->startOfMonth()->startOfDay();             // 1st day
-            $to = $date->copy()->startOfMonth()->addDays(14)->endOfDay();    // 15th day
-        } else {
-            $from = $date->copy()->startOfMonth()->addDays(15)->startOfDay(); // 16th
-            $to = $date->copy()->endOfMonth()->startOfDay();                    // end of month (30th or 31st)
-        }
-        Log::info($timezone);
-        Log::info($date);
-        Log::info($from->setTimezone($timezone)->format('Y-m-d'));
-        Log::info($to->format('Y-m-d'));
-        return [
-            'from' => $from->setTimezone($timezone)->format('Y-m-d'),
-            'to' => $to->setTimezone($timezone)->format('Y-m-d'),
-        ];
-    }
-    public function getBimonthlyPeriod(Carbon $date)
-    {
-        return $date->day <= 15
-            ? $date->format('Y-m') . '-1' // 1st half
-            : $date->format('Y-m') . '-2'; // 2nd half
-    }
-    public function store(Request $request)
-    {
-        try {
-            Log::info($request);
-            $data = $request->validate([
-                'date_start' => 'required|date',
-                'date_end' => 'required|date',
-                'hours' => 'required|numeric|min:0.25', // assuming hours are required too
-            ]);
-
-
-            $data['user_id'] = Auth::user()->id;
-            $data['status'] = 'pending';
-
-            // Calculate bimonthly period
-            // if ($date->day <= 15) {
-            //     $data['date'] = $date->format('Y-m') . '-1';  // 1st half
-            // } else {
-            //     $data['date'] = $date->format('Y-m') . '-2';  // 2nd half
-            // }
-
-            $timesheet = Timesheet::create($data);
-
-            return response()->json([
-                'message' => 'Timesheet entry created successfully.', 
-            ], 201);
-        } catch (\Throwable $e) {
-            \Log::error('Timesheet store error', ['error' => $e->getMessage()]);
-
-            return response()->json([
-                'message' => 'Failed to create timesheet entry.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
     public function destroy(Request $request)
     {
-        try {
-            Log::info($request);
-            $data = $request->validate([
-                'date' => 'required|date',
-            ]);
 
-            $userId = Auth::id();
-            $targetDate = $data['date'];
+    }
 
-            $timesheets = Timesheet::where('user_id', $userId)
-                ->whereDate('date_start', '<=', $targetDate)
-                ->whereDate('date_end', '>=', $targetDate)
-                ->get();
+    public function Submit(Request $request)
+    {
+        $ids = $request->input('ids'); // or $request->get('ids');
 
-            if ($timesheets->isEmpty()) {
-                return response()->json([
-                    'message' => 'No matching timesheets found.',
-                ], 404);
-            }
-
-            // Delete all matching entries
-            foreach ($timesheets as $ts) {
-                $ts->delete();
-            }
-            return response()->json([
-                'message' => 'Timesheet unsubmitted successfully.',
-            ], 201);
-        } catch (\Throwable $e) {
-            \Log::error('Timesheet store error', ['error' => $e->getMessage()]);
-
-            return response()->json([
-                'message' => 'Failed to create timesheet entry.',
-                'error' => $e->getMessage(),
-            ], 500);
+        // Optional validation
+        if (!is_array($ids)) {
+            return response()->json(['error' => 'Invalid payload'], 422);
         }
-    }
-    public function approve(Timesheet $timesheet)
-    {
-        $timesheet->update([
-            'status' => 'approved',
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
+
+        TimeEntry::whereIn('id', $ids)->update([
+            'approval' => 'submitted',
         ]);
 
-        return response()->json(['message' => 'Approved']);
     }
 
-    public function approval(Request $request)
+    public function Unsubmit(Request $request)
     {
+        $ids = $request->input('ids'); // or $request->get('ids');
 
-        $user = Auth::user();
-        $organization = $user->currentOrganization;
-        $groups = $user->groups()->with('users')->get();
+        // Optional validation
+        if (!is_array($ids)) {
+            return response()->json(['error' => 'Invalid payload'], 422);
+        }
 
-
-        return Inertia::render('Timesheet/index', [
-            'groups' => $groups
+        TimeEntry::whereIn('id', $ids)->update([
+            'approval' => 'unsubmitted',
+            'approved_by' => null,
         ]);
+
     }
-
-
-
-    public function approvalSelected(Request $request)
-    {
-
-        $user = Auth::user();
-        $organization = $user->currentOrganization;
-        $groups = $user->groups();
-
-        // Get all user IDs in the organization
-        $userIds = $organization->users()->pluck('users.id');
-
-        $entries = TimeEntry::with(['project', 'task'])->whereIn('user_id', $userIds)
-            ->get();
-
-
-        /////////////////////////
-
-
-
-        $timesheet = Timesheet::whereIn('user_id', $userIds)
-            ->get();
-        ;
-        $grouped = $entries->map(function ($entry) {
-            return [
-                'id' => $entry->id,
-                'date' => $entry->start?->format('Y-m-d'), // Grouping key
-                'start' => $entry->start?->toDateTimeString(),
-                'end' => $entry->end?->toDateTimeString(),
-                'tags' => Tag::find($entry->tags),
-                'project' => $entry->project,
-                'task' => $entry->task,
-                'hours' => optional($entry->getDuration()),
-                'description' => $entry->description,
-                'status' => 'Pending',
-            ];
-
-
-        })->groupBy('date')->map->values(); // Reset keys inside each group
-
-
-        // Total duration
-        $totalSeconds = $entries->reduce(function ($carry, $entry) {
-            return $carry + optional($entry->getDuration())?->totalSeconds ?? 0;
-        }, 0);
-
-        $hours = floor($totalSeconds / 3600);
-        $minutes = floor(($totalSeconds % 3600) / 60);
-        $totalFormatted = sprintf('%dh %02dm', $hours, $minutes);
-        return Inertia::render('Approval/approval', [
-            'entries' => $grouped,
-            'totalHours' => $totalFormatted,
-            'totalHoursNotForm' => $hours . '.' . $minutes,
-            'isSubmit' => true,
-            'timesheet' => $timesheet,
-            'groups' => $groups
-        ]);
-    }
-
-
 
 
     public function reject($id)
     {
-        $timesheet = Timesheet::findOrFail($id);
-        $timesheet->update([
-            'status' => 'rejected',
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-        return response()->json(['message' => 'Rejected']);
     }
 
 
@@ -381,25 +122,65 @@ class TimesheetController extends Controller
     /**
      * Show the specified resource.
      */
-    public function show(Request $request)
-    {
-        $date = $request->get('date');
-        $range = $this->getBimonthlyRange(Carbon::parse($date));
 
-        $entries = TimeEntry::where('user_id', auth()->id())
-            ->whereBetween('start', [$range['from'], $range['to']])
+    public function approval(Request $request)
+    {
+        $teamIds = Auth::user()->groups()->pluck('teams.id');
+        $timesheets = TimeEntry::with(['user.groups', 'member'])          // eager‑load member
+            ->where('approval', 'submitted')
+            ->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds))
             ->get();
-        return response()->json([
-            'isSubmitted' => $entries,
+
+        $grouped = $timesheets
+            ->groupBy(function ($t) {
+                $d = Carbon::parse($t->start);
+                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
+                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
+            })
+            ->map(function ($entriesByPeriod) {
+                return $entriesByPeriod
+                    ->groupBy('user_id')
+                    ->map(function ($entriesByUser) {
+                        $first = $entriesByUser->first();  // any row in this bucket
+                        $user = $first->user;
+                        $member = $first->member;           // ⬅︎ comes from ->with('member')
+        
+                        $totalMinutes = $entriesByUser->sum(
+                            fn($e) =>
+                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
+                        );
+
+                        return [
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->name,
+                                'groups' => $user->groups,
+                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
+                            ],
+                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
+                        ];
+                    })
+                    ->values();
+            });
+
+
+        return Inertia::render('Timesheet/Index', [
+            'timesheets' => $grouped,
         ]);
     }
-    public function showAll()
+
+    public function ApprovalOverview(Request $request)
     {
-        $entries = Timesheet::where('user_id', auth()->id())
-            ->get();
-        return response()->json([
-            'isSubmitted' => $entries,
-        ]);
+        $user = Member::where('id', '=', $request->input('user_id'))->first();
+        if ($user) {
+
+            return Inertia::render('Timesheet/TimeReportOverview', [
+                'userid' => $request->input('user_id'),
+                'period' => ['start' => '', 'end' => ''],
+            ]);
+        } else {
+            return redirect()->route('dashboard');
+        }
     }
 
     /**

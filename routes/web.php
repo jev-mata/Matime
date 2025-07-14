@@ -121,15 +121,14 @@ Route::middleware([
     Route::post('/teams/{team}/assign-members', [TeamController::class, 'assignMembers']);
     Route::name('approval.')->prefix('/approval')->group(static function (): void {
 
-        Route::get('/', [TimesheetController::class, 'approval'])->name('index');
-        Route::get('/show', [TimesheetController::class, 'show'])->name('show');
-        Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll');
-        Route::post('/submit', [TimesheetController::class, 'submit'])->name('store');
-        Route::post('{timesheet}/approve', [TimesheetController::class, 'approve'])->name('approve');
-        Route::post('{timesheet}/reject', [TimesheetController::class, 'reject'])->name('reject');
+        Route::post('/permission', [TimesheetController::class, 'permission'])->name('permission');
+        Route::get('/time-entries', [TimesheetController::class, 'getAllTimeEntries'])->name('all');
+        Route::post('/submit', [TimesheetController::class, 'Submit'])->name('submit');
+        Route::post('/unsubmit', [TimesheetController::class, 'Unsubmit'])->name('unsubmit');
+        Route::get('/', [TimesheetController::class, 'approval'])->name('index'); 
+        Route::get('/approval/overview', [TimesheetController::class, 'ApprovalOverview'])->name('ApprovalOverview'); 
     });
     Route::name('approval.')->prefix('/timesheet')->group(static function (): void {
-        Route::get('/submit', [TimesheetController::class, 'submitView'])->name('submit.get');
         Route::get('/unsubmit', [TimesheetController::class, 'unsubmitView'])->name('unsubmit.get');
         Route::post('/submit', [TimesheetController::class, 'store'])->name('submit.post');
         Route::post('/unsubmit', [TimesheetController::class, 'destroy'])->name('unsubmit.post');

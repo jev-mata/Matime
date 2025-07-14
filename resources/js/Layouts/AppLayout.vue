@@ -46,6 +46,7 @@ import { getCurrentOrganizationId } from '@/utils/useUser';
 import LoadingSpinner from '@/packages/ui/src/LoadingSpinner.vue';
 import NavigationSidebarLink from '@/Components/NavigationSidebarLink.vue';
 import { HandThumbDownIcon, HandThumbUpIcon, PaperClipIcon } from '@heroicons/vue/24/solid';
+import axios from 'axios';
 
 const showSidebarMenu = ref(false);
 const isUnloading = ref(false);
@@ -124,9 +125,20 @@ const extensionMenu = computed<ExtensionMenuItem[]>(() =>
     (page.props.extensionMenu as ExtensionMenuItem[]) ?? []
 );
 
-const canApprove = () => {
-    return true;
-}
+const mayApprove = ref<boolean | null>(null);   // null = “still loading”
+const pendingCount = ref<number>(0);   // null = “still loading”
+const fetchPermission = async () => {
+    try {
+        const { data } = await axios.get(route('api.v1.approval.permission'));  // or '/permission'
+        mayApprove.value = !!data.isManager;
+        pendingCount.value = data.remain;
+    } catch (e) {
+        console.error('Can‑approve check failed', e);
+        mayApprove.value = false;               // safe default
+    }
+};
+
+onMounted(fetchPermission);
 </script>
 
 <template>
@@ -200,9 +212,19 @@ const canApprove = () => {
                                 isInvoicingActivated() && canViewInvoices()
                             " title="Invoices" :icon="DocumentTextIcon" :current="route().current('invoices')"
                                 href="/invoices"></NavigationSidebarItem>
-                            <NavigationSidebarItem v-if="canApprove()
-                            " title="Approval" :icon="HandThumbUpIcon" :current="route().current('approval.index')"
-                                :href="route('approval.index')"></NavigationSidebarItem>
+                            <NavigationSidebarItem v-if="mayApprove" :icon="HandThumbUpIcon"
+                                :href="route('approval.index')" :current="route().current('approval.index')"
+                                title="Approval">
+
+                                <template #badge>
+                                    <span v-if="pendingCount"
+                                        class="ml-2 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-xs w-5 h-5">
+                                        {{ pendingCount }}
+                                    </span>
+                                </template>
+                            </NavigationSidebarItem>
+
+
 
 
 
