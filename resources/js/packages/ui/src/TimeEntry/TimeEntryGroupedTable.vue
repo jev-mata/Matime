@@ -269,7 +269,7 @@ watch(
     <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="">
         <div class=" border border-1 border-tertiary mt-5 border-b-4">
 
-            <div class=" bg-gray-900   border-1 p-1 ">
+            <div class="  border-1 p-1 ">
 
                 <button @click="SubmitBTN(bimonthlykey, bimonthly.days)" v-if="!bimonthly.isSubmitted &&!bimonthly.isApproved"
                     class=" p-2 border-1 mx-2 button text-blue-400">

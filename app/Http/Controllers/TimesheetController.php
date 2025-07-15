@@ -27,8 +27,6 @@ class TimesheetController extends Controller
         $org = $this->currentOrganization();
         $mem = $this->member($org);
         $isManager = $mem->role !== 'employee';
-        Log::info($mem);
-        Log::info($isManager);
         $teamIds = Auth::user()->groups()->pluck('teams.id');
 
         $timesheets = TimeEntry::with('user.groups')
@@ -125,11 +123,22 @@ class TimesheetController extends Controller
 
     public function approval(Request $request)
     {
+        $curOrg = $this->currentOrganization();
+        $memberRole = $this->member($curOrg);
+
         $teamIds = Auth::user()->groups()->pluck('teams.id');
         $timesheets = TimeEntry::with(['user.groups', 'member'])          // eager‑load member
-            ->where('approval', 'submitted')
-            ->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds))
-            ->get();
+            ->where('approval', 'submitted');
+        if ($memberRole->role == "employee") {
+            return redirect()->route('dashboard');
+        }
+        if ($memberRole->role == "manager") {
+            $timesheets = $timesheets->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
+
+        } else if ($memberRole->role == "admin") {
+
+        }
+        $timesheets = $timesheets->get();
 
         $grouped = $timesheets
             ->groupBy(function ($t) {

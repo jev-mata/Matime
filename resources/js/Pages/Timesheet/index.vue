@@ -1,27 +1,18 @@
 <script setup lang="ts">
-import AppLayout from "@/Layouts/AppLayout.vue";
-import TimeTracker from "@/Components/TimeTracker.vue";
+import AppLayout from "@/Layouts/AppLayout.vue"; 
 import MainContainer from "@/packages/ui/src/MainContainer.vue";
-
-import { ClockIcon } from "@heroicons/vue/24/outline";
+ 
 import { usePage } from "@inertiajs/vue3";
 
-import type { Tag, TimeEntry } from '@/packages/api/src';
-import { useQueryClient } from "@tanstack/vue-query";
-import { computed, onMounted } from "vue";
-import axios from "axios";
+import type { Tag, TimeEntry } from '@/packages/api/src'; 
+import { computed, onMounted } from "vue"; 
 import { ref } from "vue";
-import dayjs from "dayjs";
-import ProjectBadge from "@/packages/ui/src/Project/ProjectBadge.vue";
-import Modal from "@/packages/ui/src/Modal.vue";
+import dayjs from "dayjs"; 
 
 import PageTitle from '@/Components/Common/PageTitle.vue';
 import TabBarItem from '@/Components/Common/TabBar/TabBarItem.vue';
-import TabBar from '@/Components/Common/TabBar/TabBar.vue';
-import SecondaryButton from '@/packages/ui/src/Buttons/SecondaryButton.vue';
-import { UserCircleIcon } from '@heroicons/vue/20/solid';
-import TableRow from '@/Components/TableRow.vue';
-import TableHeading from '@/Components/Common/TableHeading.vue';
+import TabBar from '@/Components/Common/TabBar/TabBar.vue'; 
+import { UserCircleIcon } from '@heroicons/vue/20/solid'; 
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
 const activeTab = ref<'pending' | 'approved'>('pending');
