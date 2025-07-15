@@ -210,7 +210,7 @@ async function approveReject(type: 'approve' | 'reject') {
         );
         setTimeout(() => {
             router.visit(route('approval.index')); // change to your target page
-        }, 2000);
+        }, 1500);
     } catch (error) {
         console.error(error);
         addNotification(
