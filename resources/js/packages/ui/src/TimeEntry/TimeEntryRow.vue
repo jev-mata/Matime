@@ -40,7 +40,7 @@ const props = defineProps<{
     onStartStopClick: () => void;
     deleteTimeEntry: () => void;
     updateTimeEntry: (timeEntry: TimeEntry) => void;
-    duplicateTimeEntry: (timeEntry: TimeEntry) => void;
+    duplicateTimeEntry?: (timeEntry: TimeEntry) => void;
     currency: string;
     showMember?: boolean;
     showDate?: boolean;

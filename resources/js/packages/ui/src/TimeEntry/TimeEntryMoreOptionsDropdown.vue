@@ -7,7 +7,7 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import type { TimeEntry } from '../../../api/src';
-const props = defineProps<{ entry: TimeEntry; haveduplicate: boolean }>();
+const props = defineProps<{ entry?: TimeEntry; haveduplicate?: boolean }>();
 
 const emit = defineEmits<{
     delete: [];                // no payload
