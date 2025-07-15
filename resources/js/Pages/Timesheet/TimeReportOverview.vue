@@ -41,7 +41,7 @@ import { useSessionStorage, useStorage } from '@vueuse/core';
 import { useNotificationsStore } from '@/utils/notification';
 import { getRandomColorWithSeed } from '@/packages/ui/src/utils/color';
 import { useProjectsStore } from '@/utils/useProjects';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 
 import ReadOnlyTimeEntryRow from './ReadOnlyTimeEntryRow.vue';
@@ -206,8 +206,11 @@ async function approveReject(type: 'approve' | 'reject') {
 
         addNotification(
             'success',
-            `${type === 'approve' ? 'Approved' : 'Rejected'}`, 
+            `${type === 'approve' ? 'Approved' : 'Rejected'}`,
         );
+        setTimeout(() => {
+            router.visit(route('approval.index')); // change to your target page
+        }, 2000);
     } catch (error) {
         console.error(error);
         addNotification(
