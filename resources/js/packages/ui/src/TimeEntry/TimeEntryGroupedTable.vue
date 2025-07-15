@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import type {
     CreateClientBody,
     CreateProjectBody,
@@ -64,123 +64,99 @@ function startTimeEntryFromExisting(entry: TimeEntry) {
         tags: [...entry.tags],
     });
 }
+type GroupedTimeEntries = Record<
+    string, // biMonthKey
+    {
+        isApproved: boolean;
+        isSubmitted: boolean;
+        days: Record<string, TimeEntriesGroupedByType[]>; // daily breakdown
+    }
+>
+function getBimonthlyKey(dateInput: string | Date): string {
+    const date = new Date(dateInput);
+    const year = date.getFullYear();
 
-const groupedTimeEntries = computed(() => {
-    const groupedEntriesByDay: Record<string, TimeEntry[]> = {};
+    const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date); // "Jan", "Feb", etc.
+
+    const isFirstHalf = date.getDate() <= 15;
+    const start = isFirstHalf ? '1' : '16';
+    const end = isFirstHalf
+        ? '15'
+        : new Date(year, date.getMonth() + 1, 0).getDate().toString(); // Last day of the month
+
+    return `${month} ${year} (${start}-${end})`;
+}
+
+
+const groupedTimeEntries = ref<GroupedTimeEntries>({});
+function isSameBimonthlyPeriod(entryDate: string | Date, submission: TimeEntry): boolean {
+    const entryKey = getBimonthlyKey(entryDate);
+    const submissionKey = getBimonthlyKey(submission.start);
+    return submissionKey === entryKey;
+}
+
+
+
+
+function groupTimeEntriesFunc() {
+    const grouped: GroupedTimeEntries = {}
+
     for (const entry of props.timeEntries) {
-        // skip current time entry
-        if (entry.end === null) {
-            continue;
-        }
-        const oldEntries =
-            groupedEntriesByDay[getLocalizedDateFromTimestamp(entry.start)];
-        groupedEntriesByDay[getLocalizedDateFromTimestamp(entry.start)] = [
-            ...(oldEntries ?? []),
-            entry,
-        ];
-    }
-    const groupedEntriesByDayAndType: Record<
-        string,
-        TimeEntriesGroupedByType[]
-    > = {};
-    for (const dailyEntriesKey in groupedEntriesByDay) {
-        const dailyEntries = groupedEntriesByDay[dailyEntriesKey];
-        const newDailyEntries: TimeEntriesGroupedByType[] = [];
+        if (entry.end === null) continue
 
-        for (const entry of dailyEntries) {
-            // check if same entry already exists
-            const oldEntriesIndex = newDailyEntries.findIndex(
-                (e) =>
-                    e.project_id === entry.project_id &&
-                    e.task_id === entry.task_id &&
-                    e.billable === entry.billable &&
-                    e.description === entry.description
-            );
-            if (oldEntriesIndex !== -1 && newDailyEntries[oldEntriesIndex]) {
-                newDailyEntries[oldEntriesIndex].timeEntries.push(entry);
+        const date = getDayJsInstance()(entry.start);
+        const year = date.year();
+        const month = date.format('MMM'); // "Jan", "Feb", "Mar", etc.
 
-                // Add up durations for time entries of the same type
-                newDailyEntries[oldEntriesIndex].duration =
-                    (newDailyEntries[oldEntriesIndex].duration ?? 0) +
-                    (entry?.duration ?? 0);
+        const dayKey = date.format('MM-DD-YYYY');
+        const isFirstHalf = date.date() <= 15;
+        const startLabel = isFirstHalf ? '1' : '16';
+        const endLabel = isFirstHalf
+            ? '15'
+            : String(date.daysInMonth()) // Get last day of month
 
-                // adapt start end times so they show the earliest start and latest end time
-                if (
-                    getDayJsInstance()(entry.start).isBefore(
-                        getDayJsInstance()(
-                            newDailyEntries[oldEntriesIndex].start
-                        )
-                    )
-                ) {
-                    newDailyEntries[oldEntriesIndex].start = entry.start;
-                }
-                if (
-                    getDayJsInstance()(entry.end).isAfter(
-                        getDayJsInstance()(newDailyEntries[oldEntriesIndex].end)
-                    )
-                ) {
-                    newDailyEntries[oldEntriesIndex].end = entry.end;
-                }
-            } else {
-                newDailyEntries.push({ ...entry, timeEntries: [entry] });
+        const biMonthKey = `${month} ${startLabel} - ${month}  ${endLabel}, ${year}`
+
+        if (!grouped[biMonthKey]) {
+            grouped[biMonthKey] = {
+                isApproved: entry.approval == "approved",
+                isSubmitted: entry.approval == "submitted" ||entry.approval == "approved",
+                days: {}
             }
         }
+        console.log(grouped);
+        if (!grouped[biMonthKey].days[dayKey]) {
+            grouped[biMonthKey].days[dayKey] = []
+        }
+        // Now find if this entry matches an existing grouped entry (by type/project/task)
+        const existingGroup = grouped[biMonthKey].days[dayKey]
+        const index = existingGroup.findIndex(
+            (e) =>
+                e.project_id === entry.project_id &&
+                e.task_id === entry.task_id &&
+                e.billable === entry.billable &&
+                e.description === entry.description
+        )
 
-        groupedEntriesByDayAndType[dailyEntriesKey] = newDailyEntries;
-    }
-    return groupedEntriesByDayAndType;
-});
+        if (index !== -1) {
+            const group = existingGroup[index]
+            group.timeEntries.push(entry)
+            group.duration = (group.duration ?? 0) + (entry.duration ?? 0)
 
-
-const groupedBiMonthly = computed<
-    Record<string, TimeEntriesGroupedByType[]>
->(() => {
-    const result: Record<string, TimeEntriesGroupedByType[]> = {};
-
-    // 1️⃣  Loop over the daily buckets we already have
-    Object.values(groupedTimeEntries.value).forEach((dailyList) => {
-        dailyList.forEach((entry) => {
-            const d = new Date(entry.start);
-            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getDate() <= 15 ? '1' : '2'}`;
-
-            const bucket = (result[key] ||= []);
-
-            // 2️⃣  Merge “same‑type” entries inside this half‑month
-            const i = bucket.findIndex(
-                (e) =>
-                    e.project_id === entry.project_id &&
-                    e.task_id === entry.task_id &&
-                    e.billable === entry.billable &&
-                    e.description === entry.description
-            );
-
-            if (i !== -1) {
-                // Already have an aggregate for this combo → extend it
-                const agg = bucket[i];
-
-                // merge the inner time‑entry arrays
-                agg.timeEntries.push(...entry.timeEntries);
-
-                // total duration
-                agg.duration = (agg.duration ?? 0) + (entry.duration ?? 0);
-
-                // earliest start / latest end
-                if (new Date(entry.start) < new Date(agg.start)) agg.start = entry.start;
-                if (
-                    entry.end &&
-                    (!agg.end || new Date(entry.end) > new Date(agg.end))
-                ) {
-                    agg.end = entry.end;
-                }
-            } else {
-                // First time we see this combo in this half‑month
-                bucket.push({ ...entry });
+            if (getDayJsInstance()(entry.start).isBefore(getDayJsInstance()(group.start))) {
+                group.start = entry.start
             }
-        });
-    });
+            if (getDayJsInstance()(entry.end).isAfter(getDayJsInstance()(group.end))) {
+                group.end = entry.end
+            }
+        } else {
+            existingGroup.push({ ...entry, timeEntries: [entry] })
+        }
+    }
+    groupedTimeEntries.value = grouped;
+}
 
-    return result;
-});
+
 function sumDuration(timeEntries: TimeEntry[]) {
     return timeEntries.reduce((acc, entry) => acc + (entry?.duration ?? 0), 0);
 }
@@ -214,20 +190,22 @@ function getFirstDayKey(days: Record<string, any>) {
     const keys = Object.keys(days);
     return keys.length ? keys[0] : null;
 }
-function SubmitBTN(days: string, sheet: TimeEntriesGroupedByType[]) {
+function SubmitBTN(days: string, sheet: Record<string, TimeEntriesGroupedByType[]>) {
     previewSheets.value = sheet;
-    selectedPeriod.value = days;
     isSubmit.value = true;
 }
 function pluckID(
-    timeEntryGroup: TimeEntriesGroupedByType[]
+    timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>
 ): string[] {
-    return timeEntryGroup.flatMap(entryGroup =>
-        entryGroup.timeEntries.map(timeEntry => timeEntry.id)
+    return Object.values(timeEntryGroup).flatMap(entryGroups =>
+        entryGroups.flatMap(entryGroup =>
+            entryGroup.timeEntries.map(timeEntry => timeEntry.id)
+        )
     );
 }
 
-const unSubmitBTN = async (days: string, sheet: TimeEntriesGroupedByType[]) => {
+
+const unSubmitBTN = async (days: string, sheet: Record<string, TimeEntriesGroupedByType[]>) => {
     // previewSheets.value = sheet;
     // selectedPeriod.value = days;
     // isSubmit.value = false;
@@ -273,139 +251,143 @@ function isApproved(entries: TimeEntry[]): boolean {
 function clearClick() {
 
     previewSheets.value = null;
-    selectedPeriod.value = "";
 }
-const previewSheets = ref<TimeEntriesGroupedByType[] | null>(null);
+const previewSheets = ref<Record<string, TimeEntriesGroupedByType[]> | null>(null);
 const isSubmit = ref<boolean>(false);
-const selectedPeriod = ref<string>('');
+watch(
+    () => props.timeEntries,  // 👈 Reactive dependency
+    () => {
+        groupTimeEntriesFunc(); // 👈 Your function\ 
+    },
+    { deep: true, immediate: true } // Optional: runs on load + deep compare
+);
+
 </script>
 
 <template>
 
-    <div v-for="(entriesGroup, period) in groupedBiMonthly" :key="period" class="">
+    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="">
         <div class=" border border-1 border-tertiary mt-5 border-b-4">
 
-            <div class=" bg-default-background   border-1 p-1 ">
+            <div class=" bg-gray-900   border-1 p-1 ">
 
-                <button @click="SubmitBTN(period, entriesGroup)" v-if="!isSubmitted(entriesGroup)"
-                    class=" p-2 border-1 mx-2 button text-blue-500">
+                <button @click="SubmitBTN(bimonthlykey, bimonthly.days)" v-if="!bimonthly.isSubmitted &&!bimonthly.isApproved"
+                    class=" p-2 border-1 mx-2 button text-blue-400">
                     submit
                 </button>
-                <button @click="unSubmitBTN(period, entriesGroup)" v-if="isSubmitted(entriesGroup)"
-                    class=" p-2 border-1 mx-2 button text-blue-500">
+                <button @click="unSubmitBTN(bimonthlykey, bimonthly.days)" v-if="bimonthly.isSubmitted"
+                    class=" p-2 border-1 mx-2 button text-blue-400">
                     unsubmit
                 </button>
 
-                {{ periodLabel(period) }}
-                <span v-if="isSubmitted(entriesGroup) && isApproved(entriesGroup)"
-                    class="ml-4 bg-green-800 p-2 rounded-md">Approved</span>
-                <span v-if="isSubmitted(entriesGroup)"
+                {{ bimonthlykey }}
+                <span v-if="bimonthly.isApproved" class="ml-4 bg-green-800 p-2 rounded-md">Approved</span>
+                <span v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
                     class="ml-4 bg-orange-700 p-2 rounded-md">Pending</span>
             </div>
 
-            <template v-for="entryGroup in entriesGroup" :key="entryGroup.id">
-                <div v-if="!isSubmitted(entriesGroup)">
 
-                    <TimeEntryRowHeading :date="entryGroup.start" :duration="sumDuration(entryGroup.timeEntries)"
-                        :checked="entriesGroup.every((timeEntry: TimeEntry) =>
-                            selectedTimeEntries.includes(timeEntry)
-                        )
-                            " @select-all="selectAllTimeEntries(entriesGroup)"
-                        @unselect-all="unselectAllTimeEntries(entriesGroup)">
+            <template v-for="(value, key) in bimonthly.days" :key="key" class="mb-5">
+                <div v-if="!isSubmitted(value)" class=" bg-gray-900   border-1 p-1">
+                    <TimeEntryRowHeading :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
+                        selectedTimeEntries.includes(timeEntry)
+                    )
+                        " @select-all="selectAllTimeEntries(value)" @unselect-all="unselectAllTimeEntries(value)">
                     </TimeEntryRowHeading>
-                    <TimeEntryAggregateRow v-if="'timeEntries' in entryGroup && entryGroup.timeEntries.length > 1"
-                        :create-project :can-create-project :enable-estimated-time
-                        :selected-time-entries="selectedTimeEntries" :create-client :projects="projects" :tasks="tasks"
-                        :tags="tags" :clients :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries
-                        :update-time-entry :delete-time-entries :create-tag :currency="currency"
-                        :time-entry="entryGroup" @selected="
-                            (timeEntries: TimeEntry[]) => {
-                                selectedTimeEntries = [
-                                    ...selectedTimeEntries,
-                                    ...timeEntries,
-                                ];
-                            }
-                        " @unselected="
-                            (timeEntriesToUnselect: TimeEntry[]) => {
-                                selectedTimeEntries = selectedTimeEntries.filter(
-                                    (item: TimeEntry) =>
-                                        !timeEntriesToUnselect.find(
-                                            (filterEntry: TimeEntry) =>
-                                                filterEntry.id === item.id
-                                        )
-                                );
-                            }
-                        "></TimeEntryAggregateRow>
-
-
-                    <TimeEntryRow v-else :create-client :enable-estimated-time :can-create-project :create-project
-                        :projects="projects" :selected="!!selectedTimeEntries.find(
-                            (filterEntry: TimeEntry) => filterEntry.id === entryGroup.id
-                        )
-                            " :tasks="tasks" :tags="tags" :clients :create-tag :update-time-entry :loadEntries
-                        :on-start-stop-click="() => startTimeEntryFromExisting(entryGroup)"
-                        :delete-time-entry="() => deleteTimeEntries([entryGroup])" :currency="currency"
-                        :time-entry="entryGroup.timeEntries[0]" @selected="selectedTimeEntries.push(entryGroup)"
-                        @unselected="
-                            selectedTimeEntries = selectedTimeEntries.filter(
-                                (item: TimeEntry) => item.id !== entryGroup.id
+                    <template v-for="entry in value" :key="entry.id">
+                        <TimeEntryAggregateRow v-if="'timeEntries' in entry && entry.timeEntries.length > 1"
+                            :create-project :can-create-project :enable-estimated-time
+                            :selected-time-entries="selectedTimeEntries" :create-client :projects="projects"
+                            :tasks="tasks" :tags="tags" :clients :on-start-stop-click="startTimeEntryFromExisting"
+                            :update-time-entries :update-time-entry :delete-time-entries :create-tag
+                            :currency="currency" :time-entry="entry" @selected="
+                                (timeEntries: TimeEntry[]) => {
+                                    selectedTimeEntries = [
+                                        ...selectedTimeEntries,
+                                        ...timeEntries,
+                                    ];
+                                }
+                            " @unselected="
+                                (timeEntriesToUnselect: TimeEntry[]) => {
+                                    selectedTimeEntries = selectedTimeEntries.filter(
+                                        (item: TimeEntry) =>
+                                            !timeEntriesToUnselect.find(
+                                                (filterEntry: TimeEntry) =>
+                                                    filterEntry.id === item.id
+                                            )
+                                    );
+                                }
+                            "></TimeEntryAggregateRow>
+                        <TimeEntryRow v-else :create-client :enable-estimated-time :can-create-project :create-project
+                            :projects="projects" :selected="!!selectedTimeEntries.find(
+                                (filterEntry: TimeEntry) => filterEntry.id === entry.id
                             )
-                            "></TimeEntryRow>
+                                " :tasks="tasks" :tags="tags" :clients :create-tag :update-time-entry :loadEntries
+                            :on-start-stop-click="() => startTimeEntryFromExisting(entry)"
+                            :delete-time-entry="() => deleteTimeEntries([entry])" :currency="currency"
+                            :time-entry="entry.timeEntries[0]" @selected="selectedTimeEntries.push(entry)" @unselected="
+                                selectedTimeEntries = selectedTimeEntries.filter(
+                                    (item: TimeEntry) => item.id !== entry.id
+                                )
+                                "></TimeEntryRow>
+
+                    </template>
                 </div>
-                <div v-if="isSubmitted(entriesGroup)">
+                <div v-if="isSubmitted(value)">
 
 
-                    <TimeEntryRowHeading class="opacity-70" :date="entryGroup.start"
-                        :duration="sumDuration(entryGroup.timeEntries)" :checked="entriesGroup.every((timeEntry: TimeEntry) =>
-                            selectedTimeEntries.includes(timeEntry)
-                        )
-                            " @select-all="selectAllTimeEntries(entriesGroup)"
-                        @unselect-all="unselectAllTimeEntries(entriesGroup)">
+                    <TimeEntryRowHeading class="opacity-70" :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
+                        selectedTimeEntries.includes(timeEntry)
+                    )
+                        " @select-all="selectAllTimeEntries(value)" @unselect-all="unselectAllTimeEntries(value)">
                     </TimeEntryRowHeading>
 
 
-                    <ReadOnlyTimeEntryAggregateRow
-                        v-if="'timeEntries' in entryGroup && entryGroup.timeEntries.length > 1" :create-project
-                        :can-create-project :enable-estimated-time :selected-time-entries="selectedTimeEntries"
-                        :create-client :projects="projects" :tasks="tasks" :tags="tags" :clients
-                        :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry
-                        :delete-time-entries :create-tag :currency="currency" :time-entry="entryGroup" @selected="
-                            (timeEntries: TimeEntry[]) => {
-                                selectedTimeEntries = [
-                                    ...selectedTimeEntries,
-                                    ...timeEntries,
-                                ];
-                            }
-                        " @unselected="
-                            (timeEntriesToUnselect: TimeEntry[]) => {
-                                selectedTimeEntries = selectedTimeEntries.filter(
-                                    (item: TimeEntry) =>
-                                        !timeEntriesToUnselect.find(
-                                            (filterEntry: TimeEntry) =>
-                                                filterEntry.id === item.id
-                                        )
-                                );
-                            }
-                        "></ReadOnlyTimeEntryAggregateRow>
-                    <ReadOnlyTimeEntryRow v-else :create-client :enable-estimated-time :can-create-project
-                        :create-project :projects="projects" :selected="!!selectedTimeEntries.find(
-                            (filterEntry: TimeEntry) => filterEntry.id === entryGroup.id
-                        )
-                            " :tasks="tasks" :tags="tags" :clients :create-tag :update-time-entry :loadEntries
-                        :on-start-stop-click="() => startTimeEntryFromExisting(entryGroup)"
-                        :delete-time-entry="() => deleteTimeEntries([entryGroup])" :currency="currency"
-                        :time-entry="entryGroup.timeEntries[0]" @selected="selectedTimeEntries.push(entryGroup)"
-                        @unselected="
-                            selectedTimeEntries = selectedTimeEntries.filter(
-                                (item: TimeEntry) => item.id !== entryGroup.id
+                    <template v-for="entry in value" :key="entry.id">
+                        <ReadOnlyTimeEntryAggregateRow v-if="'timeEntries' in entry && entry.timeEntries.length > 1"
+                            :create-project :can-create-project :enable-estimated-time
+                            :selected-time-entries="selectedTimeEntries" :create-client :projects="projects"
+                            :tasks="tasks" :tags="tags" :clients :on-start-stop-click="startTimeEntryFromExisting"
+                            :update-time-entries :update-time-entry :delete-time-entries :create-tag
+                            :currency="currency" :time-entry="entry" @selected="
+                                (timeEntries: TimeEntry[]) => {
+                                    selectedTimeEntries = [
+                                        ...selectedTimeEntries,
+                                        ...timeEntries,
+                                    ];
+                                }
+                            " @unselected="
+                                (timeEntriesToUnselect: TimeEntry[]) => {
+                                    selectedTimeEntries = selectedTimeEntries.filter(
+                                        (item: TimeEntry) =>
+                                            !timeEntriesToUnselect.find(
+                                                (filterEntry: TimeEntry) =>
+                                                    filterEntry.id === item.id
+                                            )
+                                    );
+                                }
+                            "></ReadOnlyTimeEntryAggregateRow>
+                        <ReadOnlyTimeEntryRow v-else :create-client :enable-estimated-time :can-create-project
+                            :create-project :projects="projects" :selected="!!selectedTimeEntries.find(
+                                (filterEntry: TimeEntry) => filterEntry.id === entry.id
                             )
-                            "></ReadOnlyTimeEntryRow>
+                                " :tasks="tasks" :tags="tags" :clients :create-tag :update-time-entry :loadEntries
+                            :on-start-stop-click="() => startTimeEntryFromExisting(entry)"
+                            :delete-time-entry="() => deleteTimeEntries([entry])" :currency="currency"
+                            :time-entry="entry.timeEntries[0]" @selected="selectedTimeEntries.push(entry)" @unselected="
+                                selectedTimeEntries = selectedTimeEntries.filter(
+                                    (item: TimeEntry) => item.id !== entry.id
+                                )
+                                "></ReadOnlyTimeEntryRow>
+                    </template>
+
                 </div>
+
             </template>
         </div>
     </div>
-    <Submit v-if="previewSheets" :groupEntries="previewSheets" :period="periodLabel(selectedPeriod)" @clear="clearClick"
-        :isSubmit="isSubmit" :projects="projects" :tags="tags" :tasks="tasks" @getTimesheet="fetchTimeEntries">
+    <Submit v-if="previewSheets" :groupEntries="previewSheets" @clear="clearClick" :isSubmit="isSubmit"
+        :projects="projects" :tags="tags" :tasks="tasks" @getTimesheet="fetchTimeEntries">
     </Submit>
 </template>
 

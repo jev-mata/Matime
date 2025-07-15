@@ -6,7 +6,7 @@ import MainContainer from "@/packages/ui/src/MainContainer.vue";
 import { ClockIcon } from "@heroicons/vue/24/outline";
 import { usePage } from "@inertiajs/vue3";
 
-import type { Tag } from '@/packages/api/src';
+import type { Tag, TimeEntry } from '@/packages/api/src';
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, onMounted } from "vue";
 import axios from "axios";
@@ -36,32 +36,41 @@ type Bimontly = {
 
 }
 const page = usePage<{
-  timesheets: Record<string, Bimontly[]>;
+  grouped: Record<string, Bimontly[]>;
+  timesheets: TimeEntry[];
 }>();
+
+
 const isGroupedEmpty = computed(() =>
   Object.keys(
-    page.props.timesheets as Record<string, Bimontly[]>
+    page.props.grouped as Record<string, Bimontly[]>
   ).length === 0
 )
 
-function highlightPeriod(periodKey: string): boolean {
-  // periodKey format is "YYYY-MM-1" or "YYYY-MM-2"
+function getPeriodInfo(periodKey: string): {
+  isHighlighted: boolean;
+  endDate: string; // formatted as YYYY-MM-DD
+} {
   const [year, month, half] = periodKey.split('-');
-
-  // start of month
   const monthStart = dayjs(`${year}-${month}-01`);
 
-  // compute window start & end
-  const windowStart = half === '1' ? monthStart : monthStart.date(16);
-  const windowEnd =
-    half === '1'
-      ? monthStart.date(15).add(5, 'day') // 1‑15 + 5 days
-      : monthStart.endOf('month').add(5, 'day'); // 16‑EOM + 5 days
+  let windowStart, windowEnd;
 
-  // today inside [windowStart, windowEnd] inclusive?
-  return dayjs().isBetween(windowStart, windowEnd, 'day', '[]');
+  if (half === '1') {
+    windowStart = monthStart;
+    windowEnd = monthStart.date(15).add(5, 'day'); // 1–15 + 5 days
+  } else {
+    windowStart = monthStart.date(16);
+    windowEnd = monthStart.endOf('month').add(5, 'day'); // 16–EOM + 5 days
+  }
+
+  const isHighlighted = dayjs().isBetween(windowStart, windowEnd, 'day', '[]');
+  return {
+    isHighlighted,
+    endDate: windowEnd.format('YYYY-MM-DD')
+  };
 }
-onMounted(console.log(page.props.timesheets));
+
 </script><template>
   <AppLayout title="Dashboard" data-testid="dashboard_view">
     <MainContainer class="py-5 border-b border-default-background-separator flex justify-between items-center">
@@ -83,9 +92,10 @@ onMounted(console.log(page.props.timesheets));
               No {{ activeTab }} timesheets found
             </h3>
           </div>
-          <template v-for="(userEntries, period) in page.props.timesheets" :key="period">
-            <div class="p-3 font-bold" :class="highlightPeriod(period) ? 'bg-green-900 text-white' : 'bg-transparent'">
-              {{ period }}
+          <template v-for="(userEntries, period) in page.props.grouped" :key="period">
+            <div class="p-3 font-bold"
+              :class="getPeriodInfo(period).isHighlighted ? 'bg-green-900 text-white' : 'bg-transparent'">
+              {{ period }} (ends {{ getPeriodInfo(period).endDate }})
             </div>
             <a v-for="entry in userEntries" :key="entry.user.id" class="flex border p-3"
               :href="route('approval.ApprovalOverview', { user_id: entry.user.member.id })">
@@ -97,9 +107,6 @@ onMounted(console.log(page.props.timesheets));
               <div class="flex-1">{{ entry.totalHours }}</div>
             </a>
           </template>
-
-
-
         </div>
       </div>
     </div>

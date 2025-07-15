@@ -116,37 +116,49 @@ class ClockifyTimeEntriesImporter extends DefaultImporter
                     throw new ImportException('Time entry description is too long');
                 }
                 $timeEntry->description = $record['Description'];
-                if (! in_array($record['Billable'], ['Yes', 'No'], true)) {
+                if (!in_array($record['Billable'], ['Yes', 'No'], true)) {
                     throw new ImportException('Invalid billable value');
                 }
                 $timeEntry->billable = $record['Billable'] === 'Yes';
                 $timeEntry->tags = $this->getTags($record['Tags']);
                 $timeEntry->is_imported = true;
+                $timeEntry->approval = $record['Approval'];
+                // $timeEntry->approved_by = $record['Approved by'];
 
                 // Start
                 $start = null;
                 try {
                     $startDateStr = $record['Start Date'];
                     $startTimeStr = $record['Start Time'];
-                    $startStr = $startDateStr.' '.$startTimeStr;
+                    $startStr = $startDateStr . ' ' . $startTimeStr;
                     $matches = [];
-                    $checkResult = preg_match('/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4}) ([0-9]{1,2}):([0-9]{1,2})(:[0-9]{1,2})? (AM|PM)$/', $startStr, $matches);
 
+                    $checkResult = preg_match(
+                        '/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4}) ([0-9]{1,2}):([0-9]{1,2})(:[0-9]{1,2})? (AM|PM)$/i',
+                        $startStr,
+                        $matches
+                    );
                     if ($checkResult === 1) {
-                        if ((int) $matches[1] > 12) {
-                            throw new ImportException('Start date ("'.$startDateStr.'") is invalid, please select the correct date format before exporting from Clockify');
+                        $day = (int) $matches[1];
+                        $month = (int) $matches[2];
+                        $year = (int) $matches[3];
+
+                        if (!checkdate($month, $day, $year)) {
+                            throw new ImportException('Start date ("' . $startDateStr . '") is invalid, please select the correct date format before exporting from Clockify');
                         }
+
                         if ($matches[6] === '') {
-                            $start = Carbon::createFromFormat('m/d/Y h:i A', $startStr, $timezone);
+                            $start = Carbon::createFromFormat('d/m/Y h:i A', $startStr, $timezone);
                         } else {
-                            $start = Carbon::createFromFormat('m/d/Y H:i:s A', $startStr, $timezone);
+                            $start = Carbon::createFromFormat('d/m/Y h:i:s A', $startStr, $timezone);
                         }
                     }
+
                 } catch (InvalidFormatException) {
-                    throw new ImportException('Start date ("'.$startDateStr.'") or time ("'.$startTimeStr.'") are invalid');
+                    throw new ImportException('Start date ("' . $startDateStr . '") or time ("' . $startTimeStr . '") are invalid');
                 }
                 if ($start === null) {
-                    throw new ImportException('Start date ("'.$startDateStr.'") or time ("'.$startTimeStr.'") are invalid');
+                    throw new ImportException('Start date ("' . $startDateStr . '") or time ("' . $startTimeStr . '") are invalid');
                 }
                 $timeEntry->start = $start->utc();
 
@@ -155,25 +167,35 @@ class ClockifyTimeEntriesImporter extends DefaultImporter
                 try {
                     $endDateStr = $record['End Date'];
                     $endTimeStr = $record['End Time'];
-                    $endStr = $endDateStr.' '.$endTimeStr;
+                    $endStr = $endDateStr . ' ' . $endTimeStr;
                     $matches = [];
-                    $checkResult = preg_match('/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4}) ([0-9]{1,2}):([0-9]{1,2})(:[0-9]{1,2})? (AM|PM)$/', $endStr, $matches);
+                    $checkResult = preg_match(
+                        '/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4}) ([0-9]{1,2}):([0-9]{1,2})(:[0-9]{1,2})? (AM|PM)$/i',
+                        $endStr,
+                        $matches
+                    );
+
 
                     if ($checkResult === 1) {
-                        if ((int) $matches[1] > 12) {
-                            throw new ImportException('Start date ("'.$endDateStr.'") is invalid, please select the correct date format before exporting from Clockify');
+                        $day = (int) $matches[1];
+                        $month = (int) $matches[2];
+                        $year = (int) $matches[3];
+
+                        if (!checkdate($month, $day, $year)) {
+                            throw new ImportException('Start date ("' . $startDateStr . '") is invalid, please select the correct date format before exporting from Clockify');
                         }
+
                         if ($matches[6] === '') {
-                            $end = Carbon::createFromFormat('m/d/Y h:i A', $endStr, $timezone);
+                            $end = Carbon::createFromFormat('d/m/Y h:i A', $endStr, $timezone);
                         } else {
-                            $end = Carbon::createFromFormat('m/d/Y H:i:s A', $endStr, $timezone);
+                            $end = Carbon::createFromFormat('d/m/Y H:i:s A', $endStr, $timezone);
                         }
                     }
                 } catch (InvalidFormatException) {
-                    throw new ImportException('End date ("'.$endDateStr.'") or time ("'.$endTimeStr.'") are invalid');
+                    throw new ImportException('End date ("' . $endDateStr . '") or time ("' . $endTimeStr . '") are invalid');
                 }
                 if ($end === null) {
-                    throw new ImportException('End date ("'.$endDateStr.'") or time ("'.$endTimeStr.'") are invalid');
+                    throw new ImportException('End date ("' . $endDateStr . '") or time ("' . $endTimeStr . '") are invalid');
                 }
                 $timeEntry->end = $end->utc();
 
@@ -224,10 +246,12 @@ class ClockifyTimeEntriesImporter extends DefaultImporter
             'Start Time',
             'End Date',
             'End Time',
+            'Approval',
+            'Approved by',
         ];
         foreach ($requiredFields as $requiredField) {
-            if (! in_array($requiredField, $header, true)) {
-                throw new ImportException('Invalid CSV header, missing field: '.$requiredField);
+            if (!in_array($requiredField, $header, true)) {
+                throw new ImportException('Invalid CSV header, missing field: ' . $requiredField);
             }
         }
     }

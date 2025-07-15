@@ -20,7 +20,7 @@ import type { TimeEntriesGroupedByType } from "@/types/time-entries";
 import TagBadge from "@/packages/ui/src/Tag/TagBadge.vue";
 // import type { PreviewSheet } from "@/packages/ui/src/TimeEntry/TimeEntryGroupedTable.vue";
 
-import { useNotificationsStore } from '@/utils/notification'; 
+import { useNotificationsStore } from '@/utils/notification';
 function selectProject(
   id: string | null,
   projects: Project[]
@@ -48,8 +48,7 @@ function selectTags(
 }
 
 type GroupEntries = {
-  groupEntries: TimeEntriesGroupedByType[]
-  period: string;
+  groupEntries: Record<string, TimeEntriesGroupedByType[]> 
   projects: Project[];
   tasks: Task[];
   tags: Tag[];
@@ -78,12 +77,15 @@ function sumDuration(timeEntryGroup: TimeEntriesGroupedByType[]) {
 }
 
 function pluckID(
-  timeEntryGroup: TimeEntriesGroupedByType[]
+  timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>
 ): string[] {
-  return timeEntryGroup.flatMap(entryGroup =>
-    entryGroup.timeEntries.map(timeEntry => timeEntry.id)
+  return Object.values(timeEntryGroup).flatMap(entryGroups =>
+    entryGroups.flatMap(entryGroup =>
+      entryGroup.timeEntries.map(timeEntry => timeEntry.id)
+    )
   );
 }
+
 
 const submit = async () => {
   const IDlist = pluckID(props.groupEntries);
@@ -140,17 +142,21 @@ function duration(_start: string, _end: string) {
   return `${hours}h ${minutes}m`;
 }
 
-function durationAll(timeEntryGroup: TimeEntriesGroupedByType[]): string {
+function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>): string {
   let totalMinutes = 0;
 
-  timeEntryGroup.forEach((entry) => {
-    const start = new Date(entry.start).getTime();
-    const end = entry.end ? new Date(entry.end).getTime() : NaN;
+  Object.values(timeEntryGroup).forEach((entryGroups) => {
+    entryGroups.forEach((entryGroup) => {
+      entryGroup.timeEntries.forEach((timeEntry) => {
+        const start = new Date(timeEntry.start).getTime();
+        const end = timeEntry.end ? new Date(timeEntry.end).getTime() : NaN;
 
-    if (!isNaN(start) && !isNaN(end)) {
-      const diffInMinutes = Math.floor((end - start) / (1000 * 60));
-      totalMinutes += diffInMinutes;
-    }
+        if (!isNaN(start) && !isNaN(end)) {
+          const diffInMinutes = Math.floor((end - start) / (1000 * 60));
+          totalMinutes += diffInMinutes;
+        }
+      });
+    });
   });
 
   const hours = Math.floor(totalMinutes / 60);
@@ -158,6 +164,7 @@ function durationAll(timeEntryGroup: TimeEntriesGroupedByType[]): string {
 
   return `${hours}h ${minutes}m`;
 }
+
 
 </script>
 
@@ -169,11 +176,11 @@ function durationAll(timeEntryGroup: TimeEntriesGroupedByType[]): string {
         <div class="text-md mb-2">{{ props.period }}</div>
         <div class="max-h-20 overflow-y-scroll " style="max-height: 50vh;">
           <div v-for="(entries, date2) in props.groupEntries" :key="date2" class="mt-4 mb-4 border">
-            <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">{{ formatDate(entries.start) }}
+            <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">{{ date2 }}
             </h2>
 
             <ul class="">
-              <li v-for="entry in entries.timeEntries" :key="entry.id" class="flex flex-row px-3 rounded border py-2">
+              <li v-for="(entry) in entries" :key="entry.id" class="flex flex-row px-3 rounded border py-2">
 
                 <div class="basis-64 flex content-center">
                   {{ formatTime(entry.start) }} - {{ entry.end && formatTime(entry.end) }}

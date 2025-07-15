@@ -67,23 +67,7 @@ async function startTimeEntry(
 function deleteTimeEntries(timeEntries: TimeEntry[]) {
     useTimeEntriesStore().deleteTimeEntries(timeEntries);
     fetchTimeEntries();
-}
-const fetchCurrentTimeEntries = async () => {
-    try {
-        const response = await axios.get(route('approval.all'), {
-            withCredentials: true, // if you're using Sanctum/cookies
-            headers: {
-                Accept: 'application/json',
-            },
-        });
-
-        console.log('Time entries:', response.data);
-        return response.data as TimeEntry[]; // this will be your time entry array
-    } catch (error) {
-        console.error('Failed to fetch time entries:', error);
-        return [];
-    }
-};
+} 
 watch(isLoadMoreVisible, async (isVisible) => {
     if (
         isVisible &&
@@ -94,11 +78,7 @@ watch(isLoadMoreVisible, async (isVisible) => {
         await timeEntriesStore.fetchMoreTimeEntries();
     }
 });
-
-const timeCurrentEntries = ref<TimeEntry[]>([]);   // initialise with empty array
-async function loadCurrentEntries() {
-    timeCurrentEntries.value = await fetchCurrentTimeEntries();
-}
+ 
 onMounted(async () => {
     await loadEntries();    
 });

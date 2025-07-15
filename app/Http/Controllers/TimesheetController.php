@@ -165,7 +165,8 @@ class TimesheetController extends Controller
 
 
         return Inertia::render('Timesheet/Index', [
-            'timesheets' => $grouped,
+            'timesheets' => $timesheets,
+            'grouped' => $grouped,
         ]);
     }
 
