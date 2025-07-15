@@ -26,36 +26,57 @@ class TimesheetController extends Controller
      */
     public function permission()
     {
-        $org = $this->currentOrganization();
-        $mem = $this->member($org);
-        $isManager = $mem->role !== 'employee';
+        $curOrg = $this->currentOrganization();
+        $memberRole = $this->member($curOrg); 
+        $isManager = $memberRole->role !== 'employee';
         $teamIds = Auth::user()->groups()->pluck('teams.id');
 
-        $timesheets = TimeEntry::with('user.groups')
-            ->where('approval', '=', 'submitted')
-            ->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds))
-            ->get();
+
+        $timesheets = TimeEntry::with(['user.groups', 'member'])          // eager‑load member
+            ->where('approval', 'submitted');
+        if ($memberRole->role == "employee") {
+            return redirect()->route('dashboard');
+        }
+        if ($memberRole->role == "manager") {
+            $timesheets = $timesheets->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
+
+        } else if ($memberRole->role == "admin") {
+
+        }
+        $timesheets = $timesheets->get();
 
         $grouped = $timesheets
             ->groupBy(function ($t) {
                 $d = Carbon::parse($t->start);
-                $half = $d->day <= 15 ? 1 : 2;
-                return $d->format('Y-m') . '-' . $half;
+                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
+                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
             })
             ->map(function ($entriesByPeriod) {
                 return $entriesByPeriod
                     ->groupBy('user_id')
                     ->map(function ($entriesByUser) {
-                        $user = $entriesByUser->first()->user;
-                        $totalMinutes = $entriesByUser->sum(function ($entry) {
-                            return Carbon::parse($entry->start)->diffInMinutes(Carbon::parse($entry->end));
-                        });
+                        $first = $entriesByUser->first();  // any row in this bucket
+                        $user = $first->user;
+                        $member = $first->member;           // ⬅︎ comes from ->with('member')
+        
+                        $totalMinutes = $entriesByUser->sum(
+                            fn($e) =>
+                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
+                        );
+
                         return [
-                            'user' => $user->only(['id', 'name']) + ['groups' => $user->groups],
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->name,
+                                'groups' => $user->groups,
+                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
+                            ],
                             'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
                         ];
-                    })->values();
+                    })
+                    ->values();
             });
+
 
         return response()->json(
             [
