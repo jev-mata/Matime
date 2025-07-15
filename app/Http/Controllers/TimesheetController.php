@@ -27,64 +27,68 @@ class TimesheetController extends Controller
     public function permission()
     {
         $curOrg = $this->currentOrganization();
-        $memberRole = $this->member($curOrg); 
+        $memberRole = $this->member($curOrg);
         $isManager = $memberRole->role !== 'employee';
-        $teamIds = Auth::user()->groups()->pluck('teams.id');
 
-
-        $timesheets = TimeEntry::with(['user.groups', 'member'])          // eager‑load member
-            ->where('approval', 'submitted');
-        if ($memberRole->role == "employee") {
+        // Redirect employees away from approval route
+        if ($memberRole->role === 'employee') {
             return redirect()->route('dashboard');
         }
-        if ($memberRole->role == "manager") {
-            $timesheets = $timesheets->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
 
-        } else if ($memberRole->role == "admin") {
+        $teamIds = Auth::user()->groups()->pluck('teams.id');
 
+        // Start base query with eager-loaded user.groups and member
+        $query = TimeEntry::with(['user.groups', 'member'])
+            ->where('approval', 'submitted');
+
+        // Filter based on manager’s teams
+        if ($memberRole->role === 'manager') {
+            $query = $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         }
-        $timesheets = $timesheets->get();
 
+        $timesheets = $query->get();
+
+        // Group and map entries
         $grouped = $timesheets
-            ->groupBy(function ($t) {
-                $d = Carbon::parse($t->start);
-                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
-                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
+            ->groupBy(function ($entry) {
+                $date = Carbon::parse($entry->start);
+                $half = $date->day <= 15 ? 1 : 2;
+                return $date->format('Y-m') . '-' . $half;  // e.g. 2025-07-1 or 2025-07-2
             })
             ->map(function ($entriesByPeriod) {
                 return $entriesByPeriod
                     ->groupBy('user_id')
                     ->map(function ($entriesByUser) {
-                        $first = $entriesByUser->first();  // any row in this bucket
+                        $first = $entriesByUser->first();
                         $user = $first->user;
-                        $member = $first->member;           // ⬅︎ comes from ->with('member')
-        
-                        $totalMinutes = $entriesByUser->sum(
-                            fn($e) =>
-                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
-                        );
+                        $member = $first->member;
+
+                        $totalMinutes = $entriesByUser->sum(function ($e) {
+                            return Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end));
+                        });
 
                         return [
                             'user' => [
                                 'id' => $user->id,
                                 'name' => $user->name,
                                 'groups' => $user->groups,
-                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
+                                'member' => $member ? ['id' => $member->id] : null,
                             ],
                             'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
                         ];
                     })
-                    ->values();
+                    ->values(); // Remove user_id keys
             });
 
+        // Optional: Count total distinct users across all periods
+        $totalUsers = $timesheets->pluck('user_id')->unique()->count();
 
-        return response()->json(
-            [
-                "isManager" => $isManager,
-                "remain" => count($grouped),
-            ]
-        );
+        return response()->json([
+            'isManager' => $isManager,
+            'remain' => $totalUsers,     // Number of bi-monthly periods  
+        ]);
     }
+
 
     public function getAllTimeEntries()
     {
