@@ -48,7 +48,7 @@ function selectTags(
 }
 
 type GroupEntries = {
-  groupEntries: Record<string, TimeEntriesGroupedByType[]> 
+  groupEntries: Record<string, TimeEntriesGroupedByType[]>
   projects: Project[];
   tasks: Task[];
   tags: Tag[];
@@ -172,8 +172,7 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
   <Modal :show="true" max-width="5xl">
     <template #default>
       <div class="col-span-full my-1 p-5">
-        <h2 class="text-lg font-semibold mb-1">My Entries</h2>
-        <div class="text-md mb-2">{{ props.period }}</div>
+        <h2 class="text-lg font-semibold mb-1">My Entries</h2> 
         <div class="max-h-20 overflow-y-scroll " style="max-height: 50vh;">
           <div v-for="(entries, date2) in props.groupEntries" :key="date2" class="mt-4 mb-4 border">
             <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">{{ date2 }}

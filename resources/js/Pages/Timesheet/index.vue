@@ -50,6 +50,7 @@ const isGroupedEmpty = computed(() =>
 function getPeriodInfo(periodKey: string): {
   isHighlighted: boolean;
   endDate: string; // formatted as YYYY-MM-DD
+  endDate2: string; // formatted as YYYY-MM-DD
 } {
   const [year, month, half] = periodKey.split('-');
   const monthStart = dayjs(`${year}-${month}-01`);
@@ -58,19 +59,26 @@ function getPeriodInfo(periodKey: string): {
 
   if (half === '1') {
     windowStart = monthStart;
-    windowEnd = monthStart.date(15).add(5, 'day'); // 1–15 + 5 days
+    windowEnd = monthStart.date(15); // 1–15 + 5 days
   } else {
     windowStart = monthStart.date(16);
-    windowEnd = monthStart.endOf('month').add(5, 'day'); // 16–EOM + 5 days
+    windowEnd = monthStart.endOf('month'); // 16–EOM + 5 days
   }
 
   const isHighlighted = dayjs().isBetween(windowStart, windowEnd, 'day', '[]');
   return {
     isHighlighted,
-    endDate: windowEnd.format('YYYY-MM-DD')
+    endDate: windowEnd.format('D, YYYY'),
+    endDate2: windowEnd.format('YYYY-MM-DD')
   };
 }
-
+function formatDate(dateString: string, format?: string) {
+  if (!format) {
+    format = 'MMMM D';
+  }
+  const formatted = dayjs(dateString).format(format);
+  return formatted;
+}
 </script><template>
   <AppLayout title="Dashboard" data-testid="dashboard_view">
     <MainContainer class="py-5 border-b border-default-background-separator flex justify-between items-center">
@@ -95,10 +103,10 @@ function getPeriodInfo(periodKey: string): {
           <template v-for="(userEntries, period) in page.props.grouped" :key="period">
             <div class="p-3 font-bold"
               :class="getPeriodInfo(period).isHighlighted ? 'bg-green-900 text-white' : 'bg-transparent'">
-              {{ period }} (ends {{ getPeriodInfo(period).endDate }})
+              {{ formatDate(period) }} - {{ (getPeriodInfo(period).endDate) }}
             </div>
             <a v-for="entry in userEntries" :key="entry.user.id" class="flex border p-3"
-              :href="route('approval.ApprovalOverview', { user_id: entry.user.member.id })">
+              :href="route('approval.ApprovalOverview', { user_id: entry.user.member.id, date_start: period, date_end: getPeriodInfo(period).endDate2 })">
 
               <div class="flex-1">{{ entry.user.name }}</div>
               <div class="flex-1">

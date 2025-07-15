@@ -177,7 +177,7 @@ class TimesheetController extends Controller
 
             return Inertia::render('Timesheet/TimeReportOverview', [
                 'userid' => $request->input('user_id'),
-                'period' => ['start' => '', 'end' => ''],
+                'period' => ['start' => $request->input('date_start'), 'end' => $request->input('date_end')],
             ]);
         } else {
             return redirect()->route('dashboard');
