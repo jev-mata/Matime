@@ -1,66 +1,64 @@
 <script setup lang="ts">
-import {
-    ChartBarIcon,
-    CheckCircleIcon,
-    TagIcon,
-    UserGroupIcon,
-} from '@heroicons/vue/20/solid';
-import { FolderIcon } from '@heroicons/vue/16/solid';
-import BillableIcon from '@/packages/ui/src/Icons/BillableIcon.vue';
 import { getOrganizationCurrencyString } from '@/utils/money';
 import {
     formatHumanReadableDuration,
     getDayJsInstance,
     getLocalizedDayJs,
+    getLocalizedDateFromTimestamp,
 } from '@/packages/ui/src/utils/time';
 import { formatCents } from '@/packages/ui/src/utils/money';
-import ReportingTabNavbar from '@/Components/Common/Reporting/ReportingTabNavbar.vue';
-import ReportingExportButton from '@/Components/Common/Reporting/ReportingExportButton.vue';
-import TaskMultiselectDropdown from '@/Components/Common/Task/TaskMultiselectDropdown.vue';
-import ClientMultiselectDropdown from '@/Components/Common/Client/ClientMultiselectDropdown.vue';
 import ReportingRow from '@/Components/Common/Reporting/ReportingRow.vue';
-import MemberMultiselectDropdown from '@/Components/Common/Member/MemberMultiselectDropdown.vue';
-import ReportingFilterBadge from '@/Components/Common/Reporting/ReportingFilterBadge.vue';
-import PageTitle from '@/Components/Common/PageTitle.vue';
-import ProjectMultiselectDropdown from '@/Components/Common/Project/ProjectMultiselectDropdown.vue';
 import ReportingChart from '@/Components/Common/Reporting/ReportingChart.vue';
-import SelectDropdown from '@/packages/ui/src/Input/SelectDropdown.vue';
-import ReportingGroupBySelect from '@/Components/Common/Reporting/ReportingGroupBySelect.vue';
 import MainContainer from '@/packages/ui/src/MainContainer.vue';
-import DateRangePicker from '@/packages/ui/src/Input/DateRangePicker.vue';
 import ReportingExportModal from '@/Components/Common/Reporting/ReportingExportModal.vue';
-import ReportSaveButton from '@/Components/Common/Report/ReportSaveButton.vue';
-import TagDropdown from '@/packages/ui/src/Tag/TagDropdown.vue';
 import ReportingPieChart from '@/Components/Common/Reporting/ReportingPieChart.vue';
 
+import type {
+    Project,
+    Tag,
+    Task,
+    TimeEntry,
+    Client,
+} from '@/packages/api/src';
+import type { TimeEntriesGroupedByType } from '@/types/time-entries';
+import TabBar from '@/Components/Common/TabBar/TabBar.vue';
+import TabBarItem from '@/Components/Common/TabBar/TabBarItem.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, type ComputedRef, inject, onMounted, ref, watch, watchEffect } from 'vue';
 import { useReportingStore, type GroupingOption } from '@/utils/useReporting';
 import { storeToRefs } from 'pinia';
 import {
     type AggregatedTimeEntriesQueryParams,
-    api,
     type CreateReportBodyProperties,
     type Organization,
 } from '@/packages/api/src';
 import {
     getCurrentMembershipId,
-    getCurrentOrganizationId,
     getCurrentRole,
 } from '@/utils/useUser';
 import { useTagsStore } from '@/utils/useTags';
 import { useSessionStorage, useStorage } from '@vueuse/core';
 import { useNotificationsStore } from '@/utils/notification';
-import type { ExportFormat } from '@/types/reporting';
 import { getRandomColorWithSeed } from '@/packages/ui/src/utils/color';
 import { useProjectsStore } from '@/utils/useProjects';
 import { usePage } from '@inertiajs/vue3';
+import dayjs from 'dayjs';
 
+import ReadOnlyTimeEntryRow from './ReadOnlyTimeEntryRow.vue';
+import { SecondaryButton } from '@/packages/ui/src';
+import axios from 'axios';
+import ReadOnlyTimeEntryAggregateRow from './ReadOnlyTimeEntryAggregateRow.vue';
 const { handleApiRequestNotifications } = useNotificationsStore();
 
 const page = usePage<{
     userid: string;
-    period: { start: string; end: string }
+    period: { start: string; end: string };
+    name: string;
+    timeEntries: TimeEntry[];
+    projects: Project[];
+    tasks: Task[];
+    tags: Tag[];
+    clients: Client[];
 }>();
 
 const startDate = useSessionStorage<string>('reporting-start-date', '');
@@ -74,8 +72,8 @@ const selectedClients = ref<string[]>([]);
 const billable = ref<'true' | 'false' | null>(null);
 watchEffect(() => {
     startDate.value = page.props.period.start;
-     endDate.value = page.props.period.end;
-     selectedMembers.value = [page.props.userid];
+    endDate.value = page.props.period.end;
+    selectedMembers.value = [page.props.userid];
 });
 const group = useStorage<GroupingOption>('reporting-group', 'project');
 const subGroup = useStorage<GroupingOption>('reporting-sub-group', 'task');
@@ -195,34 +193,28 @@ const reportProperties = computed(() => {
     } as CreateReportBodyProperties;
 });
 
-async function downloadExport(format: ExportFormat) {
-    const organizationId = getCurrentOrganizationId();
-    if (organizationId) {
-        const response = await handleApiRequestNotifications(
-            () =>
-                api.exportAggregatedTimeEntries({
-                    params: {
-                        organization: organizationId,
-                    },
-                    queries: {
-                        ...getFilterAttributes(),
-                        group: group.value,
-                        sub_group: subGroup.value,
-                        history_group: getOptimalGroupingOption(
-                            startDate.value,
-                            endDate.value
-                        ),
-                        format: format,
-                    },
-                }),
-            'Export successful',
-            'Export failed'
+const { addNotification } = useNotificationsStore();
+async function approveReject(type: 'approve' | 'reject') {
+    try {
+        const ids = page.props.timeEntries.map(t => t.id);
+
+        const { data } = await axios.post(
+            route(`approval.${type}`),          // approval.approve | approval.reject
+            { timeEntries: ids },
+            { withCredentials: true, headers: { Accept: 'application/json' } }
         );
 
-        if (response?.download_url) {
-            showExportModal.value = true;
-            exportUrl.value = response.download_url as string;
-        }
+        addNotification(
+            'success',
+            `${type === 'approve' ? 'Approved' : 'Rejected'}`, 
+        );
+    } catch (error) {
+        console.error(error);
+        addNotification(
+            'error',
+            'Failed',
+            `Could not ${type} entries`
+        );
     }
 }
 
@@ -292,16 +284,147 @@ const tableData = computed(() => {
         };
     });
 });
+
+function formatDate(dateString: string, format?: string) {
+    if (!format) {
+        format = 'MMMM D';
+    }
+    const formatted = dayjs(dateString).format(format);
+    return formatted;
+}
+const tabs = ref<'summary' | 'detailed'>('summary');
+
+
+
+type GroupedTimeEntries = Record<
+    string, // biMonthKey
+    {
+        isApproved: boolean;
+        isSubmitted: boolean;
+        days: Record<string, TimeEntriesGroupedByType[]>; // daily breakdown
+    }
+>
+function getBimonthlyKey(dateInput: string | Date): string {
+    const date = new Date(dateInput);
+    const year = date.getFullYear();
+
+    const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date); // "Jan", "Feb", etc.
+
+    const isFirstHalf = date.getDate() <= 15;
+    const start = isFirstHalf ? '1' : '16';
+    const end = isFirstHalf
+        ? '15'
+        : new Date(year, date.getMonth() + 1, 0).getDate().toString(); // Last day of the month
+
+    return `${month} ${year} (${start}-${end})`;
+}
+
+
+const groupedTimeEntries = computed(() => {
+    const groupedEntriesByDay: Record<string, TimeEntry[]> = {};
+    for (const entry of page.props.timeEntries) {
+        // skip current time entry
+        if (entry.end === null) {
+            continue;
+        }
+        const oldEntries =
+            groupedEntriesByDay[getLocalizedDateFromTimestamp(entry.start)];
+        groupedEntriesByDay[getLocalizedDateFromTimestamp(entry.start)] = [
+            ...(oldEntries ?? []),
+            entry,
+        ];
+    }
+    const groupedEntriesByDayAndType: Record<
+        string,
+        TimeEntriesGroupedByType[]
+    > = {};
+    for (const dailyEntriesKey in groupedEntriesByDay) {
+        const dailyEntries = groupedEntriesByDay[dailyEntriesKey];
+        const newDailyEntries: TimeEntriesGroupedByType[] = [];
+
+        for (const entry of dailyEntries) {
+            // check if same entry already exists
+            const oldEntriesIndex = newDailyEntries.findIndex(
+                (e) =>
+                    e.project_id === entry.project_id &&
+                    e.task_id === entry.task_id &&
+                    e.billable === entry.billable &&
+                    e.description === entry.description
+            );
+            if (oldEntriesIndex !== -1 && newDailyEntries[oldEntriesIndex]) {
+                newDailyEntries[oldEntriesIndex].timeEntries.push(entry);
+
+                // Add up durations for time entries of the same type
+                newDailyEntries[oldEntriesIndex].duration =
+                    (newDailyEntries[oldEntriesIndex].duration ?? 0) +
+                    (entry?.duration ?? 0);
+
+                // adapt start end times so they show the earliest start and latest end time
+                if (
+                    getDayJsInstance()(entry.start).isBefore(
+                        getDayJsInstance()(
+                            newDailyEntries[oldEntriesIndex].start
+                        )
+                    )
+                ) {
+                    newDailyEntries[oldEntriesIndex].start = entry.start;
+                }
+                if (
+                    getDayJsInstance()(entry.end).isAfter(
+                        getDayJsInstance()(newDailyEntries[oldEntriesIndex].end)
+                    )
+                ) {
+                    newDailyEntries[oldEntriesIndex].end = entry.end;
+                }
+            } else {
+                newDailyEntries.push({ ...entry, timeEntries: [entry] });
+            }
+        }
+
+        groupedEntriesByDayAndType[dailyEntriesKey] = newDailyEntries;
+    }
+    return groupedEntriesByDayAndType;
+});
+
+function sumDuration(timeEntries: TimeEntry[]) {
+    return timeEntries.reduce((acc, entry) => acc + (entry?.duration ?? 0), 0);
+}
+
+
 </script>
 
 <template>
     <AppLayout title="Reporting" data-testid="reporting_view" class="overflow-hidden">
         <ReportingExportModal v-model:show="showExportModal" :export-url="exportUrl"></ReportingExportModal>
         <MainContainer
-            class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center"> 
+            class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
             <div class="flex space-x-2">
-                <ReportingExportButton :download="downloadExport"></ReportingExportButton>
-                <ReportSaveButton :report-properties="reportProperties"></ReportSaveButton>
+                <div class="px-2 font-bold text-lg">
+                    {{ page.props.name }}</div>
+                <div class="font-bold text-lg">
+                    -
+                </div>
+                <div class="pl-2 font-semibold">(
+                    {{ formatDate(page.props.period.start, 'ddd, MMMM D') }} -
+                    {{ formatDate(page.props.period.end, 'D - YYYY') }})</div>
+            </div>
+        </MainContainer>
+        <MainContainer
+            class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
+            <div class="relative flex space-x-2 w-full">
+                <div class="px-2  text-sm">
+                    Submitted by: {{ page.props.name }}</div>
+                <div class="pl-2 font-semibold">(
+                    {{ formatDate(page.props.period.end, 'ddd, MMMM D - YYYY') }})
+                </div>
+                <div class="absolute right-5 pl-2 font-semibold">
+                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                        @click="ApproveReject('approve')">APPROVE
+                    </SecondaryButton>
+                    <SecondaryButton class="border-0 px-2 bg-red-600 mx-2 text-quaternary"
+                        @click="ApproveReject('reject')">REJECT</SecondaryButton>
+                </div>
+
             </div>
         </MainContainer>
         <MainContainer>
@@ -309,11 +432,11 @@ const tableData = computed(() => {
                 <ReportingChart :grouped-type="aggregatedGraphTimeEntries?.grouped_type" :grouped-data="aggregatedGraphTimeEntries?.grouped_data
                     "></ReportingChart>
             </div>
-        </MainContainer> 
+        </MainContainer>
         <MainContainer>
             <div class="sm:grid grid-cols-4 pt-6 items-start">
                 <div class="col-span-3 bg-card-background rounded-lg border border-card-border pt-3">
-                     
+
                     <div class="grid items-center" style="grid-template-columns: 1fr 100px 150px">
                         <div
                             class="contents [&>*]:border-card-background-separator [&>*]:border-b [&>*]:bg-tertiary [&>*]:pb-1.5 [&>*]:pt-1 text-text-secondary text-sm">
@@ -366,6 +489,29 @@ const tableData = computed(() => {
                 </div>
                 <div class="px-2 lg:px-4">
                     <ReportingPieChart :data="groupedPieChartData"></ReportingPieChart>
+                </div>
+            </div>
+        </MainContainer>
+        <MainContainer class="-mt-20">
+
+            <div v-for="(value, key) in groupedTimeEntries" :key="key">
+                <div class=" border border-1 mt-5 border-tertiary border-b-4">
+
+
+
+                    <TimeEntryRowHeading class=" " :date="key" :duration="sumDuration(value)">
+                    </TimeEntryRowHeading>
+
+
+                    <template v-for="entry in value" :key="entry.id">
+                        <ReadOnlyTimeEntryAggregateRow v-if="'timeEntries' in entry && entry.timeEntries.length > 1"
+                            :projects="projects" :tasks="page.props.tasks" :tags="tags" :clients="page.props.clients"
+                            :create-tag :time-entry="entry"></ReadOnlyTimeEntryAggregateRow>
+                        <ReadOnlyTimeEntryRow v-else :projects="projects" :tasks="page.props.tasks" :tags="tags"
+                            :clients="page.props.clients" :time-entry="entry.timeEntries[0]">
+                        </ReadOnlyTimeEntryRow>
+                    </template>
+
                 </div>
             </div>
         </MainContainer>

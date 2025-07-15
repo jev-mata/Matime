@@ -54,8 +54,6 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
             Route::get('/permission', [TimesheetController::class, 'permission'])->name('permission');
             Route::get('/show', [TimesheetController::class, 'show'])->name('show');
             Route::get('/showAll', [TimesheetController::class, 'showAll'])->name('showAll'); 
-            Route::post('{timesheet}/approve', [TimesheetController::class, 'approve'])->name('approve');
-            Route::post('{timesheet}/reject', [TimesheetController::class, 'reject'])->name('reject');
         });
         // Member routes
         Route::name('members.')->prefix('/organizations/{organization}')->group(static function (): void {

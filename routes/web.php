@@ -127,6 +127,10 @@ Route::middleware([
         Route::post('/unsubmit', [TimesheetController::class, 'Unsubmit'])->name('unsubmit');
         Route::get('/', [TimesheetController::class, 'approval'])->name('index'); 
         Route::get('/approval/overview', [TimesheetController::class, 'ApprovalOverview'])->name('ApprovalOverview'); 
+
+        
+        Route::post('/approve', [TimesheetController::class, 'approve'])->name('approve');
+        Route::post('/reject', [TimesheetController::class, 'reject'])->name('reject');
     });
     Route::name('approval.')->prefix('/timesheet')->group(static function (): void {
         Route::get('/unsubmit', [TimesheetController::class, 'unsubmitView'])->name('unsubmit.get');

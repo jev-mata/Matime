@@ -96,6 +96,8 @@ function isSameBimonthlyPeriod(entryDate: string | Date, submission: TimeEntry):
 }
 
 
+const arraysEqual = (a: string[], b: string[]) =>
+    a.length === b.length && a.every((val, index) => val === b[index]);
 
 
 function groupTimeEntriesFunc() {
@@ -120,7 +122,7 @@ function groupTimeEntriesFunc() {
         if (!grouped[biMonthKey]) {
             grouped[biMonthKey] = {
                 isApproved: entry.approval == "approved",
-                isSubmitted: entry.approval == "submitted" ||entry.approval == "approved",
+                isSubmitted: entry.approval == "submitted" || entry.approval == "approved",
                 days: {}
             }
         }
@@ -129,13 +131,14 @@ function groupTimeEntriesFunc() {
             grouped[biMonthKey].days[dayKey] = []
         }
         // Now find if this entry matches an existing grouped entry (by type/project/task)
-        const existingGroup = grouped[biMonthKey].days[dayKey]
+        const existingGroup = grouped[biMonthKey].days[dayKey];
         const index = existingGroup.findIndex(
             (e) =>
                 e.project_id === entry.project_id &&
                 e.task_id === entry.task_id &&
                 e.billable === entry.billable &&
-                e.description === entry.description
+                e.description === entry.description &&
+                arraysEqual(e.tags, entry.tags)
         )
 
         if (index !== -1) {
@@ -271,7 +274,8 @@ watch(
 
             <div class="  border-1 p-1 ">
 
-                <button @click="SubmitBTN(bimonthlykey, bimonthly.days)" v-if="!bimonthly.isSubmitted &&!bimonthly.isApproved"
+                <button @click="SubmitBTN(bimonthlykey, bimonthly.days)"
+                    v-if="!bimonthly.isSubmitted && !bimonthly.isApproved"
                     class=" p-2 border-1 mx-2 button text-blue-400">
                     submit
                 </button>

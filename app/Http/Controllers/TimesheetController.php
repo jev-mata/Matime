@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Member;
 use App\Models\Organization;
+use App\Models\Project;
 use App\Models\Tag;
 use App\Models\Teams;
 use App\Models\TimeEntry;
@@ -108,8 +110,27 @@ class TimesheetController extends Controller
     }
 
 
-    public function reject($id)
+    public function approve(Request $request)
     {
+
+        $ids = $request->input('timeEntries'); // expect array of UUIDs
+        $timeEntry = TimeEntry::whereIn('id', $ids)->update(['approval' => 'approved']);
+
+        return response()->json([
+            'updated' => count($ids),
+            'status' => 'ok',
+        ]);
+    }
+    public function reject(Request $request)
+    {
+
+        $ids = $request->input('timeEntries'); // expect array of UUIDs
+        $timeEntry = TimeEntry::whereIn('id', $ids)->update(['approval' => 'rejected']);
+
+        return response()->json([
+            'updated' => count($ids),
+            'status' => 'ok',
+        ]);
     }
 
 
@@ -172,26 +193,48 @@ class TimesheetController extends Controller
                     ->values();
             });
 
-
         return Inertia::render('Timesheet/Index', [
             'timesheets' => $timesheets,
             'grouped' => $grouped,
         ]);
     }
-
     public function ApprovalOverview(Request $request)
     {
-        $user = Member::where('id', '=', $request->input('user_id'))->first();
-        if ($user) {
+        $user = Member::with('user')->find($request->input('user_id'));
 
-            return Inertia::render('Timesheet/TimeReportOverview', [
-                'userid' => $request->input('user_id'),
-                'period' => ['start' => $request->input('date_start'), 'end' => $request->input('date_end')],
-            ]);
-        } else {
+        if (!$user) {
             return redirect()->route('dashboard');
         }
+
+        $start = $request->input('date_start');
+        $end = $request->input('date_end');
+        $curOrg = $this->currentOrganization();
+
+        $projects = Project::where('organization_id', $curOrg->id)->get();
+        $tags = Tag::where('organization_id', $curOrg->id)->get();
+        $clients = Client::where('organization_id', $curOrg->id)->get();
+
+        $timeEntriesQuery = TimeEntry::where('organization_id', $curOrg->id)
+            ->where('member_id', $user->id)
+            ->whereBetween('start', [$start, $end])
+            ->where('approval', 'submitted');
+
+        if (!$timeEntriesQuery->exists()) {
+            return redirect()->route('approval.index');
+        }
+
+        return Inertia::render('Timesheet/TimeReportOverview', [
+            'userid' => $user->id,
+            'period' => ['start' => $start, 'end' => $end],
+            'name' => $user->user->name,
+            'projects' => $projects,
+            'timeEntries' => $timeEntriesQuery->get(),
+            'tasks' => $projects, // you might want to actually load real tasks if needed
+            'tags' => $tags,
+            'clients' => $clients,
+        ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
