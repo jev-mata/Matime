@@ -14,7 +14,7 @@ const emit = defineEmits<{
     duplicate: [TimeEntry];    // payload is a TimeEntry
 }>();
 function onCopyClick() {
-    emit('duplicate', props.entry);   // 👈 send the whole entry upward
+    props.entry && emit('duplicate', props.entry);   // 👈 send the whole entry upward
 }
 </script>
 
