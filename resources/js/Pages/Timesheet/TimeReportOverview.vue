@@ -419,10 +419,10 @@ function sumDuration(timeEntries: TimeEntry[]) {
                 </div>
                 <div class="absolute right-5 pl-2 font-semibold">
                     <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
-                        @click="ApproveReject('approve')">APPROVE
+                        @click="approveReject('approve')">APPROVE
                     </SecondaryButton>
                     <SecondaryButton class="border-0 px-2 bg-red-600 mx-2 text-quaternary"
-                        @click="ApproveReject('reject')">REJECT</SecondaryButton>
+                        @click="approveReject('reject')">REJECT</SecondaryButton>
                 </div>
 
             </div>
