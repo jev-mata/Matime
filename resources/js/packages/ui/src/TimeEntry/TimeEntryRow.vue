@@ -32,7 +32,7 @@ const props = defineProps<{
     projects: Project[];
     tasks: Task[];
     tags: Tag[];
-    clients: Client[]; 
+    clients: Client[];
     members?: Member[];
     createTag: (name: string) => Promise<Tag | undefined>;
     createProject: (project: CreateProjectBody) => Promise<Project | undefined>;
@@ -40,6 +40,7 @@ const props = defineProps<{
     onStartStopClick: () => void;
     deleteTimeEntry: () => void;
     updateTimeEntry: (timeEntry: TimeEntry) => void;
+    duplicateTimeEntry: (timeEntry: TimeEntry) => void;
     currency: string;
     showMember?: boolean;
     showDate?: boolean;
@@ -86,7 +87,7 @@ const memberName = computed(() => {
     return '';
 });
 
-function onSelectChange(checked : boolean) {
+function onSelectChange(checked: boolean) {
     if (checked) {
         emit('selected');
     } else {
@@ -96,80 +97,45 @@ function onSelectChange(checked : boolean) {
 </script>
 
 <template>
-    <div
-        class="border-b border-default-background-separator transition min-w-0 bg-row-background"
+    <div class="border-b border-default-background-separator transition min-w-0 bg-row-background"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0">
-            <div
-                class="sm:flex py-2 min-w-0 items-center justify-between group">
+            <div class="sm:flex py-2 min-w-0 items-center justify-between group">
                 <div class="flex items-center min-w-0">
-                    <Checkbox
-                        :checked="selected"
-                        @update:checked="onSelectChange" />
+                    <Checkbox :checked="selected" @update:checked="onSelectChange" />
                     <div v-if="indent === true" class="w-10 h-7"></div>
-                    <TimeEntryDescriptionInput
-                        class="min-w-0 mr-4"
-                        :model-value="
-                            timeEntry.description
-                        "
-                        @changed="updateTimeEntryDescription"></TimeEntryDescriptionInput>
-                    <TimeTrackerProjectTaskDropdown
-                        :create-project
-                        :create-client
-                        :can-create-project
-                        :clients
-                        :projects="projects"
-                        :tasks="tasks"
-                        :show-badge-border="false"
-                        :project="timeEntry.project_id"
-                        :currency="currency"
-                        :enable-estimated-time
-                        :task="
-                            timeEntry.task_id
-                        "
-                        @changed="updateProjectAndTask"></TimeTrackerProjectTaskDropdown>
+                    <TimeEntryDescriptionInput class="min-w-0 mr-4" :model-value="timeEntry.description
+                        " @changed="updateTimeEntryDescription"></TimeEntryDescriptionInput>
+                    <TimeTrackerProjectTaskDropdown :create-project :create-client :can-create-project :clients
+                        :projects="projects" :tasks="tasks" :show-badge-border="false" :project="timeEntry.project_id"
+                        :currency="currency" :enable-estimated-time :task="timeEntry.task_id
+                            " @changed="updateProjectAndTask"></TimeTrackerProjectTaskDropdown>
                 </div>
-                <div
-                    class="flex items-center font-medium space-x-1 lg:space-x-2">
+                <div class="flex items-center font-medium space-x-1 lg:space-x-2">
                     <div v-if="showMember && members" class="text-sm px-2">
                         {{ memberName }}
                     </div>
-                    <TimeEntryRowTagDropdown
-                        :create-tag
-                        :tags="tags"
-                        :model-value="timeEntry.tags"
+                    <TimeEntryRowTagDropdown :create-tag :tags="tags" :model-value="timeEntry.tags"
                         @changed="updateTimeEntryTags"></TimeEntryRowTagDropdown>
-                    <BillableToggleButton
-                        :model-value="timeEntry.billable"
-                        :class="twMerge('opacity-50 group-hover:opacity-100 focus-visible:opacity-100')"
-                        size="small"
+                    <BillableToggleButton :model-value="timeEntry.billable"
+                        :class="twMerge('opacity-50 group-hover:opacity-100 focus-visible:opacity-100')" size="small"
                         @changed="
                             updateTimeEntryBillable
                         "></BillableToggleButton>
                     <div class="flex-1">
-                        <TimeEntryRangeSelector
-                            class="hidden lg:block"
-                            :start="timeEntry.start"
-                            :end="timeEntry.end"
-                            :show-date
-                            @changed="
+                        <TimeEntryRangeSelector class="hidden lg:block" :start="timeEntry.start" :end="timeEntry.end"
+                            :show-date @changed="
                                 updateStartEndTime
                             "></TimeEntryRangeSelector>
                     </div>
-                    <TimeEntryRowDurationInput
-                        :start="timeEntry.start"
-                        :end="timeEntry.end"
-                        @changed="
-                            updateStartEndTime
-                        "></TimeEntryRowDurationInput>
-                    <TimeTrackerStartStop
-                        :active="!!(timeEntry.start && !timeEntry.end)"
+                    <TimeEntryRowDurationInput :start="timeEntry.start" :end="timeEntry.end" @changed="
+                        updateStartEndTime
+                    "></TimeEntryRowDurationInput>
+                    <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
                         class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100"
                         @changed="onStartStopClick"></TimeTrackerStartStop>
-                    <TimeEntryMoreOptionsDropdown
-                        @delete="
-                            deleteTimeEntry
-                        "></TimeEntryMoreOptionsDropdown>
+                    <TimeEntryMoreOptionsDropdown :entry="timeEntry" @duplicate="duplicateTimeEntry" :haveduplicate="true"
+                        @delete="deleteTimeEntry"></TimeEntryMoreOptionsDropdown>
                 </div>
             </div>
         </MainContainer>

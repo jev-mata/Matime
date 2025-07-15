@@ -64,6 +64,17 @@ function startTimeEntryFromExisting(entry: TimeEntry) {
         tags: [...entry.tags],
     });
 }
+function copyTimeEntryFromExisting(entry: TimeEntry) {
+    props.createTimeEntry({
+        project_id: entry.project_id,
+        task_id: entry.task_id,
+        start: entry.start,
+        end: entry.end,
+        billable: entry.billable,
+        description: entry.description,
+        tags: [...entry.tags],
+    });
+}
 type GroupedTimeEntries = Record<
     string, // biMonthKey
     {
@@ -301,10 +312,10 @@ watch(
                     <template v-for="entry in value" :key="entry.id">
                         <TimeEntryAggregateRow v-if="'timeEntries' in entry && entry.timeEntries.length > 1"
                             :create-project :can-create-project :enable-estimated-time
-                            :selected-time-entries="selectedTimeEntries" :create-client :projects="projects"
-                            :tasks="tasks" :tags="tags" :clients :on-start-stop-click="startTimeEntryFromExisting"
-                            :update-time-entries :update-time-entry :delete-time-entries :create-tag
-                            :currency="currency" :time-entry="entry" @selected="
+                            :create-time-entry="createTimeEntry" :selected-time-entries="selectedTimeEntries"
+                            :create-client :projects="projects" :tasks="tasks" :tags="tags" :clients
+                            :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry
+                            :delete-time-entries :create-tag :currency="currency" :time-entry="entry" @selected="
                                 (timeEntries: TimeEntry[]) => {
                                     selectedTimeEntries = [
                                         ...selectedTimeEntries,
@@ -323,7 +334,7 @@ watch(
                                 }
                             "></TimeEntryAggregateRow>
                         <TimeEntryRow v-else :create-client :enable-estimated-time :can-create-project :create-project
-                            :projects="projects" :selected="!!selectedTimeEntries.find(
+                            :duplicate-time-entry="copyTimeEntryFromExisting" :projects="projects" :selected="!!selectedTimeEntries.find(
                                 (filterEntry: TimeEntry) => filterEntry.id === entry.id
                             )
                                 " :tasks="tasks" :tags="tags" :clients :create-tag :update-time-entry :loadEntries
