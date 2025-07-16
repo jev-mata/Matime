@@ -15,7 +15,7 @@ import TabBar from '@/Components/Common/TabBar/TabBar.vue';
 import { UserCircleIcon } from '@heroicons/vue/20/solid'; 
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
-const activeTab = ref<'pending' | 'approved'>('pending');
+const activeTab = ref<'pending' | 'unsubmitted'|'archive'>('pending');
 type Bimontly = {
   user: {
     id: string;
@@ -29,12 +29,29 @@ type Bimontly = {
 const page = usePage<{
   grouped: Record<string, Bimontly[]>;
   timesheets: TimeEntry[];
+
+  unsubmitted_grouped: Record<string, Bimontly[]>;
+  unsubmitted_timesheets: TimeEntry[];
+
+  archive_grouped: Record<string, Bimontly[]>;
+  archive_timesheets:  TimeEntry[];
 }>();
 
 
 const isGroupedEmpty = computed(() =>
   Object.keys(
     page.props.grouped as Record<string, Bimontly[]>
+  ).length === 0
+)
+
+const isUnsubmittedGroupedEmpty = computed(() =>
+  Object.keys(
+    page.props.unsubmitted_grouped as Record<string, Bimontly[]>
+  ).length === 0
+)
+const isArchiveGroupedEmpty = computed(() =>
+  Object.keys(
+    page.props.archive_grouped as Record<string, Bimontly[]>
   ).length === 0
 )
 
@@ -77,14 +94,15 @@ function formatDate(dateString: string, format?: string) {
         <PageTitle :icon="UserCircleIcon" title="Timesheet Approval" />
         <TabBar v-model="activeTab">
           <TabBarItem value="pending">Pending</TabBarItem>
-          <TabBarItem value="approved">Approved</TabBarItem>
+          <TabBarItem value="unsubmitted">Unsubmitted</TabBarItem>
+          <TabBarItem value="archive">Archive</TabBarItem>
         </TabBar>
       </div>
     </MainContainer>
 
     <div class="flow-root max-w-[100vw] overflow-x-auto">
       <div class="inline-block w-full align-middle">
-        <div data-testid="client_table" class="grid w-full">
+        <div data-testid="client_table" class="grid w-full" v-if="activeTab=='pending'">
           <div v-if="isGroupedEmpty" class="col-span-3 py-24 text-center">
             <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
             <h3 class="text-text-primary font-semibold">
@@ -106,6 +124,24 @@ function formatDate(dateString: string, format?: string) {
               <div class="flex-1">{{ entry.totalHours }}</div>
             </a>
           </template>
+        </div>
+        <div data-testid="client_table" class="grid w-full" v-if="activeTab=='unsubmitted'">
+          
+          <div v-if="isUnsubmittedGroupedEmpty" class="col-span-3 py-24 text-center">
+            <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
+            <h3 class="text-text-primary font-semibold">
+              No {{ activeTab }} timesheets found
+            </h3>
+          </div>
+        </div>
+        <div data-testid="client_table" class="grid w-full" v-if="activeTab=='archive'">
+          
+          <div v-if="isArchiveGroupedEmpty" class="col-span-3 py-24 text-center">
+            <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
+            <h3 class="text-text-primary font-semibold">
+              No {{ activeTab }} timesheets found
+            </h3>
+          </div>
         </div>
       </div>
     </div>

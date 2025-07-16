@@ -173,8 +173,7 @@ class TimesheetController extends Controller
         $memberRole = $this->member($curOrg);
 
         $teamIds = Auth::user()->groups()->pluck('teams.id');
-        $timesheets = TimeEntry::with(['user.groups', 'member'])          // eager‑load member
-            ->where('approval', 'submitted');
+        $timesheets = TimeEntry::with(['user.groups', 'member']);
         if ($memberRole->role == "employee") {
             return redirect()->route('dashboard');
         }
@@ -184,9 +183,8 @@ class TimesheetController extends Controller
         } else if ($memberRole->role == "admin") {
 
         }
-        $timesheets = $timesheets->get();
 
-        $grouped = $timesheets
+        $grouped = $timesheets->where('approval', 'submitted')->get()
             ->groupBy(function ($t) {
                 $d = Carbon::parse($t->start);
                 $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
@@ -217,10 +215,78 @@ class TimesheetController extends Controller
                     })
                     ->values();
             });
+        $unsubmitted_timesheets = $timesheets->where('approval', 'unsubmitted')->get();
+        $unsubmitted_grouped = $unsubmitted_timesheets
+            ->groupBy(function ($t) {
+                $d = Carbon::parse($t->start);
+                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
+                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
+            })
+            ->map(function ($entriesByPeriod) {
+                return $entriesByPeriod
+                    ->groupBy('user_id')
+                    ->map(function ($entriesByUser) {
+                        $first = $entriesByUser->first();  // any row in this bucket
+                        $user = $first->user;
+                        $member = $first->member;           // ⬅︎ comes from ->with('member')
+        
+                        $totalMinutes = $entriesByUser->sum(
+                            fn($e) =>
+                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
+                        );
 
+                        return [
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->name,
+                                'groups' => $user->groups,
+                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
+                            ],
+                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
+                        ];
+                    })
+                    ->values();
+            });
+        $archive_timesheets = $timesheets->where('approval', 'approved')->get();
+        $archive_grouped = $archive_timesheets
+            ->groupBy(function ($t) {
+                $d = Carbon::parse($t->start);
+                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
+                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
+            })
+            ->map(function ($entriesByPeriod) {
+                return $entriesByPeriod
+                    ->groupBy('user_id')
+                    ->map(function ($entriesByUser) {
+                        $first = $entriesByUser->first();  // any row in this bucket
+                        $user = $first->user;
+                        $member = $first->member;           // ⬅︎ comes from ->with('member')
+        
+                        $totalMinutes = $entriesByUser->sum(
+                            fn($e) =>
+                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
+                        );
+
+                        return [
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->name,
+                                'groups' => $user->groups,
+                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
+                            ],
+                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
+                        ];
+                    })
+                    ->values();
+            });
+        $timesheets2=$timesheets->where('approval', 'submitted')->get();
         return Inertia::render('Timesheet/Index', [
-            'timesheets' => $timesheets,
+            'timesheets' => $timesheets2,
             'grouped' => $grouped,
+            'archive_timesheets' => $archive_timesheets,
+            'archive_grouped' => $archive_grouped,
+            'unsubmitted_timesheets' => $unsubmitted_timesheets,
+            'unsubmitted_grouped' => $unsubmitted_grouped,
         ]);
     }
     public function ApprovalOverview(Request $request)
