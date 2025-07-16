@@ -126,7 +126,7 @@ Route::middleware([
         Route::post('/submit', [TimesheetController::class, 'Submit'])->name('submit');
         Route::post('/unsubmit', [TimesheetController::class, 'Unsubmit'])->name('unsubmit');
         Route::get('/', [TimesheetController::class, 'approval'])->name('index');
-        Route::get('/approval/overview', [TimesheetController::class, 'ApprovalOverview'])->name('ApprovalOverview');
+        Route::get('/overview', [TimesheetController::class, 'ApprovalOverview'])->name('ApprovalOverview');
 
 
         Route::post('/approve', [TimesheetController::class, 'approve'])->name('approve');
