@@ -307,8 +307,8 @@ class TimesheetController extends Controller
         $timeEntriesQuery = TimeEntry::where('organization_id', $curOrg->id)
             ->where('member_id', $user->id)
             ->whereBetween('start', [$start, $end])
-            ->where('approval', 'submitted');
-
+            ->where('approval', 'submitted')
+            ->orderBy('start');
         if (!$timeEntriesQuery->exists()) {
             return redirect()->route('approval.index');
         }
