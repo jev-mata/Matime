@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import PageTitle from '@/Components/Common/PageTitle.vue';
 import TabBarItem from '@/Components/Common/TabBar/TabBarItem.vue';
 import TabBar from '@/Components/Common/TabBar/TabBar.vue'; 
-import { UserCircleIcon } from '@heroicons/vue/20/solid'; 
+import { HandThumbUpIcon } from '@heroicons/vue/20/solid'; 
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
 const activeTab = ref<'pending' | 'unsubmitted'|'archive'>('pending');
@@ -89,9 +89,9 @@ function formatDate(dateString: string, format?: string) {
 }
 </script><template>
   <AppLayout title="Dashboard" data-testid="dashboard_view">
-    <MainContainer class="py-5 border-b border-default-background-separator flex justify-between items-center">
-      <div class="flex items-center space-x-3 sm:space-x-6">
-        <PageTitle :icon="UserCircleIcon" title="Timesheet Approval" />
+    <MainContainer class="py-5 border-b border-default-background-separator flex justify-between items-center w-full">
+      <div class="flex items-center space-x-3 sm:space-x-6 w-full">
+        <PageTitle :icon="HandThumbUpIcon" title="Timesheet Approval"/>
         <TabBar v-model="activeTab">
           <TabBarItem value="pending">Pending</TabBarItem>
           <TabBarItem value="unsubmitted">Unsubmitted</TabBarItem>
@@ -133,6 +133,21 @@ function formatDate(dateString: string, format?: string) {
               No {{ activeTab }} timesheets found
             </h3>
           </div>
+          <template v-for="(userEntries, period) in page.props.unsubmitted_grouped" :key="period">
+            <div class="p-3 font-bold"
+              :class="getPeriodInfo(period).isHighlighted ? 'bg-green-900 text-white' : 'bg-transparent'">
+              {{ formatDate(period) }} - {{ (getPeriodInfo(period).endDate) }}
+            </div>
+            <a v-for="entry in userEntries" :key="entry.user.id" class="flex border p-3"
+              :href="route('approval.ApprovalOverview', { user_id: entry.user.member.id, date_start: period, date_end: getPeriodInfo(period).endDate2 })">
+
+              <div class="flex-1">{{ entry.user.name }}</div>
+              <div class="flex-1">
+                {{ entry.user.groups?.[0]?.manager?.name ?? '—' }}
+              </div>
+              <div class="flex-1">{{ entry.totalHours }}</div>
+            </a>
+          </template>
         </div>
         <div data-testid="client_table" class="grid w-full" v-if="activeTab=='archive'">
           
@@ -142,6 +157,21 @@ function formatDate(dateString: string, format?: string) {
               No {{ activeTab }} timesheets found
             </h3>
           </div>
+          <template v-for="(userEntries, period) in page.props.archive_grouped" :key="period">
+            <div class="p-3 font-bold"
+              :class="getPeriodInfo(period).isHighlighted ? 'bg-green-900 text-white' : 'bg-transparent'">
+              {{ formatDate(period) }} - {{ (getPeriodInfo(period).endDate) }}
+            </div>
+            <a v-for="entry in userEntries" :key="entry.user.id" class="flex border p-3"
+              :href="route('approval.ApprovalOverview', { user_id: entry.user.member.id, date_start: period, date_end: getPeriodInfo(period).endDate2 })">
+
+              <div class="flex-1">{{ entry.user.name }}</div>
+              <div class="flex-1">
+                {{ entry.user.groups?.[0]?.manager?.name ?? '—' }}
+              </div>
+              <div class="flex-1">{{ entry.totalHours }}</div>
+            </a>
+          </template>
         </div>
       </div>
     </div>

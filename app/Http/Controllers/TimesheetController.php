@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TimeEntryReminder;
 use App\Models\Client;
 use App\Models\Member;
 use App\Models\Organization;
@@ -17,6 +18,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class TimesheetController extends Controller
@@ -134,6 +136,27 @@ class TimesheetController extends Controller
 
     }
 
+    public function remind(Request $request)
+    {
+        $ids = $request->input('timeEntries'); // or $request->get('ids');
+
+        if (!is_array($ids)) {
+            return response()->json(['error' => 'Invalid payload'], 422);
+        }
+
+        $entry = TimeEntry::with('user')->whereIn('id', $ids)->first();
+
+        if (!$entry || !$entry->user || !$entry->user->email) {
+            return response()->json(['error' => 'User email not found'], 404);
+        }
+
+        $email = $entry->user->email;
+
+        // Send the email
+        Mail::to($email)->send(new TimeEntryReminder(route('time')));
+
+        return response()->json(['message' => 'Reminder email sent']);
+    }
 
     public function approve(Request $request)
     {
@@ -283,10 +306,10 @@ class TimesheetController extends Controller
         return Inertia::render('Timesheet/Index', [
             'timesheets' => $timesheets2,
             'grouped' => $grouped,
-            'archive_timesheets' => $archive_timesheets,
-            'archive_grouped' => $archive_grouped,
             'unsubmitted_timesheets' => $unsubmitted_timesheets,
             'unsubmitted_grouped' => $unsubmitted_grouped,
+            'archive_timesheets' => $archive_timesheets,
+            'archive_grouped' => $archive_grouped,
         ]);
     }
     public function ApprovalOverview(Request $request)
@@ -307,7 +330,6 @@ class TimesheetController extends Controller
         $timeEntriesQuery = TimeEntry::where('organization_id', $curOrg->id)
             ->where('member_id', $user->id)
             ->whereBetween('start', [$start, $end])
-            ->where('approval', 'submitted')
             ->orderBy('start');
         if (!$timeEntriesQuery->exists()) {
             return redirect()->route('approval.index');

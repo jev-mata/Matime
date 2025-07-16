@@ -62,6 +62,16 @@ const page = usePage<{
     clients: Client[];
 }>();
 
+const approvalStatus = computed(() => {
+    const entries = page.props.timeEntries;
+
+    if (entries.length === 0) return 'none';
+
+    const first = entries[0].approval;
+    const allSame = entries.every(entry => entry.approval === first);
+
+    return allSame ? first : 'mixed';
+});
 const startDate = useSessionStorage<string>('reporting-start-date', '');
 const endDate = useSessionStorage<string>('reporting-end-date', '');
 const selectedTags = ref<string[]>([]);
@@ -395,6 +405,32 @@ function sumDuration(timeEntries: TimeEntry[]) {
 }
 
 
+async function UnsubmittedRemind(type: 'unsubmitted' | 'remind') {
+    try {
+        const ids = page.props.timeEntries.map(t => t.id);
+
+        const { data } = await axios.post(
+            route(`approval.${type}`),          // approval.approve | approval.reject
+            { timeEntries: ids },
+            { withCredentials: true, headers: { Accept: 'application/json' } }
+        );
+
+        addNotification(
+            'success',
+            `${type === 'unsubmitted' ? 'Unsubmitted Entries' : 'Sent Reminder Successfuly'}`,
+        );
+        setTimeout(() => {
+            router.visit(route('approval.index')); // change to your target page
+        }, 1500);
+    } catch (error) {
+        console.error(error);
+        addNotification(
+            'error',
+            'Failed',
+            `Could not ${type} entries`
+        );
+    }
+}
 </script>
 
 <template>
@@ -421,12 +457,22 @@ function sumDuration(timeEntries: TimeEntry[]) {
                 <div class="pl-2 font-semibold">(
                     {{ formatDate(page.props.period.end, 'ddd, MMMM D - YYYY') }})
                 </div>
-                <div class="absolute right-5 pl-2 font-semibold">
+                <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'submitted'">
                     <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
                         @click="approveReject('approve')">APPROVE
                     </SecondaryButton>
                     <SecondaryButton class="border-0 px-2 bg-red-600 mx-2 text-quaternary"
                         @click="approveReject('reject')">REJECT</SecondaryButton>
+                </div>
+                <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'unsubmitted'">
+                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                        @click="UnsubmittedRemind('remind')">REMIND TO SUBMIT
+                    </SecondaryButton>
+                </div>
+                <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'approved'">
+                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                        @click="UnsubmittedRemind('unsubmitted')">UNSUBMIT
+                    </SecondaryButton>
                 </div>
 
             </div>
