@@ -26,7 +26,7 @@ export default {
             },
             fontFamily: {
                 sans: [
-                    "Outfit",
+                    "Poppins",
                     ...defaultTheme.fontFamily.sans
                 ]
             },
