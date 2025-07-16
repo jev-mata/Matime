@@ -279,7 +279,7 @@ class TimesheetController extends Controller
                     })
                     ->values();
             });
-        $timesheets2=$timesheets->where('approval', 'submitted')->get();
+        $timesheets2 = $timesheets->where('approval', 'submitted')->get();
         return Inertia::render('Timesheet/Index', [
             'timesheets' => $timesheets2,
             'grouped' => $grouped,
@@ -296,9 +296,8 @@ class TimesheetController extends Controller
         if (!$user) {
             return redirect()->route('dashboard');
         }
-
-        $start = $request->input('date_start');
-        $end = $request->input('date_end');
+        $start = Carbon::parse($request->input('date_start'))->startOfDay();
+        $end = Carbon::parse($request->input('date_end'))->endOfDay();
         $curOrg = $this->currentOrganization();
 
         $projects = Project::where('organization_id', $curOrg->id)->get();
@@ -307,7 +306,7 @@ class TimesheetController extends Controller
 
         $timeEntriesQuery = TimeEntry::where('organization_id', $curOrg->id)
             ->where('member_id', $user->id)
-            ->whereBetween('start', [$start, $end+1])
+            ->whereBetween('start', [$start, $end])
             ->where('approval', 'submitted');
 
         if (!$timeEntriesQuery->exists()) {
