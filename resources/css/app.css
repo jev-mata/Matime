@@ -162,27 +162,27 @@ body {
 
 @font-face {
     font-family: 'Outfit';
-    src: url('/fonts/Outfit-Regular.ttf');
+    src: url('/fonts/Poppins/Poppins-Regular.ttf');
     font-weight: 400;
 }
 @font-face {
     font-family: 'Outfit';
-    src: url('/fonts/Outfit-Medium.ttf');
+    src: url('/fonts/Poppins/Poppins-Medium.ttf');
     font-weight: 500;
 }
 @font-face {
     font-family: 'Outfit';
-    src: url('/fonts/Outfit-SemiBold.ttf');
+    src: url('/fonts/Poppins/Poppins-SemiBold.ttf');
     font-weight: 600;
 }
 @font-face {
     font-family: 'Outfit';
-    src: url('/fonts/Outfit-Bold.ttf');
+    src: url('/fonts/Poppins/Poppins-Bold.ttf');
     font-weight: 700;
 }
 @font-face {
     font-family: 'Outfit';
-    src: url('/fonts/Outfit-ExtraBold.ttf');
+    src: url('/fonts/Poppins/Poppins-ExtraBold.ttf');
     font-weight: 800;
 }
 
