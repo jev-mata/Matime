@@ -106,8 +106,8 @@ const selectedProjectColor = computed(() => {
     <div class="border-b border-default-background-separator bg-row-background min-w-0 transition"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0 opacity-40">
-            <div class="sm:flex py-1.5 items-center min-w-0 justify-between group">
-                <div class="flex space-x-3 items-center min-w-0">
+            <div class="grid grid-cols-8 py-1.5 items-center min-w-0 justify-between group">
+                <div class="flex items-center col-span-2 min-w-0">
                     <Checkbox :checked="timeEntry.timeEntries.every(
                         (aggregateTimeEntry: TimeEntry) =>
                             selectedTimeEntries.includes(
@@ -119,40 +119,43 @@ const selectedProjectColor = computed(() => {
                         <GroupedItemsCountButton :expanded="expanded" @click="expanded = !expanded">
                             {{ timeEntry?.timeEntries?.length }}
                         </GroupedItemsCountButton>
-                        <div class="min-w-0 mr-4">
+                        <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate">
                             {{ timeEntry.description }}
                         </div>
-                        <ProjectBadge :color="selectedProjectColor" :border="false" tag="button" @click="expanded = !expanded"
-                            :name="selectedProjectName" :class=" 
-                                'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'
-                                ">
-                            <div class="flex items-center lg:space-x-1 min-w-0">
-                                <span class="whitespace-nowrap text-xs lg:text-sm">
-                                    {{ selectedProjectName }}
-                                </span>
-                                <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0">
-                                </ChevronRightIcon>
-                                <div v-if="currentTask" class="min-w-0 shrink text-xs lg:text-sm truncate">
-                                    {{ currentTask.name }}
-                                </div>
-                            </div>
-                        </ProjectBadge> 
+
                     </div>
                 </div>
-                <div class="flex items-center font-medium lg:space-x-2">
+                <div class="flex items-center px-2  w-full col-span-3 bg-secondary min-w-0">
+                    <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
+                        @click="expanded = !expanded" :name="selectedProjectName" :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'
+                            ">
+                        <div class="flex items-center lg:space-x-1 min-w-0">
+                            <span class="whitespace-nowrap text-xs lg:text-sm">
+                                {{ selectedProjectName }}
+                            </span>
+                            <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0">
+                            </ChevronRightIcon>
+                            <div v-if="currentTask" class="min-w-0 shrink text-xs lg:text-sm truncate">
+                                {{ currentTask.name }}
+                            </div>
+                        </div>
+                    </ProjectBadge>
+
+                </div>
+                <div class="flex items-center px-2  w-full  col-span-1  bg-secondary min-w-0">
                     <TagBadge :border="false" size="large"
                         class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary"
                         :name="timeEntryTags(timeEntry.tags).map((tag: Tag) => tag.name).join(', ')
                             "></TagBadge>
-                    <div class="flex-1">
-                        <button
-                            :class="twMerge('hidden lg:block text-text-secondary w-[110px] px-1 py-1.5 bg-transparent text-center hover:bg-card-background rounded-lg border border-transparent hover:border-card-border text-sm font-medium focus-visible:outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-tertiary', organization?.time_format === '12-hours' ? 'w-[160px]' : 'w-[110px]')"
-                            @click="expanded = !expanded">
-                            {{ formatStartEnd(timeEntry.start, timeEntry.end, organization?.time_format) }}
-                        </button>
+                </div>
+                <div class="flex items-center space-x-2  justify-end pl-4">
+                    <div class="text-sm font-medium whitespace-nowrap">
+                        {{ formatStartEnd(timeEntry.start, timeEntry.end, organization?.time_format) }}
                     </div>
+                </div>
+                <div class="flex items-center font-medium lg:space-x-2">
                     <button
-                        class="text-text-primary min-w-[90px] px-2.5 py-1.5 bg-transparent text-right hover:bg-card-background rounded-lg border border-transparent hover:border-card-border text-sm font-semibold focus-visible:outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-tertiary"
+                        class="flex-1 text-text-primary min-w-[90px] px-2.5 py-1.5 bg-transparent text-right hover:bg-card-background rounded-lg border border-transparent hover:border-card-border text-sm font-semibold focus-visible:outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-tertiary"
                         @click="expanded = !expanded">
                         {{
                             formatHumanReadableDuration(
@@ -166,9 +169,9 @@ const selectedProjectColor = computed(() => {
                     <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
                         class="opacity-20 hidden sm:flex group-hover:opacity-100 focus-visible:opacity-100" @changed="
                             onStartStopClick(timeEntry)
-                            "></TimeTrackerStartStop> 
-                        
-                    <div class="pl-4" title="Editing disabled for submitted entries">
+                            "></TimeTrackerStartStop>
+
+                    <div class="" title="Editing disabled for submitted entries">
                         <LockClosedIcon class="w-4" title="Editing disabled for submitted entries"></LockClosedIcon>
                     </div>
                 </div>

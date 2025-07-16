@@ -297,14 +297,14 @@ watch(
                 </button>
 
                 {{ bimonthlykey }}
-                <span v-if="bimonthly.isApproved" class="ml-4 bg-green-800 p-2 rounded-md">Approved</span>
+                <span v-if="bimonthly.isApproved" class="ml-4  bg-tertiary p-2 font-bold p-2 rounded-md">Approved</span>
                 <span v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
-                    class="ml-4 bg-orange-700 p-2 rounded-md">Pending</span>
+                    class="ml-4 bg-tertiary p-2 rounded-md font-bold">Pending</span>
             </div>
 
 
             <template v-for="(value, key) in bimonthly.days" :key="key" class="mb-5">
-                <div v-if="!isSubmitted(value)" class=" bg-gray-900   border-1 p-1">
+                <div v-if="!isSubmitted(value)" class="   border-1 p-1">
                     <TimeEntryRowHeading :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
                         selectedTimeEntries.includes(timeEntry)
                     )

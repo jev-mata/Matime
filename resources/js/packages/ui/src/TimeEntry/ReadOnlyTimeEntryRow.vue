@@ -22,6 +22,7 @@ import TimeTrackerProjectTaskDropdown from '@/packages/ui/src/TimeTracker/TimeTr
 import { Checkbox } from '@/packages/ui/src';
 import { twMerge } from 'tailwind-merge';
 
+import TagBadge from '@/packages/ui/src/Tag/TagBadge.vue';
 import { ChevronRightIcon, ChevronDownIcon, LockClosedIcon } from '@heroicons/vue/16/solid';
 import ProjectBadge from '@/packages/ui/src/Project/ProjectBadge.vue';
 import {
@@ -90,6 +91,10 @@ const selectedProjectName = computed(() => {
     return currentProject.value?.name;
 });
 
+function timeEntryTags(model: string[]) {
+    return props.tags.filter((tag) => model.includes(tag.id));
+};
+
 const selectedProjectColor = computed(() => {
     return currentProject.value?.color || 'var(--theme-color-icon-default)';
 });
@@ -100,47 +105,57 @@ const organization = inject<ComputedRef<Organization>>('organization');
     <div class="border-b border-default-background-separator transition min-w-0 bg-row-background"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0 opacity-40">
-            <div class="sm:flex py-2 min-w-0 items-center justify-between group">
-                <div class="flex items-center min-w-0">
+            <div class="grid grid-cols-8 items-center py-2 group">
+
+                <!-- Checkbox + Description -->
+                <div class="flex items-center col-span-2 min-w-0">
                     <Checkbox :checked="selected" @update:checked="onSelectChange" />
                     <div v-if="indent === true" class="w-10 h-7"></div>
-                    <div
-                        class=" text-ellipsis whitespace-nowrap overflow-hidden px-0 h-full min-w-0 pl-3 pr-1 left-0 top-0 w-full text-sm text-text-primary font-medium bg-transparent focus-visible:ring-0 rounded-lg border-0">
-                        {{ timeEntry.description }}</div>
+                    <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate">
+                        {{ timeEntry.description }}
+                    </div>
+                </div>
 
-                    <ProjectBadge :color="selectedProjectColor" :border="false" tag="button" :name="selectedProjectName"
-                        :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'
-                            ">
-                        <div class="flex items-center lg:space-x-1 min-w-0">
+                <!-- Project/Task Badge -->
+                <div class="px-2  w-full col-span-3 bg-secondary min-w-0">
+                    <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
+                        class="flex focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0">
+                        <div class="flex lg:space-x-1 min-w-0">
                             <span class="whitespace-nowrap text-xs lg:text-sm">
                                 {{ selectedProjectName }}
                             </span>
-                            <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0">
-                            </ChevronRightIcon>
+                            <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0" />
                             <div v-if="currentTask" class="min-w-0 shrink text-xs lg:text-sm truncate">
                                 {{ currentTask.name }}
                             </div>
                         </div>
                     </ProjectBadge>
-
                 </div>
-                <div class="flex items-center font-medium space-x-1 lg:space-x-2">
 
-                    <div class="flex-1">
+                <!-- Time Range -->
+                <!-- Duration Input -->
 
+                <div class="px-2   bg-secondary min-w-0">
+                    <TagBadge :border="false" size="large"
+                        class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary"
+                        :name="timeEntryTags(timeEntry.tags).map((tag: Tag) => tag.name).join(', ')
+                            "></TagBadge>
+                </div>
+                <!-- Lock/Action -->
+                <div class="flex items-center space-x-2  justify-end  ">
+                    <div class="text-sm font-medium whitespace-nowrap">
                         {{ formatStartEnd(timeEntry.start, timeEntry.end, organization?.time_format) }}
                     </div>
-                    <TimeEntryRowDurationInput :start="timeEntry.start" :end="timeEntry.end">
-                    </TimeEntryRowDurationInput>
+                </div>
+                <div class="flex items-center space-x-2   justify-end pl-4">
+                    <TimeEntryRowDurationInput :start="timeEntry.start" :end="timeEntry.end" class="text-sm" />
                     <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100 ">
-                    </TimeTrackerStartStop>
-                    <div class="pl-4" title="Editing disabled for submitted entries">
-                        <LockClosedIcon class="w-4" title="Editing disabled for submitted entries"></LockClosedIcon>
-                    </div>
+                        class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100" />
+                    <LockClosedIcon class="w-4" title="Editing disabled for submitted entries" />
                 </div>
             </div>
         </MainContainer>
+
     </div>
 </template>
 

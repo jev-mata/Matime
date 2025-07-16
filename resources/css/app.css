@@ -49,11 +49,11 @@
 }
 
 :root.light {
-    --color-bg-primary: #F5F5F5;
-    --color-bg-secondary: #f7f7f8;
-    --color-bg-tertiary: #e1e1e3;
-    --color-bg-quaternary: #ffffff;
-    --color-bg-background: #ffffff;
+    --color-bg-primary: #fafafa;
+    --color-bg-secondary: #F2F2F2;
+    --color-bg-tertiary: #E0E2E6;
+    --color-bg-quaternary: #CBCED3;
+    --color-bg-background: #fafafa;
     --color-text-primary: #18181b;
     --color-text-secondary: #3f3f46;
     --color-text-tertiary: #57575C;
@@ -65,7 +65,7 @@
     --color-input-border-active: rgba(0,0,0,0.3);
     --theme-color-menu-active: var(--color-bg-tertiary);
 
-    --theme-color-card-background: var(--color-bg-quaternary);
+    --theme-color-card-background: var(--color-bg-secondary);
     --theme-color-card-background-active: var(--color-bg-primary);
 
     --theme-color-chart: var(--color-accent-400);

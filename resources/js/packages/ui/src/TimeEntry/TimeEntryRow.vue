@@ -112,30 +112,40 @@ function onSelectChange(checked: boolean) {
                             " @changed="updateProjectAndTask"></TimeTrackerProjectTaskDropdown>
                 </div>
                 <div class="flex items-center font-medium space-x-1 lg:space-x-2">
-                    <div v-if="showMember && members" class="text-sm px-2">
+                    <div v-if="showMember && members" class="flex-1 text-sm px-2">
                         {{ memberName }}
                     </div>
-                    <TimeEntryRowTagDropdown :create-tag :tags="tags" :model-value="timeEntry.tags"
-                        @changed="updateTimeEntryTags"></TimeEntryRowTagDropdown>
-                    <BillableToggleButton :model-value="timeEntry.billable"
-                        :class="twMerge('opacity-50 group-hover:opacity-100 focus-visible:opacity-100')" size="small"
-                        @changed="
-                            updateTimeEntryBillable
-                        "></BillableToggleButton>
+                    <div class="flex-1 text-sm px-2">
+                        <TimeEntryRowTagDropdown :create-tag :tags="tags" :model-value="timeEntry.tags"
+                            @changed="updateTimeEntryTags"></TimeEntryRowTagDropdown>
+                    </div>
+                    <div class="flex-1 text-sm px-2">
+                        <BillableToggleButton :model-value="timeEntry.billable"
+                            :class="twMerge('opacity-50 group-hover:opacity-100 focus-visible:opacity-100')"
+                            size="small" @changed="
+                                updateTimeEntryBillable
+                            "></BillableToggleButton>
+                    </div>
                     <div class="flex-1">
                         <TimeEntryRangeSelector class="hidden lg:block" :start="timeEntry.start" :end="timeEntry.end"
                             :show-date @changed="
                                 updateStartEndTime
                             "></TimeEntryRangeSelector>
                     </div>
-                    <TimeEntryRowDurationInput :start="timeEntry.start" :end="timeEntry.end" @changed="
-                        updateStartEndTime
-                    "></TimeEntryRowDurationInput>
-                    <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100"
-                        @changed="onStartStopClick"></TimeTrackerStartStop>
-                    <TimeEntryMoreOptionsDropdown :entry="timeEntry" @duplicate="duplicateTimeEntry" :haveduplicate="true"
-                        @delete="deleteTimeEntry"></TimeEntryMoreOptionsDropdown>
+                    <div class="flex-1">
+                        <TimeEntryRowDurationInput :start="timeEntry.start" :end="timeEntry.end" @changed="
+                            updateStartEndTime
+                        "></TimeEntryRowDurationInput>
+                    </div>
+                    <div class="flex-1">
+                        <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
+                            class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100"
+                            @changed="onStartStopClick"></TimeTrackerStartStop>
+                    </div>
+                    <div class="flex-1">
+                        <TimeEntryMoreOptionsDropdown :entry="timeEntry" @duplicate="duplicateTimeEntry"
+                            :haveduplicate="true" @delete="deleteTimeEntry"></TimeEntryMoreOptionsDropdown>
+                    </div>
                 </div>
             </div>
         </MainContainer>
