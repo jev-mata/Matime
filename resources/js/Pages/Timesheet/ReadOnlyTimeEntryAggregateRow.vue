@@ -30,15 +30,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     selected: [TimeEntry[]];
     unselected: [TimeEntry[]];
-}>();
-const project = defineModel<string | null>('project', {
-    default: null,
-});
-
-const task = defineModel<string | null>('task', {
-    default: null,
-});
-
+}>(); 
 const organization = inject<ComputedRef<Organization>>('organization');
 
 const expanded = ref(false);
@@ -57,24 +49,19 @@ function timeEntryTags(model: string[]) {
 
 const currentProject = computed(() => {
     return props.projects.find(
-        (iteratingProject) => iteratingProject.id === project.value
+        (iteratingProject) => iteratingProject.id === props.timeEntry.timeEntries[0].project_id
     );
 });
 
 const currentTask = computed(() => {
     return props.tasks.find(
-        (iteratingTasks) => iteratingTasks.id === task.value
+        (iteratingTasks) => iteratingTasks.id === props.timeEntry.task_id
     );
 });
 
 const selectedProjectName = computed(() => {
-    if (project.value === null) {
-        return 'No Project';
-    }
-    if (project.value === '') {
-        return 'No Project';
-    }
-    return currentProject.value?.name;
+
+    return currentProject.value?.name ? currentProject.value.name : 'No Project';
 });
 
 const selectedProjectColor = computed(() => {
