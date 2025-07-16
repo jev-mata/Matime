@@ -125,10 +125,10 @@ Route::middleware([
         Route::get('/time-entries', [TimesheetController::class, 'getAllTimeEntries'])->name('all');
         Route::post('/submit', [TimesheetController::class, 'Submit'])->name('submit');
         Route::post('/unsubmit', [TimesheetController::class, 'Unsubmit'])->name('unsubmit');
-        Route::get('/', [TimesheetController::class, 'approval'])->name('index'); 
-        Route::get('/approval/overview', [TimesheetController::class, 'ApprovalOverview'])->name('ApprovalOverview'); 
+        Route::get('/', [TimesheetController::class, 'approval'])->name('index');
+        Route::get('/approval/overview', [TimesheetController::class, 'ApprovalOverview'])->name('ApprovalOverview');
 
-        
+
         Route::post('/approve', [TimesheetController::class, 'approve'])->name('approve');
         Route::post('/reject', [TimesheetController::class, 'reject'])->name('reject');
     });
@@ -138,5 +138,7 @@ Route::middleware([
         Route::post('/unsubmit', [TimesheetController::class, 'destroy'])->name('unsubmit.post');
     });
 });
-
+Route::fallback(function () {
+    return Inertia::render('Notfound');
+});
 // Route::get('/team-invitation/view', [TeamInvitationController::class, 'showAcceptPage']);
