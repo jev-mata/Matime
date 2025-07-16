@@ -1,21 +1,23 @@
 <script setup lang="ts">
-import AppLayout from "@/Layouts/AppLayout.vue"; 
-import MainContainer from "@/packages/ui/src/MainContainer.vue";
- 
-import { usePage } from "@inertiajs/vue3";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import MainContainer from "@/packages/ui/src/MainContainer.vue"; 
 
-import type { Tag, TimeEntry } from '@/packages/api/src'; 
-import { computed, onMounted } from "vue"; 
+import type { Tag, TimeEntry } from '@/packages/api/src';
+import { computed, onMounted } from "vue";
 import { ref } from "vue";
-import dayjs from "dayjs"; 
+import dayjs from "dayjs";
 
+import { router, usePage } from '@inertiajs/vue3';
+import { useNotificationsStore } from '@/utils/notification';
+import { SecondaryButton } from '@/packages/ui/src';
 import PageTitle from '@/Components/Common/PageTitle.vue';
 import TabBarItem from '@/Components/Common/TabBar/TabBarItem.vue';
-import TabBar from '@/Components/Common/TabBar/TabBar.vue'; 
-import { HandThumbUpIcon } from '@heroicons/vue/20/solid'; 
+import TabBar from '@/Components/Common/TabBar/TabBar.vue';
+import { HandThumbUpIcon } from '@heroicons/vue/20/solid';
 import isBetween from 'dayjs/plugin/isBetween';
+import axios from "axios";
 dayjs.extend(isBetween);
-const activeTab = ref<'pending' | 'unsubmitted'|'archive'>('pending');
+const activeTab = ref<'pending' | 'unsubmitted' | 'archive'>('pending');
 type Bimontly = {
   user: {
     id: string;
@@ -34,7 +36,7 @@ const page = usePage<{
   unsubmitted_timesheets: TimeEntry[];
 
   archive_grouped: Record<string, Bimontly[]>;
-  archive_timesheets:  TimeEntry[];
+  archive_timesheets: TimeEntry[];
 }>();
 
 
@@ -43,6 +45,7 @@ const isGroupedEmpty = computed(() =>
     page.props.grouped as Record<string, Bimontly[]>
   ).length === 0
 )
+const { addNotification } = useNotificationsStore();
 
 const isUnsubmittedGroupedEmpty = computed(() =>
   Object.keys(
@@ -55,6 +58,32 @@ const isArchiveGroupedEmpty = computed(() =>
   ).length === 0
 )
 
+async function approveRejectAll(type: 'approve' | 'reject') {
+    try {
+        const ids = page.props.timesheets.map(t => t.id);
+
+        const { data } = await axios.post(
+            route(`approval.${type}`),          // approval.approve | approval.reject
+            { timeEntries: ids },
+            { withCredentials: true, headers: { Accept: 'application/json' } }
+        );
+
+        addNotification(
+            'success',
+            `${type === 'approve' ? 'Approved' : 'Rejected'}`,
+        );
+        setTimeout(() => {
+            router.visit(route('approval.index')); // change to your target page
+        }, 1500);
+    } catch (error) {
+        console.error(error);
+        addNotification(
+            'error',
+            'Failed',
+            `Could not ${type} entries`
+        );
+    }
+}
 function getPeriodInfo(periodKey: string): {
   isHighlighted: boolean;
   endDate: string; // formatted as YYYY-MM-DD
@@ -91,18 +120,24 @@ function formatDate(dateString: string, format?: string) {
   <AppLayout title="Dashboard" data-testid="dashboard_view">
     <MainContainer class="py-5 border-b border-default-background-separator flex justify-between items-center w-full">
       <div class="flex items-center space-x-3 sm:space-x-6 w-full">
-        <PageTitle :icon="HandThumbUpIcon" title="Approval"/>
+        <PageTitle :icon="HandThumbUpIcon" title="Approval" />
         <TabBar v-model="activeTab">
           <TabBarItem value="pending">Pending</TabBarItem>
           <TabBarItem value="unsubmitted">Unsubmitted</TabBarItem>
           <TabBarItem value="archive">Archive</TabBarItem>
         </TabBar>
+        <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary" @click="approveRejectAll('approve')">
+          APPROVE ALL
+        </SecondaryButton>
+        <SecondaryButton class="border-0 px-2 bg-red-600 mx-2 text-quaternary" @click="approveRejectAll('reject')">
+          REJECT ALL
+        </SecondaryButton>
       </div>
     </MainContainer>
 
     <div class="flow-root max-w-[100vw] overflow-x-auto">
       <div class="inline-block w-full align-middle">
-        <div data-testid="client_table" class="grid w-full" v-if="activeTab=='pending'">
+        <div data-testid="client_table" class="grid w-full" v-if="activeTab == 'pending'">
           <div v-if="isGroupedEmpty" class="col-span-3 py-24 text-center">
             <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
             <h3 class="text-text-primary font-semibold">
@@ -125,8 +160,8 @@ function formatDate(dateString: string, format?: string) {
             </a>
           </template>
         </div>
-        <div data-testid="client_table" class="grid w-full" v-if="activeTab=='unsubmitted'">
-          
+        <div data-testid="client_table" class="grid w-full" v-if="activeTab == 'unsubmitted'">
+
           <div v-if="isUnsubmittedGroupedEmpty" class="col-span-3 py-24 text-center">
             <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
             <h3 class="text-text-primary font-semibold">
@@ -149,8 +184,8 @@ function formatDate(dateString: string, format?: string) {
             </a>
           </template>
         </div>
-        <div data-testid="client_table" class="grid w-full" v-if="activeTab=='archive'">
-          
+        <div data-testid="client_table" class="grid w-full" v-if="activeTab == 'archive'">
+
           <div v-if="isArchiveGroupedEmpty" class="col-span-3 py-24 text-center">
             <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
             <h3 class="text-text-primary font-semibold">

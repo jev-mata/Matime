@@ -476,7 +476,7 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
                         @click="UnsubmittedRemind('remind')">REMIND TO SUBMIT
                     </SecondaryButton>
                 </div>
-                <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'approved'">
+                <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus != 'submitted' && approvalStatus != 'unsubmitted'">
                     <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
                         @click="UnsubmittedRemind('withdraw')">WITHDRAW
                     </SecondaryButton>
@@ -549,7 +549,7 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
                 </div>
             </div>
         </MainContainer>
-        <MainContainer class="-mt-20">
+        <MainContainer class=" ">
 
             <div v-for="(value, key) in groupedTimeEntries" :key="key">
                 <div class=" border border-1 mt-5 border-tertiary border-b-4">
