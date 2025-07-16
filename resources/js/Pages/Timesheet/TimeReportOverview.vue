@@ -10,6 +10,7 @@ import { formatCents } from '@/packages/ui/src/utils/money';
 import ReportingRow from '@/Components/Common/Reporting/ReportingRow.vue';
 import ReportingChart from '@/Components/Common/Reporting/ReportingChart.vue';
 import MainContainer from '@/packages/ui/src/MainContainer.vue';
+import TimeReportRowHeading from '@/Pages/Timesheet/TimeReportRowHeading.vue';
 import ReportingExportModal from '@/Components/Common/Reporting/ReportingExportModal.vue';
 import ReportingPieChart from '@/Components/Common/Reporting/ReportingPieChart.vue';
 
@@ -502,8 +503,8 @@ function sumDuration(timeEntries: TimeEntry[]) {
 
 
 
-                    <TimeEntryRowHeading class=" " :date="key" :duration="sumDuration(value)">
-                    </TimeEntryRowHeading>
+                    <TimeReportRowHeading class=" " :date="key" :duration="sumDuration(value)">
+                    </TimeReportRowHeading>
 
 
                     <template v-for="entry in value" :key="entry.id">
