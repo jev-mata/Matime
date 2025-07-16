@@ -139,6 +139,6 @@ Route::middleware([
     });
 });
 Route::fallback(function () {
-    return Inertia::render('Notfound');
+    return Inertia::render('Error/404');
 });
 // Route::get('/team-invitation/view', [TeamInvitationController::class, 'showAcceptPage']);

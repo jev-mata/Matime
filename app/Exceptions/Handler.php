@@ -55,7 +55,7 @@ class Handler extends ExceptionHandler
 
         // 404 – Eloquent model not found
         if ($e instanceof ModelNotFoundException) {
-            return Inertia::render('Notfound', ['status' => 404])
+            return Inertia::render('Error/404', ['status' => 404])
                 ->toResponse($request)
                 ->setStatusCode(404);
         }
@@ -63,7 +63,7 @@ class Handler extends ExceptionHandler
         // Other HTTP exceptions (403, 429, 500 …)
         if ($e instanceof HttpException) {
             $status = $e->getStatusCode();   // not getCode()
-            return Inertia::render('Notfound', ['status' => $status])
+            return Inertia::render('Error/500', ['status' => $status])
                 ->toResponse($request)
                 ->setStatusCode($status);
         }
@@ -75,7 +75,7 @@ class Handler extends ExceptionHandler
                 ? 'Database error occurred'
                 : 'Service temporarily unavailable';
 
-            return Inertia::render('Notfound', compact('status', 'message'))
+            return Inertia::render('Error/500', compact('status', 'message'))
                 ->toResponse($request)
                 ->setStatusCode($status);
         }
