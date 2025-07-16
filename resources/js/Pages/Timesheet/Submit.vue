@@ -6,7 +6,6 @@ import MainContainer from "@/packages/ui/src/MainContainer.vue";
 import { ClockIcon } from "@heroicons/vue/24/outline";
 import { usePage } from "@inertiajs/vue3";
 
-import { defineEmits, defineProps, onMounted } from 'vue'
 import type { Project, Tag, Task, TimeEntry } from '@/packages/api/src';
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";

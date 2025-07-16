@@ -14,6 +14,7 @@ import TimeReportRowHeading from '@/Pages/Timesheet/TimeReportRowHeading.vue';
 import ReportingExportModal from '@/Components/Common/Reporting/ReportingExportModal.vue';
 import ReportingPieChart from '@/Components/Common/Reporting/ReportingPieChart.vue';
 
+import { Link } from '@inertiajs/vue3';
 import type {
     Project,
     Tag,
@@ -45,6 +46,7 @@ import { useProjectsStore } from '@/utils/useProjects';
 import { router, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 
+import { ArrowLeftIcon } from '@heroicons/vue/24/solid';
 import ReadOnlyTimeEntryRow from './ReadOnlyTimeEntryRow.vue';
 import { SecondaryButton } from '@/packages/ui/src';
 import axios from 'axios';
@@ -405,7 +407,7 @@ function sumDuration(timeEntries: TimeEntry[]) {
 }
 
 
-async function UnsubmittedRemind(type: 'unsubmitted' | 'remind') {
+async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
     try {
         const ids = page.props.timeEntries.map(t => t.id);
 
@@ -417,7 +419,7 @@ async function UnsubmittedRemind(type: 'unsubmitted' | 'remind') {
 
         addNotification(
             'success',
-            `${type === 'unsubmitted' ? 'Unsubmitted Entries' : 'Sent Reminder Successfuly'}`,
+            `${type === 'withdraw' ? 'Withdraw Entries' : 'Sent Reminder Successfuly'}`,
         );
         setTimeout(() => {
             router.visit(route('approval.index')); // change to your target page
@@ -435,10 +437,15 @@ async function UnsubmittedRemind(type: 'unsubmitted' | 'remind') {
 
 <template>
     <AppLayout title="Reporting" data-testid="reporting_view" class="overflow-hidden">
-        <ReportingExportModal v-model:show="showExportModal" :export-url="exportUrl"></ReportingExportModal>
+        <div class="flex">
+
+        </div>
         <MainContainer
             class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
             <div class="flex space-x-2">
+            <Link :href="route('approval.index')" title="back">
+            <ArrowLeftIcon class="w-5"></ArrowLeftIcon>
+            </Link> 
                 <div class="px-2 font-bold text-lg">
                     {{ page.props.name }}</div>
                 <div class="font-bold text-lg">
@@ -471,7 +478,7 @@ async function UnsubmittedRemind(type: 'unsubmitted' | 'remind') {
                 </div>
                 <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'approved'">
                     <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
-                        @click="UnsubmittedRemind('unsubmitted')">UNSUBMIT
+                        @click="UnsubmittedRemind('withdraw')">WITHDRAW
                     </SecondaryButton>
                 </div>
 

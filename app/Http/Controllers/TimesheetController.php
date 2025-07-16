@@ -122,7 +122,7 @@ class TimesheetController extends Controller
 
     public function Unsubmit(Request $request)
     {
-        $ids = $request->input('ids'); // or $request->get('ids');
+        $ids = $request->input('ids'); // or $request->get('ids'); 
 
         // Optional validation
         if (!is_array($ids)) {
@@ -131,6 +131,22 @@ class TimesheetController extends Controller
 
         TimeEntry::whereIn('id', $ids)->update([
             'approval' => 'unsubmitted',
+            'approved_by' => null,
+        ]);
+
+    }
+
+    public function withdraw(Request $request)
+    {
+        $ids = $request->input('timeEntries'); // or $request->get('ids'); 
+
+        // Optional validation
+        if (!is_array($ids)) {
+            return response()->json(['error' => 'Invalid payload'], 422);
+        }
+
+        TimeEntry::whereIn('id', $ids)->update([
+            'approval' => 'submitted',
             'approved_by' => null,
         ]);
 
@@ -189,129 +205,69 @@ class TimesheetController extends Controller
     /**
      * Show the specified resource.
      */
-
     public function approval(Request $request)
     {
         $curOrg = $this->currentOrganization();
         $memberRole = $this->member($curOrg);
 
-        $teamIds = Auth::user()->groups()->pluck('teams.id');
-        $timesheets = TimeEntry::with(['user.groups', 'member']);
-        if ($memberRole->role == "employee") {
+        if ($memberRole->role === 'employee') {
             return redirect()->route('dashboard');
         }
-        if ($memberRole->role == "manager") {
-            $timesheets = $timesheets->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
 
-        } else if ($memberRole->role == "admin") {
+        $query = TimeEntry::with(['user.groups', 'member']);
 
+        if ($memberRole->role === 'manager') {
+            $teamIds = Auth::user()->groups()->pluck('teams.id');
+            $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         }
 
-        $grouped = $timesheets->where('approval', 'submitted')->get()
-            ->groupBy(function ($t) {
-                $d = Carbon::parse($t->start);
-                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
-                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
-            })
-            ->map(function ($entriesByPeriod) {
-                return $entriesByPeriod
-                    ->groupBy('user_id')
-                    ->map(function ($entriesByUser) {
-                        $first = $entriesByUser->first();  // any row in this bucket
-                        $user = $first->user;
-                        $member = $first->member;           // ⬅︎ comes from ->with('member')
-        
-                        $totalMinutes = $entriesByUser->sum(
-                            fn($e) =>
-                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
-                        );
+        $submitted = (clone $query)->where('approval', 'submitted')->get();
+        $unsubmitted = (clone $query)->where('approval', 'unsubmitted')->get();
+        $approved = (clone $query)->where('approval', 'approved')->get();
 
-                        return [
-                            'user' => [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                                'groups' => $user->groups,
-                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
-                            ],
-                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
-                        ];
-                    })
-                    ->values();
-            });
-        $unsubmitted_timesheets = $timesheets->where('approval', 'unsubmitted')->get();
-        $unsubmitted_grouped = $unsubmitted_timesheets
-            ->groupBy(function ($t) {
-                $d = Carbon::parse($t->start);
-                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
-                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
-            })
-            ->map(function ($entriesByPeriod) {
-                return $entriesByPeriod
-                    ->groupBy('user_id')
-                    ->map(function ($entriesByUser) {
-                        $first = $entriesByUser->first();  // any row in this bucket
-                        $user = $first->user;
-                        $member = $first->member;           // ⬅︎ comes from ->with('member')
-        
-                        $totalMinutes = $entriesByUser->sum(
-                            fn($e) =>
-                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
-                        );
-
-                        return [
-                            'user' => [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                                'groups' => $user->groups,
-                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
-                            ],
-                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
-                        ];
-                    })
-                    ->values();
-            });
-        $archive_timesheets = $timesheets->where('approval', 'approved')->get();
-        $archive_grouped = $archive_timesheets
-            ->groupBy(function ($t) {
-                $d = Carbon::parse($t->start);
-                $half = $d->day <= 15 ? 1 : 2;           // 1‑15 ⇒ 1, 16‑EOM ⇒ 2
-                return $d->format('Y-m') . '-' . $half;  // e.g. 2025‑07‑2
-            })
-            ->map(function ($entriesByPeriod) {
-                return $entriesByPeriod
-                    ->groupBy('user_id')
-                    ->map(function ($entriesByUser) {
-                        $first = $entriesByUser->first();  // any row in this bucket
-                        $user = $first->user;
-                        $member = $first->member;           // ⬅︎ comes from ->with('member')
-        
-                        $totalMinutes = $entriesByUser->sum(
-                            fn($e) =>
-                            Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end))
-                        );
-
-                        return [
-                            'user' => [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                                'groups' => $user->groups,
-                                'member' => $member ? ['id' => $member->id] : null, // ⬅︎ new
-                            ],
-                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
-                        ];
-                    })
-                    ->values();
-            });
-        $timesheets2 = $timesheets->where('approval', 'submitted')->get();
         return Inertia::render('Timesheet/Index', [
-            'timesheets' => $timesheets2,
-            'grouped' => $grouped,
-            'unsubmitted_timesheets' => $unsubmitted_timesheets,
-            'unsubmitted_grouped' => $unsubmitted_grouped,
-            'archive_timesheets' => $archive_timesheets,
-            'archive_grouped' => $archive_grouped,
+            'timesheets' => $submitted,
+            'grouped' => $this->groupTimesheets($submitted),
+            'unsubmitted_timesheets' => $unsubmitted,
+            'unsubmitted_grouped' => $this->groupTimesheets($unsubmitted),
+            'archive_timesheets' => $approved,
+            'archive_grouped' => $this->groupTimesheets($approved),
         ]);
     }
+
+    private function groupTimesheets($timesheets)
+    {
+        return $timesheets
+            ->groupBy(function ($t) {
+                $d = Carbon::parse($t->start);
+                $half = $d->day <= 15 ? 1 : 16;
+                return $d->format('Y-m') . '-' . $half;
+            })
+            ->map(function ($entriesByPeriod) {
+                return $entriesByPeriod
+                    ->groupBy('user_id')
+                    ->map(function ($entriesByUser) {
+                        $first = $entriesByUser->first();
+                        $user = $first->user;
+                        $member = $first->member;
+
+                        $totalMinutes = $entriesByUser->sum(function ($e) {
+                            return Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end));
+                        });
+
+                        return [
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->name,
+                                'groups' => $user->groups,
+                                'member' => $member ? ['id' => $member->id] : null,
+                            ],
+                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
+                        ];
+                    })->values();
+            });
+    }
+
     public function ApprovalOverview(Request $request)
     {
         $user = Member::with('user')->find($request->input('user_id'));

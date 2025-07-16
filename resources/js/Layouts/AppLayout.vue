@@ -256,7 +256,7 @@ onMounted(fetchPermission);
                     </nav>
                 </div>
                 <div class="justify-self-end">
-                    <UpdateSidebarNotification></UpdateSidebarNotification>
+                    <!-- <UpdateSidebarNotification></UpdateSidebarNotification> -->
                     <ul
                         class="border-t border-default-background-separator pt-3 flex justify-between pr-4 items-center">
                         <NavigationSidebarItem class="flex-1" title="Profile Settings" :icon="Cog6ToothIcon" :href="route('profile.show')

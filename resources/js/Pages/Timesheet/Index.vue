@@ -91,7 +91,7 @@ function formatDate(dateString: string, format?: string) {
   <AppLayout title="Dashboard" data-testid="dashboard_view">
     <MainContainer class="py-5 border-b border-default-background-separator flex justify-between items-center w-full">
       <div class="flex items-center space-x-3 sm:space-x-6 w-full">
-        <PageTitle :icon="HandThumbUpIcon" title="Timesheet Approval"/>
+        <PageTitle :icon="HandThumbUpIcon" title="Approval"/>
         <TabBar v-model="activeTab">
           <TabBarItem value="pending">Pending</TabBarItem>
           <TabBarItem value="unsubmitted">Unsubmitted</TabBarItem>

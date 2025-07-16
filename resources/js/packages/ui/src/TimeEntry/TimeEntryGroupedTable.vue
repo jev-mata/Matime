@@ -290,7 +290,8 @@ watch(
                     class=" p-2 border-1 mx-2 button text-blue-400">
                     submit
                 </button>
-                <button @click="unSubmitBTN(bimonthlykey, bimonthly.days)" v-if="bimonthly.isSubmitted"
+                <button @click="unSubmitBTN(bimonthlykey, bimonthly.days)"
+                    v-if="bimonthly.isSubmitted && !bimonthly.isApproved"
                     class=" p-2 border-1 mx-2 button text-blue-400">
                     unsubmit
                 </button>

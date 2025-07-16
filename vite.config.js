@@ -5,8 +5,7 @@ import checker from 'vite-plugin-checker';
 import {
     collectModuleAssetsPaths,
     collectModulePlugins,
-} from './vite-module-loader.js';
-
+} from './vite-module-loader.js'; 
 async function getConfig() {
     const paths = [
         'resources/js/app.ts',
@@ -20,11 +19,19 @@ async function getConfig() {
         build: {
             sourcemap: true, // Source map generation must be turned on
         },
+        optimizeDeps: {
+            include: [
+                '@inertiajs/vue3',
+                'axios',
+                'lodash',
+                'vue',
+            ]
+        },
         plugins: [
             laravel({
                 input: [...paths, ...modulePaths],
                 refresh: true,
-            }),
+            }), 
             vue({
                 template: {
                     transformAssetUrls: {
@@ -40,17 +47,8 @@ async function getConfig() {
                 lintCommand: 'eslint "./**/*.{ts,vue}"',
             }),
             ...additionalPlugins,
-        ], server: {
-            host: '0.0.0.0', // bind to all interfaces
-            port: 5147,
-            hmr: {
-                host: 'localhost',
-                https: true, // or use your host machine IP if accessed from LAN
-                port: 5147,
-                clientPort: 5147
-            },
-        },
-        
+        ],
+
 
 
     });
