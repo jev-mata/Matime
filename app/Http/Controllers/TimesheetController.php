@@ -224,7 +224,7 @@ class TimesheetController extends Controller
                     route('approval.approve'),
                     $period,
                     Auth::user()->name,
-                    $user->names,
+                    $user->name,
                     'Withdraw'
                 )
             );
@@ -290,7 +290,7 @@ class TimesheetController extends Controller
                     route('time'),
                     $period,
                     Auth::user()->name,
-                    $$user->names,
+                    $user->name,
                     'Approved'
                 )
             );
@@ -326,7 +326,7 @@ class TimesheetController extends Controller
                     route('time'),
                     $period,
                     Auth::user()->name,
-                    $user->names,
+                    $user->name,
                     'Rejected'
                 )
             );
