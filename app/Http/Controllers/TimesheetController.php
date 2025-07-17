@@ -123,10 +123,11 @@ class TimesheetController extends Controller
         $entries = TimeEntry::with('user')->whereIn('id', $ids);
 
         $names = $entries->get()
-            ->pluck('user.name')       // get user emails
-            ->filter()                  // remove nulls
-            ->unique()                  // remove duplicates
-            ->values();                 // reindex (optional)
+            ->pluck('user.name')     // get user names
+            ->filter()               // remove nulls
+            ->unique()               // remove duplicates
+            ->values()               // reindex
+            ->implode(', ');         // convert to a comma-separated string
 
         $entries->update([
             'approval' => 'submitted',
@@ -162,10 +163,12 @@ class TimesheetController extends Controller
 
         $entries = TimeEntry::with('user')->whereIn('id', $ids);
         $names = $entries->get()
-            ->pluck('user')       // get user emails
-            ->filter()                  // remove nulls
-            ->unique()                  // remove duplicates
-            ->values();                 // reindex (optional)
+            ->pluck('user.name')     // get user names
+            ->filter()               // remove nulls
+            ->unique()               // remove duplicates
+            ->values()               // reindex
+            ->implode(', ');         // convert to a comma-separated string
+
 
         $entries->update([
             'approval' => 'unsubmitted',
