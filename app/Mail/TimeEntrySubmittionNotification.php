@@ -44,7 +44,7 @@ class TimeEntrySubmittionNotification extends Mailable
 
     public function build()
     {
-        return $this->markdown('emails.time-entry-reminder')
+        return $this->markdown('emails.submission-notification')
             ->subject('Reminder: Submit Your Timesheet');
     }
     /**

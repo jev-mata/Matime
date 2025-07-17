@@ -207,7 +207,7 @@ periodSelected.value=days;
     const IDlist = pluckID(sheet);
     const success = await axios.post(
         route('approval.unsubmit'),
-        { ids: IDlist },
+        { ids: IDlist, period:days  },
         {
             withCredentials: true,
             headers: { Accept: 'application/json' },
