@@ -110,7 +110,7 @@ class TimesheetController extends Controller
     public function Submit(Request $request)
     {
         $ids = $request->input('ids'); // or $request->get('ids');
-        $period = $request->input('period','All'); // or $request->get('ids');
+        $period = $request->input('period', 'All'); // or $request->get('ids');
 
         $curOrg = $this->currentOrganization();
         $memb = $this->member($curOrg)->whereIn('role', [Role::Manager, Role::Admin])->pluck('user_id');
@@ -120,16 +120,17 @@ class TimesheetController extends Controller
             return response()->json(['error' => 'Invalid payload'], 422);
         }
 
-        $entries = TimeEntry::whereIn('id', $ids)->update([
-            'approval' => 'submitted',
-        ]);
+        $entries = TimeEntry::with('user')->whereIn('id', $ids);
 
-        $names = $entries
+        $names = $entries->get()
             ->pluck('user.name')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
             ->values();                 // reindex (optional)
 
+        $entries->update([
+            'approval' => 'submitted',
+        ]);
         $emails = $user->pluck('email');                 // reindex (optional)
         foreach ($emails as $email) {
             Mail::to($email)->send(
@@ -149,7 +150,7 @@ class TimesheetController extends Controller
     {
         $ids = $request->input('ids'); // or $request->get('ids'); 
 
-        $period = $request->input('period','All'); // or $request->get('ids');
+        $period = $request->input('period', 'All'); // or $request->get('ids');
 
         $curOrg = $this->currentOrganization();
         $memb = $this->member($curOrg)->whereIn('role', [Role::Manager, Role::Admin])->pluck('user_id');
@@ -159,16 +160,17 @@ class TimesheetController extends Controller
             return response()->json(['error' => 'Invalid payload'], 422);
         }
 
-        $entries = TimeEntry::whereIn('id', $ids)->update([
-            'approval' => 'unsubmitted',
-            'approved_by' => null,
-        ]);
-
-        $names = $entries
+        $entries = TimeEntry::with('user')->whereIn('id', $ids);
+        $names = $entries->get()
             ->pluck('user.name')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
             ->values();                 // reindex (optional)
+
+        $entries->update([
+            'approval' => 'unsubmitted',
+            'approved_by' => null,
+        ]);
 
         $emails = $user->pluck('email');                 // reindex (optional)
         foreach ($emails as $email) {
@@ -190,7 +192,7 @@ class TimesheetController extends Controller
         $ids = $request->input('timeEntries'); // or $request->get('ids'); 
 
 
-        $period = $request->input('period','All'); // or $request->get('ids');
+        $period = $request->input('period', 'All'); // or $request->get('ids');
         $curOrg = $this->currentOrganization();
         $memb = $this->member($curOrg)->whereIn('role', [Role::Manager, Role::Admin])->pluck('user_id');
         $user = User::whereIn('id', $memb->id)->get();
@@ -199,11 +201,8 @@ class TimesheetController extends Controller
             return response()->json(['error' => 'Invalid payload'], 422);
         }
 
-        $entries = TimeEntry::with('user')->whereIn('id', $ids)->update([
-            'approval' => 'submitted',
-            'approved_by' => null,
-        ]);
-        $emails = $entries
+        $entries = TimeEntry::with('user')->whereIn('id', $ids);
+        $emails = $entries->get()
             ->pluck('user.email')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
@@ -213,12 +212,15 @@ class TimesheetController extends Controller
             return response()->json(['error' => 'No valid user emails found'], 404);
         }
 
-        $names = $entries
+        $names = $entries->get()
             ->pluck('user.name')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
             ->values();                 // reindex (optional)
-
+        $entries->update([
+            'approval' => 'submitted',
+            'approved_by' => null,
+        ]);
         $emails = $user->pluck('email');                 // reindex (optional)
         foreach ($emails as $email) {
             Mail::to($email)->send(
@@ -272,10 +274,10 @@ class TimesheetController extends Controller
     {
 
         $ids = $request->input('timeEntries'); // expect array of UUIDs
-        $period = $request->input('period','All'); // or $request->get('ids');
-        $timeEntry = TimeEntry::where('user')->whereIn('id', $ids)->update(['approval' => 'approved']);
+        $period = $request->input('period', 'All'); // or $request->get('ids');
+        $timeEntry = TimeEntry::with('user')->whereIn('id', $ids);
         // Extract user emails, filter nulls, and remove duplicates
-        $emails = $timeEntry
+        $emails = $timeEntry->get()
             ->pluck('user.email')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
@@ -285,12 +287,12 @@ class TimesheetController extends Controller
             return response()->json(['error' => 'No valid user emails found'], 404);
         }
 
-        $names = $timeEntry
+        $names = $timeEntry->get()
             ->pluck('user.name')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
             ->values();                 // reindex (optional)
-
+        $timeEntry->update(['approval' => 'approved']);
         foreach ($emails as $email) {
             Mail::to($email)->send(
                 new TimeEntrySubmittionNotification(
@@ -312,9 +314,9 @@ class TimesheetController extends Controller
     {
 
         $ids = $request->input('timeEntries'); // expect array of UUIDs
-        $period = $request->input('period','All'); // or $request->get('ids');
-        $timeEntry = TimeEntry::whereIn('id', $ids)->update(['approval' => 'rejected']);
-        $emails = $timeEntry
+        $period = $request->input('period', 'All'); // or $request->get('ids');
+        $timeEntry = TimeEntry::with('user')->whereIn('id', $ids);
+        $emails = $timeEntry->get()
             ->pluck('user.email')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
@@ -324,12 +326,13 @@ class TimesheetController extends Controller
             return response()->json(['error' => 'No valid user emails found'], 404);
         }
 
-        $names = $timeEntry
+        $names = $timeEntry->get()
             ->pluck('user.name')       // get user emails
             ->filter()                  // remove nulls
             ->unique()                  // remove duplicates
             ->values();                 // reindex (optional)
 
+        $timeEntry->update(['approval' => 'rejected']);
         foreach ($emails as $email) {
             Mail::to($email)->send(
                 new TimeEntrySubmittionNotification(

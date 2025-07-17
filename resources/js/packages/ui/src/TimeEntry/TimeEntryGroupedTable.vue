@@ -184,6 +184,7 @@ function SubmitBTN(days: string, sheet: Record<string, TimeEntriesGroupedByType[
     previewSheets.value = sheet;
     isSubmit.value = true;
     isLoading.value=true;
+periodSelected.value=days;
 }
 function pluckID(
     timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>
@@ -201,6 +202,7 @@ const unSubmitBTN = async (days: string, sheet: Record<string, TimeEntriesGroupe
     // selectedPeriod.value = days;
     // isSubmit.value = false;
 
+periodSelected.value=days;
     isLoading.value=true;
     const IDlist = pluckID(sheet);
     const success = await axios.post(
@@ -228,11 +230,12 @@ function isSubmitted(entries: TimeEntry[]): boolean {
     return entries.every(entry => entry.approval !== 'unsubmitted');
 }
 function clearClick() {
-
+periodSelected.value='';
     isLoading.value=false;
     previewSheets.value = null;
 }
 const previewSheets = ref<Record<string, TimeEntriesGroupedByType[]> | null>(null);
+const periodSelected = ref<string>('');
 const isSubmit = ref<boolean>(false);
 watch(
     () => props.timeEntries,  // 👈 Reactive dependency
@@ -374,7 +377,7 @@ watch(
         </div>
     </div>
     <Submit v-if="previewSheets" :groupEntries="previewSheets" @clear="clearClick" :isSubmit="isSubmit"
-        :projects="projects" :tags="tags" :tasks="tasks" @getTimesheet="fetchTimeEntries">
+        :projects="projects" :period-selected="periodSelected" :tags="tags" :tasks="tasks" @getTimesheet="fetchTimeEntries">
     </Submit>
 </template>
 

@@ -6,6 +6,7 @@ import MainContainer from "@/packages/ui/src/MainContainer.vue";
 import { ClockIcon } from "@heroicons/vue/24/outline";
 import { usePage } from "@inertiajs/vue3";
 
+import { SecondaryButton } from '@/packages/ui/src';
 import type { Project, Tag, Task, TimeEntry } from '@/packages/api/src';
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
@@ -34,6 +35,7 @@ function selectTask(
   return id ? tasks.find(t => t.id === id) : undefined;
 }
 
+const isLoading=ref<boolean>(false);
 function selectTags(
   ids: string[],   // many IDs ↠ many tags
   tags: Tag[]
@@ -52,6 +54,7 @@ type GroupEntries = {
   tasks: Task[];
   tags: Tag[];
   isSubmit: boolean;
+  periodSelected:string;
 }
 const props = defineProps<GroupEntries>();
 // const page = usePage<{
@@ -88,7 +91,7 @@ function pluckID(
 
 const submit = async () => {
   const IDlist = pluckID(props.groupEntries);
-
+isLoading.value=true;
   if (!IDlist.length) {
     console.warn('No time entry IDs to submit.');
     return;
@@ -96,7 +99,7 @@ const submit = async () => {
 
   const success = await axios.post(
     route('approval.submit'),
-    { ids: IDlist },
+    { ids: IDlist, period:props.periodSelected  },
     {
       withCredentials: true,
       headers: { Accept: 'application/json' },
@@ -108,8 +111,10 @@ const submit = async () => {
     addNotification('success', 'Submitted', 'Entry Submitted');
     emit('clear');
     emit('getTimesheet');
+isLoading.value=false;
   } else {
 
+isLoading.value=false;
     addNotification('error', 'Failed', 'Entry Failed to Submit');
   }
 };
@@ -174,7 +179,7 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
         <h2 class="text-lg font-semibold mb-1">My Entries</h2> 
         <div class="max-h-20 overflow-y-scroll " style="max-height: 50vh;">
           <div v-for="(entries, date2) in props.groupEntries" :key="date2" class="mt-4 mb-4 border">
-            <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">{{ date2 }}
+            <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">2{{ date2 }}
             </h2>
 
             <ul class="">
@@ -234,10 +239,15 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
       <form @submit.prevent="submit" class="space-y-4 w-full px-5 pb-5">
         <div class="flex w-full items-center space-x-2 lg:space-x-2.5">
 
-          <Button @click.prevent="emit('clear')" class="px-4 py-2 bg-blue-600 text-white rounded">
-            Close
-          </Button>
-          <Button type="submit" :class="' px-4 py-2 bg-green-600 text-white rounded'">Submit</Button>
+                    <SecondaryButton class="px-4 py-2 bg-blue-600 text-white rounded"
+                        :loading="isLoading"
+                        @click="emit('clear')">Close
+                    </SecondaryButton> 
+
+                    <SecondaryButton   type="submit" class="px-4 py-2 bg-green-600 text-white rounded"
+                        :loading="isLoading"
+                         >Submit
+                    </SecondaryButton>  
         </div>
       </form>
     </template>

@@ -194,7 +194,9 @@ async function approveReject(type: 'approve' | 'reject') {
         const ids = page.props.timeEntries.map(t => t.id);
   await axios.post(
             route(`approval.${type}`),          // approval.approve | approval.reject
-            { timeEntries: ids },
+            { timeEntries: ids,period:
+                    `${ formatDate(page.props.period.start, 'ddd, MMMM D') } -
+                    ${ formatDate(page.props.period.end, 'D - YYYY') }` },
             { withCredentials: true, headers: { Accept: 'application/json' } }
         );
 
@@ -368,7 +370,9 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
 
           await axios.post(
             route(`approval.${type}`),          // approval.approve | approval.reject
-            { timeEntries: ids },
+            { timeEntries: ids,period:
+                    `${ formatDate(page.props.period.start, 'ddd, MMMM D') } -
+                    ${ formatDate(page.props.period.end, 'D - YYYY') }` },
             { withCredentials: true, headers: { Accept: 'application/json' } }
         );
 
