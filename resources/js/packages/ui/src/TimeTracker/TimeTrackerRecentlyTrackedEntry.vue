@@ -29,8 +29,8 @@ const task = computed(() => {
     <button
         tabindex="-1"
         :data-select-id="timeEntry.id"
-        :class="twMerge('px-2 py-1.5 flex justify-between items-center space-x-2 w-full rounded', props.highlighted && 'bg-card-background-active')">
-        <span v-if="timeEntry.description !== ''" class="text-sm font-medium">
+        :class="twMerge('px-2 py-1.5 flex justify-between items-center space-x-2 w-full rounded overflow-hidden', props.highlighted && 'bg-card-background-active')">
+        <span v-if="timeEntry.description !== ''" class="text-sm font-medium whitespace-nowrap ">
             {{
                     timeEntry.description
             }}
@@ -43,7 +43,7 @@ const task = computed(() => {
             :color="project?.color"
             :name="project?.name"
             class="">
-            <div v-if="project" class="flex items-center lg:space-x-1 min-w-0">
+            <div v-if="project" class="flex items-center lg:space-x-1 min-w-0 ">
                     <span class="whitespace-nowrap text-xs ">
                         {{ project?.name }}
                     </span>
@@ -52,7 +52,7 @@ const task = computed(() => {
                     class="w-4 lg:w-5 text-text-secondary shrink-0"></ChevronRightIcon>
                 <div
                     v-if="task"
-                    class="min-w-0 shrink text-xs truncate">
+                    class="min-w-0 shrink text-xs truncate ">
                     {{ task.name }}
                 </div>
             </div>

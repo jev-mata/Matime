@@ -21,7 +21,7 @@ import {useFocus} from "@vueuse/core";
 import {autoUpdate, flip, limitShift, offset, shift, useFloating} from "@floating-ui/vue";
 import TimeTrackerRecentlyTrackedEntry from "@/packages/ui/src/TimeTracker/TimeTrackerRecentlyTrackedEntry.vue";
 import {useSelectEvents} from "@/packages/ui/src/utils/select";
-
+import { useMediaQuery } from '@vueuse/core'; // or your preferred media query hook
 const currentTimeEntry = defineModel<TimeEntry>('currentTimeEntry', {
     required: true,
 });
@@ -175,21 +175,24 @@ watch(focused, (focused) => {
 });
 
 
+const isMobile = useMediaQuery ('(max-width: 640px)');
 const floating = ref(null);
-const {floatingStyles} = useFloating(currentTimeEntryDescriptionInput, floating, {
-    placement: 'bottom-start',
-    whileElementsMounted: autoUpdate,
-    middleware: [
-        offset(10),
-        shift({
-            limiter: limitShift({
-                offset: 5,
-            }),
-        }),
-        flip({
+const { floatingStyles } = useFloating(currentTimeEntryDescriptionInput, floating, {
+  placement: 'bottom-start',
+  whileElementsMounted: autoUpdate,
+  middleware: [
+    offset(10),
+    ...(isMobile.value
+      ? [] // Don't use shift or flip on mobile
+      : [
+          shift({
+            limiter: limitShift({ offset: 5 }),
+          }),
+          flip({
             fallbackAxisSideDirection: 'start',
-        }),
-    ],
+          }),
+        ]),
+  ],
 });
 const highlightedDropdownEntryId = ref<string | null>(null);
 
@@ -204,8 +207,8 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
         class="flex items-center relative @container"
         data-testid="dashboard_timer">
         <div
-            class="flex flex-col @2xl:flex-row w-full justify-between rounded-lg bg-card-background border-card-border border transition shadow-card">
-            <div class="flex flex-1 items-center pr-6 relative">
+            class="flex flex-col @2xl:flex-row w-full justify-between relative  rounded-lg bg-card-background border-card-border border transition shadow-card">
+            <div class="  flex-1 items-center pr-6   w-full  ">
                 <input
                     ref="currentTimeEntryDescriptionInput"
                     v-model="tempDescription"
@@ -219,7 +222,7 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                 <div
                     v-if="showDropdown && filteredRecentlyTrackedTimeEntries.length > 0"
                     ref="floating"
-                    class="z-50 w-full max-w-2xl"
+                    class="z-50 absolute w-full"  
                     :style="floatingStyles">
                     <div
                         class="rounded-lg w-full fixed min-w-xl top-0 left-0  border border-card-border overflow-none shadow-dropdown bg-card-background">

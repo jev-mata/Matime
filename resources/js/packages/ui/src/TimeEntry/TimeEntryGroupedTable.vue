@@ -29,6 +29,8 @@ import Submit from '@/Pages/Timesheet/Submit.vue';
 const selectedTimeEntries = defineModel<TimeEntry[]>('selected', {
     default: [],
 });
+
+import { SecondaryButton } from '@/packages/ui/src';
 const props = defineProps<{
     timeEntries: TimeEntry[];
     projects: Project[];
@@ -50,6 +52,7 @@ const props = defineProps<{
     fetchTimeEntries: () => void;
 }>();
 
+const isLoading=ref<boolean>(false);
 const { addNotification } = useNotificationsStore();
 function startTimeEntryFromExisting(entry: TimeEntry) {
     props.createTimeEntry({
@@ -180,6 +183,7 @@ function unselectAllTimeEntries(value: TimeEntriesGroupedByType[]) {
 function SubmitBTN(days: string, sheet: Record<string, TimeEntriesGroupedByType[]>) {
     previewSheets.value = sheet;
     isSubmit.value = true;
+    isLoading.value=true;
 }
 function pluckID(
     timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>
@@ -197,6 +201,7 @@ const unSubmitBTN = async (days: string, sheet: Record<string, TimeEntriesGroupe
     // selectedPeriod.value = days;
     // isSubmit.value = false;
 
+    isLoading.value=true;
     const IDlist = pluckID(sheet);
     const success = await axios.post(
         route('approval.unsubmit'),
@@ -209,10 +214,12 @@ const unSubmitBTN = async (days: string, sheet: Record<string, TimeEntriesGroupe
 
     // Only emit if request succeeded
     if (success) {
+    isLoading.value=false;
         addNotification('success', 'Unsubmitted', 'Entry Unsubmitted');
         props.fetchTimeEntries();
     } else {
 
+    isLoading.value=false;
         addNotification('error', 'Failed', 'Entry Failed to Submit');
     }
 }
@@ -222,6 +229,7 @@ function isSubmitted(entries: TimeEntry[]): boolean {
 }
 function clearClick() {
 
+    isLoading.value=false;
     previewSheets.value = null;
 }
 const previewSheets = ref<Record<string, TimeEntriesGroupedByType[]> | null>(null);
@@ -243,19 +251,24 @@ watch(
 
             <div class="  border-1 p-1 ">
 
-                <button @click="SubmitBTN(bimonthlykey, bimonthly.days)"
+                <SecondaryButton @click="SubmitBTN(bimonthlykey, bimonthly.days)"
                     v-if="!bimonthly.isSubmitted && !bimonthly.isApproved"
+                        :loading="isLoading"
                     class=" p-2 border-1 mx-2 button text-blue-400">
                     submit
-                </button>
-                <button @click="unSubmitBTN(bimonthlykey, bimonthly.days)"
+                </SecondaryButton>
+                <SecondaryButton @click="unSubmitBTN(bimonthlykey, bimonthly.days)"
                     v-if="bimonthly.isSubmitted && !bimonthly.isApproved"
+                        :loading="isLoading"
                     class=" p-2 border-1 mx-2 button text-blue-400">
                     unsubmit
-                </button>
+                </SecondaryButton>
 
-                {{ bimonthlykey }}
-                <span v-if="bimonthly.isApproved" class="ml-4  bg-tertiary p-2 font-bold p-2 rounded-md">Approved</span>
+                <button  class=" py-2 border-1  button text-blue-400 opacity-0" v-if="bimonthly.isApproved" >|
+                </button>
+                <span v-if="bimonthlykey" class="ml-4   p-2 rounded-md font-bold">{{ bimonthlykey }}</span>
+                
+                <span v-if="bimonthly.isApproved" class="ml-4 bg-tertiary p-2 rounded-md font-bold">Approved</span>
                 <span v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
                     class="ml-4 bg-tertiary p-2 rounded-md font-bold">Pending</span>
             </div>

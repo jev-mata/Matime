@@ -151,28 +151,39 @@ class TimesheetController extends Controller
         ]);
 
     }
+ 
 
     public function remind(Request $request)
     {
-        $ids = $request->input('timeEntries'); // or $request->get('ids');
+        $ids = $request->input('timeEntries');
 
         if (!is_array($ids)) {
             return response()->json(['error' => 'Invalid payload'], 422);
         }
 
-        $entry = TimeEntry::with('user')->whereIn('id', $ids)->first();
+        // Fetch all related users for the given time entry IDs
+        $entries = TimeEntry::with('user')
+            ->whereIn('id', $ids)
+            ->get();
 
-        if (!$entry || !$entry->user || !$entry->user->email) {
-            return response()->json(['error' => 'User email not found'], 404);
+        // Extract user emails, filter nulls, and remove duplicates
+        $emails = $entries
+            ->pluck('user.email')       // get user emails
+            ->filter()                  // remove nulls
+            ->unique()                  // remove duplicates
+            ->values();                 // reindex (optional)
+
+        if ($emails->isEmpty()) {
+            return response()->json(['error' => 'No valid user emails found'], 404);
         }
 
-        $email = $entry->user->email;
+        foreach ($emails as $email) {
+            Mail::to($email)->send(new TimeEntryReminder(route('time')));
+        }
 
-        // Send the email
-        Mail::to($email)->send(new TimeEntryReminder(route('time')));
-
-        return response()->json(['message' => 'Reminder email sent']);
+        return response()->json(['message' => 'Reminder emails sent to ' . $emails->count() . ' user(s)']);
     }
+
 
     public function approve(Request $request)
     {
