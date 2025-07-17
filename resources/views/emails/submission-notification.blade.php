@@ -5,12 +5,7 @@
     <tr>
         <td>
             <strong>{{ __('Period:') }}</strong> {{ $period }}<br>
-            <strong>{{ __('Name:') }}</strong>
-            @if (is_array($nameTarg))
-                {{ implode(', ', $nameTarg) }}
-            @else
-                {{ $nameTarg }}
-            @endif
+            <strong>{{ __('Name:') }}</strong> {{ $nameTarg }} 
         </td>
     </tr>
 </table>
