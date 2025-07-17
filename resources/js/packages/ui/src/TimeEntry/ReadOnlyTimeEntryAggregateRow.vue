@@ -60,11 +60,12 @@ function onSelectChange(checked: boolean) {
 
 function timeEntryTags(model: string[]) {
     return props.tags.filter((tag) => model.includes(tag.id));
-};
+}
 
 const currentProject = computed(() => {
     return props.projects.find(
-        (iteratingProject) => iteratingProject.id === props.timeEntry.timeEntries[0].project_id
+        (iteratingProject) =>
+            iteratingProject.id === props.timeEntry.timeEntries[0].project_id
     );
 });
 
@@ -75,8 +76,9 @@ const currentTask = computed(() => {
 });
 
 const selectedProjectName = computed(() => {
-
-    return currentProject.value?.name ? currentProject.value.name : 'No Project';
+    return currentProject.value?.name
+        ? currentProject.value.name
+        : 'No Project';
 });
 
 const selectedProjectColor = computed(() => {
@@ -85,54 +87,84 @@ const selectedProjectColor = computed(() => {
 </script>
 
 <template>
-    <div class="border-b border-default-background-separator bg-row-background min-w-0 transition"
-        data-testid="time_entry_row"  title="Editing disabled for submitted entries" >
+    <div
+        class="border-b border-default-background-separator bg-row-background min-w-0 transition"
+        data-testid="time_entry_row"
+        title="Editing disabled for submitted entries">
         <MainContainer class="min-w-0 opacity-40">
-            <div class="grid grid-cols-8 py-1.5 items-center min-w-0 justify-between group">
+            <div
+                class="grid grid-cols-8 py-1.5 items-center min-w-0 justify-between group">
                 <div class="flex items-center col-span-2 min-w-0">
-                    <Checkbox :checked="timeEntry.timeEntries.every(
-                        (aggregateTimeEntry: TimeEntry) =>
-                            selectedTimeEntries.includes(
-                                aggregateTimeEntry
+                    <Checkbox
+                        :checked="
+                            timeEntry.timeEntries.every(
+                                (aggregateTimeEntry: TimeEntry) =>
+                                    selectedTimeEntries.includes(
+                                        aggregateTimeEntry
+                                    )
                             )
-                    )
-                        " @update:checked="onSelectChange" />
+                        "
+                        @update:checked="onSelectChange" />
                     <div class="flex items-center min-w-0">
-                        <GroupedItemsCountButton :expanded="expanded" @click="expanded = !expanded">
+                        <GroupedItemsCountButton
+                            :expanded="expanded"
+                            @click="expanded = !expanded">
                             {{ timeEntry?.timeEntries?.length }}
                         </GroupedItemsCountButton>
-                        <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate" :title="timeEntry.description">
+                        <div
+                            class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate"
+                            title="{{timeEntry.description}}">
                             {{ timeEntry.description }}
                         </div>
-
                     </div>
                 </div>
-                <div class="flex items-center px-2  w-full col-span-3 bg-secondary min-w-0"  :title=" selectedProjectName +currentTask.name ">
-                    <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
-                        @click="expanded = !expanded" :name="selectedProjectName" :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'
-                            ">
+                <div
+                    class="flex items-center px-2 w-full col-span-3 bg-secondary min-w-0"
+                    title="{{selectedProjectName +currentTask.name}}">
+                    <ProjectBadge
+                        :color="selectedProjectColor"
+                        :border="false"
+                        tag="button"
+                        @click="expanded = !expanded"
+                        :name="selectedProjectName"
+                        :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'">
                         <div class="flex items-center lg:space-x-1 min-w-0">
                             <span class="whitespace-nowrap text-xs lg:text-sm">
                                 {{ selectedProjectName }}
                             </span>
-                            <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0">
+                            <ChevronRightIcon
+                                v-if="currentTask"
+                                class="w-4 lg:w-5 text-text-secondary shrink-0">
                             </ChevronRightIcon>
-                            <div v-if="currentTask" class="min-w-0 shrink text-xs lg:text-sm truncate">
+                            <div
+                                v-if="currentTask"
+                                class="min-w-0 shrink text-xs lg:text-sm truncate">
                                 {{ currentTask.name }}
                             </div>
                         </div>
                     </ProjectBadge>
-
                 </div>
-                <div class="flex items-center px-2  w-full  col-span-1  bg-secondary min-w-0">
-                    <TagBadge :border="false" size="large"
+                <div
+                    class="flex items-center px-2 w-full col-span-1 bg-secondary min-w-0">
+                    <TagBadge
+                        :border="false"
+                        size="large"
                         class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary"
-                        :name="timeEntryTags(timeEntry.tags).map((tag: Tag) => tag.name).join(', ')
-                            "></TagBadge>
+                        :name="
+                            timeEntryTags(timeEntry.tags)
+                                .map((tag: Tag) => tag.name)
+                                .join(', ')
+                        "></TagBadge>
                 </div>
-                <div class="flex items-center space-x-2  justify-end pl-4">
+                <div class="flex items-center space-x-2 justify-end pl-4">
                     <div class="text-sm font-medium whitespace-nowrap">
-                        {{ formatStartEnd(timeEntry.start, timeEntry.end, organization?.time_format) }}
+                        {{
+                            formatStartEnd(
+                                timeEntry.start,
+                                timeEntry.end,
+                                organization?.time_format
+                            )
+                        }}
                     </div>
                 </div>
                 <div class="flex items-center font-medium lg:space-x-2">
@@ -148,26 +180,45 @@ const selectedProjectColor = computed(() => {
                         }}
                     </button>
 
-                    <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden sm:flex group-hover:opacity-100 focus-visible:opacity-100" @changed="
+                    <TimeTrackerStartStop
+                        :active="!!(timeEntry.start && !timeEntry.end)"
+                        class="opacity-20 hidden sm:flex group-hover:opacity-100 focus-visible:opacity-100"
+                        @changed="
                             onStartStopClick(timeEntry)
-                            "></TimeTrackerStartStop>
+                        "></TimeTrackerStartStop>
 
-                    <div class="" title="Editing disabled for submitted entries">
-                        <LockClosedIcon class="w-4" title="Editing disabled for submitted entries"></LockClosedIcon>
+                    <div
+                        class=""
+                        title="Editing disabled for submitted entries">
+                        <LockClosedIcon
+                            class="w-4"
+                            title="Editing disabled for submitted entries"></LockClosedIcon>
                     </div>
                 </div>
             </div>
         </MainContainer>
-        <div v-if="expanded" class="w-full border-t border-default-background-separator bg-black/15">
-            <TimeEntryRow v-for="subEntry in timeEntry.timeEntries" :key="subEntry.id" :projects="projects"
-                :enable-estimated-time :tasks="tasks" :selected="!!selectedTimeEntries.find(
-                    (filterEntry: TimeEntry) =>
-                        filterEntry.id === subEntry.id
-                )
-                    " :clients :currency="currency" :tags="tags"
-                :delete-time-entry="() => deleteTimeEntries([subEntry])" :time-entry="subEntry"
-                @selected="emit('selected', [subEntry])" @unselected="emit('unselected', [subEntry])"></TimeEntryRow>
+        <div
+            v-if="expanded"
+            class="w-full border-t border-default-background-separator bg-black/15">
+            <TimeEntryRow
+                v-for="subEntry in timeEntry.timeEntries"
+                :key="subEntry.id"
+                :projects="projects"
+                :enable-estimated-time
+                :tasks="tasks"
+                :selected="
+                    !!selectedTimeEntries.find(
+                        (filterEntry: TimeEntry) =>
+                            filterEntry.id === subEntry.id
+                    )
+                "
+                :clients
+                :currency="currency"
+                :tags="tags"
+                :delete-time-entry="() => deleteTimeEntries([subEntry])"
+                :time-entry="subEntry"
+                @selected="emit('selected', [subEntry])"
+                @unselected="emit('unselected', [subEntry])"></TimeEntryRow>
         </div>
     </div>
 </template>
