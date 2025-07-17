@@ -11,11 +11,6 @@ import type {
     Client,
     Organization,
 } from '@/packages/api/src';
-import TimeEntryDescriptionInput from '@/packages/ui/src/TimeEntry/TimeEntryDescriptionInput.vue';
-import TimeEntryRowTagDropdown from '@/packages/ui/src/TimeEntry/TimeEntryRowTagDropdown.vue';
-import TimeEntryMoreOptionsDropdown from '@/packages/ui/src/TimeEntry/TimeEntryMoreOptionsDropdown.vue';
-import TimeTrackerProjectTaskDropdown from '@/packages/ui/src/TimeTracker/TimeTrackerProjectTaskDropdown.vue';
-import BillableToggleButton from '@/packages/ui/src/Input/BillableToggleButton.vue';
 import { ref, inject, type ComputedRef, computed } from 'vue';
 import {
     formatHumanReadableDuration,
@@ -25,10 +20,9 @@ import TimeEntryRow from '@/packages/ui/src/TimeEntry/ReadOnlyTimeEntryRow.vue';
 import GroupedItemsCountButton from '@/packages/ui/src/GroupedItemsCountButton.vue';
 import type { TimeEntriesGroupedByType } from '@/types/time-entries';
 import { Checkbox } from '@/packages/ui/src';
-import { twMerge } from 'tailwind-merge';
 import TagBadge from '@/packages/ui/src/Tag/TagBadge.vue';
 import ProjectBadge from '@/packages/ui/src/Project/ProjectBadge.vue';
-import { ChevronRightIcon, ChevronDownIcon, LockClosedIcon } from '@heroicons/vue/16/solid';
+import { ChevronRightIcon, LockClosedIcon } from '@heroicons/vue/16/solid';
 const props = defineProps<{
     timeEntry: TimeEntriesGroupedByType;
     projects: Project[];
@@ -92,7 +86,7 @@ const selectedProjectColor = computed(() => {
 
 <template>
     <div class="border-b border-default-background-separator bg-row-background min-w-0 transition"
-        data-testid="time_entry_row">
+        data-testid="time_entry_row"  title="Editing disabled for submitted entries" >
         <MainContainer class="min-w-0 opacity-40">
             <div class="grid grid-cols-8 py-1.5 items-center min-w-0 justify-between group">
                 <div class="flex items-center col-span-2 min-w-0">
@@ -107,13 +101,13 @@ const selectedProjectColor = computed(() => {
                         <GroupedItemsCountButton :expanded="expanded" @click="expanded = !expanded">
                             {{ timeEntry?.timeEntries?.length }}
                         </GroupedItemsCountButton>
-                        <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate">
+                        <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate" :title="timeEntry.description">
                             {{ timeEntry.description }}
                         </div>
 
                     </div>
                 </div>
-                <div class="flex items-center px-2  w-full col-span-3 bg-secondary min-w-0">
+                <div class="flex items-center px-2  w-full col-span-3 bg-secondary min-w-0"  :title=" selectedProjectName +currentTask.name ">
                     <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
                         @click="expanded = !expanded" :name="selectedProjectName" :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'
                             ">

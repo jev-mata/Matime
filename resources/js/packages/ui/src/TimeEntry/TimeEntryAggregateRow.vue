@@ -15,7 +15,7 @@ import TimeEntryDescriptionInput from '@/packages/ui/src/TimeEntry/TimeEntryDesc
 import TimeEntryRowTagDropdown from '@/packages/ui/src/TimeEntry/TimeEntryRowTagDropdown.vue';
 import TimeEntryMoreOptionsDropdown from '@/packages/ui/src/TimeEntry/TimeEntryMoreOptionsDropdown.vue';
 import TimeTrackerProjectTaskDropdown from '@/packages/ui/src/TimeTracker/TimeTrackerProjectTaskDropdown.vue';
-import BillableToggleButton from '@/packages/ui/src/Input/BillableToggleButton.vue';
+// import BillableToggleButton from '@/packages/ui/src/Input/BillableToggleButton.vue';
 import { ref, inject, type ComputedRef } from 'vue';
 import {
     formatHumanReadableDuration,
@@ -25,7 +25,6 @@ import TimeEntryRow from '@/packages/ui/src/TimeEntry/TimeEntryRow.vue';
 import GroupedItemsCountButton from '@/packages/ui/src/GroupedItemsCountButton.vue';
 import type { TimeEntriesGroupedByType } from '@/types/time-entries';
 import { Checkbox } from '@/packages/ui/src';
-import { twMerge } from 'tailwind-merge';
 const props = defineProps<{
     timeEntry: TimeEntriesGroupedByType;
     projects: Project[];
@@ -65,12 +64,12 @@ function updateTimeEntryTags(tags: string[]) {
     );
 }
 
-function updateTimeEntryBillable(billable: boolean) {
-    props.updateTimeEntries(
-        props.timeEntry.timeEntries.map((timeEntry: TimeEntry) => timeEntry.id),
-        { billable: billable }
-    );
-}
+// function updateTimeEntryBillable(billable: boolean) {
+//     props.updateTimeEntries(
+//         props.timeEntry.timeEntries.map((timeEntry: TimeEntry) => timeEntry.id),
+//         { billable: billable }
+//     );
+// }
 
 function updateProjectAndTask(projectId: string, taskId: string) {
     props.updateTimeEntries(
@@ -91,52 +90,86 @@ function onSelectChange(checked: boolean) {
 </script>
 
 <template>
-    <div class="border-b border-default-background-separator bg-row-background min-w-0 transition"
+    <div
+        class="border-b border-default-background-separator bg-row-background min-w-0 transition"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0">
-            <div class="grid grid-cols-8 py-1.5 items-center min-w-0 justify-between group">
+            <div
+                class="grid grid-cols-8 py-1.5 items-center min-w-0 justify-between group">
                 <div class="flex items-center col-span-2 min-w-0">
-                    <Checkbox :checked="timeEntry.timeEntries.every(
-                        (aggregateTimeEntry: TimeEntry) =>
-                            selectedTimeEntries.includes(
-                                aggregateTimeEntry
+                    <Checkbox
+                        :checked="
+                            timeEntry.timeEntries.every(
+                                (aggregateTimeEntry: TimeEntry) =>
+                                    selectedTimeEntries.includes(
+                                        aggregateTimeEntry
+                                    )
                             )
-                    )
-                        " @update:checked="onSelectChange" />
+                        "
+                        @update:checked="onSelectChange" />
                     <div class="flex items-center min-w-0">
-                        <GroupedItemsCountButton :expanded="expanded" @click="expanded = !expanded">
+                        <GroupedItemsCountButton
+                            :expanded="expanded"
+                            @click="expanded = !expanded">
                             {{ timeEntry?.timeEntries?.length }}
                         </GroupedItemsCountButton>
-                        <TimeEntryDescriptionInput class="min-w-0 mr-4" :model-value="timeEntry.description" @changed="
-                            updateTimeEntryDescription
-                        "></TimeEntryDescriptionInput>
+                        <TimeEntryDescriptionInput
+                            class="min-w-0 mr-4"
+                            :model-value="timeEntry.description"
+                            @changed="
+                                updateTimeEntryDescription
+                            "></TimeEntryDescriptionInput>
                     </div>
                 </div>
-                <div class="flex items-center px-2  w-full col-span-3 bg-secondary min-w-0">
-                    <TimeTrackerProjectTaskDropdown :clients :create-project :create-client :can-create-project
-                        :projects="projects" :tasks="tasks" :show-badge-border="false" :project="timeEntry.project_id"
-                        :enable-estimated-time :currency="currency" :task="timeEntry.task_id" @changed="
+                <div
+                    class="flex items-center px-2 w-full col-span-3 bg-secondary min-w-0">
+                    <TimeTrackerProjectTaskDropdown
+                        :clients
+                        :create-project
+                        :create-client
+                        :can-create-project
+                        :projects="projects"
+                        :tasks="tasks"
+                        :show-badge-border="false"
+                        :project="timeEntry.project_id"
+                        :enable-estimated-time
+                        :currency="currency"
+                        :task="timeEntry.task_id"
+                        @changed="
                             updateProjectAndTask
                         "></TimeTrackerProjectTaskDropdown>
                 </div>
-                <div class="flex items-center px-2  w-full  col-span-1  bg-secondary min-w-0">
-                    <TimeEntryRowTagDropdown :create-tag :tags="tags" :model-value="timeEntry.tags" @changed="
-                        updateTimeEntryTags
-                    "></TimeEntryRowTagDropdown>
+                <div
+                    class="flex items-center px-2 w-full col-span-1 bg-secondary min-w-0">
+                    <TimeEntryRowTagDropdown
+                        :create-tag
+                        :tags="tags"
+                        :model-value="timeEntry.tags"
+                        @changed="
+                            updateTimeEntryTags
+                        "></TimeEntryRowTagDropdown>
                     <!-- <BillableToggleButton :model-value="timeEntry.billable"
                         class="opacity-50 focus-visible:opacity-100 group-hover:opacity-100" size="small" @changed="
                             updateTimeEntryBillable
                         "></BillableToggleButton> -->
                 </div>
-                <div class="flex items-center space-x-2  justify-end pl-4"> 
-                        <button class="text-sm font-medium whitespace-nowrap" @click="expanded = !expanded">
-                            {{ formatStartEnd(timeEntry.start, timeEntry.end, organization?.time_format) }}
-                        </button> 
+                <div class="flex items-center space-x-2 justify-end pl-4">
+                    <button
+                        class="text-sm font-medium whitespace-nowrap"
+                        @click="expanded = !expanded">
+                        {{
+                            formatStartEnd(
+                                timeEntry.start,
+                                timeEntry.end,
+                                organization?.time_format
+                            )
+                        }}
+                    </button>
                 </div>
                 <div class="flex items-center font-medium lg:space-x-2">
                     <button
-                       class="flex-1 text-text-primary min-w-[90px] px-2.5 py-1.5 bg-transparent text-right hover:bg-card-background rounded-lg border border-transparent hover:border-card-border text-sm font-semibold focus-visible:outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-tertiary"
-                         @click="expanded = !expanded">
+                        class="flex-1 text-text-primary min-w-[90px] px-2.5 py-1.5 bg-transparent text-right hover:bg-card-background rounded-lg border border-transparent hover:border-card-border text-sm font-semibold focus-visible:outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-tertiary"
+                        @click="expanded = !expanded">
                         {{
                             formatHumanReadableDuration(
                                 timeEntry.duration ?? 0,
@@ -146,26 +179,49 @@ function onSelectChange(checked: boolean) {
                         }}
                     </button>
 
-                    <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden sm:flex group-hover:opacity-100 focus-visible:opacity-100" @changed="
+                    <TimeTrackerStartStop
+                        :active="!!(timeEntry.start && !timeEntry.end)"
+                        class="opacity-20 hidden sm:flex group-hover:opacity-100 focus-visible:opacity-100"
+                        @changed="
                             onStartStopClick(timeEntry)
-                            "></TimeTrackerStartStop>
-                    <TimeEntryMoreOptionsDropdown @delete="
-                        deleteTimeEntries(timeEntry?.timeEntries ?? [])
+                        "></TimeTrackerStartStop>
+                    <TimeEntryMoreOptionsDropdown
+                        @delete="
+                            deleteTimeEntries(timeEntry?.timeEntries ?? [])
                         "></TimeEntryMoreOptionsDropdown>
                 </div>
             </div>
         </MainContainer>
-        <div v-if="expanded" class="w-full border-t border-default-background-separator bg-black/15">
-            <TimeEntryRow v-for="subEntry in timeEntry.timeEntries" :key="subEntry.id" :projects="projects"
-                :enable-estimated-time :can-create-project :tasks="tasks" :selected="!!selectedTimeEntries.find(
-                    (filterEntry: TimeEntry) =>
-                        filterEntry.id === subEntry.id
-                )
-                    " :create-client :clients :create-project :tags="tags" indent :update-time-entry="(timeEntry: TimeEntry) => updateTimeEntry(timeEntry)
-                        " :on-start-stop-click="() => onStartStopClick(subEntry)"
-                :delete-time-entry="() => deleteTimeEntries([subEntry])" :currency="currency" :create-tag
-                :time-entry="subEntry" @selected="emit('selected', [subEntry])"
+        <div
+            v-if="expanded"
+            class="w-full border-t border-default-background-separator bg-black/15">
+            <TimeEntryRow
+                v-for="subEntry in timeEntry.timeEntries"
+                :key="subEntry.id"
+                :projects="projects"
+                :enable-estimated-time
+                :can-create-project
+                :tasks="tasks"
+                :selected="
+                    !!selectedTimeEntries.find(
+                        (filterEntry: TimeEntry) =>
+                            filterEntry.id === subEntry.id
+                    )
+                "
+                :create-client
+                :clients
+                :create-project
+                :tags="tags"
+                indent
+                :update-time-entry="
+                    (timeEntry: TimeEntry) => updateTimeEntry(timeEntry)
+                "
+                :on-start-stop-click="() => onStartStopClick(subEntry)"
+                :delete-time-entry="() => deleteTimeEntries([subEntry])"
+                :currency="currency"
+                :create-tag
+                :time-entry="subEntry"
+                @selected="emit('selected', [subEntry])"
                 @unselected="emit('unselected', [subEntry])"></TimeEntryRow>
         </div>
     </div>

@@ -39,14 +39,17 @@ const page = usePage<{
 
     <AuthenticationCard>
         <template #logo>
-            <AuthenticationCardLogo />
+            <div class="text-white">
+                <AuthenticationCardLogo />
+            </div>
         </template>
 
         <template #actions>
             <Link
-                class="py-8 text-text-secondary text-sm font-medium opacity-90 hover:opacity-100 transition"
+                class="py-8 dark-text-text-secondary text-sm font-medium opacity-90 hover:opacity-100 transition text-white"
                 :href="route('register')">
-                No account yet? <span class="text-text-primary">Register here!</span>
+                No account yet?
+                <span class="text-text-primary text-white">Register here!</span>
             </Link>
         </template>
 
@@ -61,7 +64,7 @@ const page = usePage<{
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="Email" class="text-white" />
                 <TextInput
                     id="email"
                     v-model="form.email"
@@ -74,7 +77,10 @@ const page = usePage<{
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel
+                    for="password"
+                    value="Password"
+                    class="text-white" />
                 <TextInput
                     id="password"
                     v-model="form.password"
@@ -89,7 +95,7 @@ const page = usePage<{
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="underline text-sm text-text-secondary hover:text-text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    class="underline text-sm text-text-secondary hover:text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white">
                     Forgot your password?
                 </Link>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import type {
     CreateClientBody,
     CreateProjectBody,
@@ -12,7 +12,6 @@ import type {
 } from '@/packages/api/src';
 import {
     getDayJsInstance,
-    getLocalizedDateFromTimestamp,
 } from '@/packages/ui/src/utils/time';
 import TimeEntryAggregateRow from '@/packages/ui/src/TimeEntry/TimeEntryAggregateRow.vue';
 import ReadOnlyTimeEntryAggregateRow from '@/packages/ui/src/TimeEntry/ReadOnlyTimeEntryAggregateRow.vue';
@@ -22,12 +21,11 @@ import TimeEntryRow from '@/packages/ui/src/TimeEntry/TimeEntryRow.vue';
 import type { TimeEntriesGroupedByType } from '@/types/time-entries';
 import axios from 'axios';
 import { useNotificationsStore } from '@/utils/notification';
-import { Checkbox } from '@/packages/ui/src';
+// import { Checkbox } from '@/packages/ui/src';
 import Submit from '@/Pages/Timesheet/Submit.vue';
-import {
-    type TimeEntriesQueryParams,
-} from '@/packages/api/src';
-import dayjs from 'dayjs';
+// import {
+//     type TimeEntriesQueryParams,
+// } from '@/packages/api/src';
 const selectedTimeEntries = defineModel<TimeEntry[]>('selected', {
     default: [],
 });
@@ -83,28 +81,9 @@ type GroupedTimeEntries = Record<
         days: Record<string, TimeEntriesGroupedByType[]>; // daily breakdown
     }
 >
-function getBimonthlyKey(dateInput: string | Date): string {
-    const date = new Date(dateInput);
-    const year = date.getFullYear();
-
-    const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date); // "Jan", "Feb", etc.
-
-    const isFirstHalf = date.getDate() <= 15;
-    const start = isFirstHalf ? '1' : '16';
-    const end = isFirstHalf
-        ? '15'
-        : new Date(year, date.getMonth() + 1, 0).getDate().toString(); // Last day of the month
-
-    return `${month} ${year} (${start}-${end})`;
-}
 
 
 const groupedTimeEntries = ref<GroupedTimeEntries>({});
-function isSameBimonthlyPeriod(entryDate: string | Date, submission: TimeEntry): boolean {
-    const entryKey = getBimonthlyKey(entryDate);
-    const submissionKey = getBimonthlyKey(submission.start);
-    return submissionKey === entryKey;
-}
 
 
 const arraysEqual = (a: string[], b: string[]) =>
@@ -136,8 +115,7 @@ function groupTimeEntriesFunc() {
                 isSubmitted: entry.approval == "submitted" || entry.approval == "approved",
                 days: {}
             }
-        }
-        console.log(grouped);
+        } 
         if (!grouped[biMonthKey].days[dayKey]) {
             grouped[biMonthKey].days[dayKey] = []
         }
@@ -198,12 +176,7 @@ function unselectAllTimeEntries(value: TimeEntriesGroupedByType[]) {
         }
     );
 }
-function getFirstDayKey(days: Record<string, any>) {
-    if (days == null)
-        return null;
-    const keys = Object.keys(days);
-    return keys.length ? keys[0] : null;
-}
+
 function SubmitBTN(days: string, sheet: Record<string, TimeEntriesGroupedByType[]>) {
     previewSheets.value = sheet;
     isSubmit.value = true;
@@ -243,24 +216,9 @@ const unSubmitBTN = async (days: string, sheet: Record<string, TimeEntriesGroupe
         addNotification('error', 'Failed', 'Entry Failed to Submit');
     }
 }
-function periodLabel(key: string) {
-    const [year, month, half] = key.split('-');
-    const firstDay = half === '1' ? 1 : 16;
-    const lastDay = half === '1'
-        ? 15
-        : new Date(Number(year), Number(month), 0).getDate(); // end of month
-    const monthName = new Date(`${year}-${month}-01`).toLocaleString('default', {
-        month: 'short',
-    });
-
-    return `${firstDay}–${lastDay} ${monthName} ${year}`;
-}
 
 function isSubmitted(entries: TimeEntry[]): boolean {
     return entries.every(entry => entry.approval !== 'unsubmitted');
-}
-function isApproved(entries: TimeEntry[]): boolean {
-    return entries.every(entry => entry.approval === 'approved');
 }
 function clearClick() {
 
@@ -303,7 +261,7 @@ watch(
             </div>
 
 
-            <template v-for="(value, key) in bimonthly.days" :key="key" class="mb-5">
+            <template v-for="(value, key) in bimonthly.days" :key="key" >
                 <div v-if="!isSubmitted(value)" class="   border-1 p-1">
                     <TimeEntryRowHeading :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
                         selectedTimeEntries.includes(timeEntry)

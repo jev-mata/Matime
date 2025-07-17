@@ -30,7 +30,7 @@ import TimeEntryMassActionRow from '@/packages/ui/src/TimeEntry/TimeEntryMassAct
 import type { UpdateMultipleTimeEntriesChangeset } from '@/packages/api/src';
 import { isAllowedToPerformPremiumAction } from '@/utils/billing';
 import { canCreateProjects } from '@/utils/permissions';
-import axios from 'axios';
+// import axios from 'axios';
 
 const timeEntriesStore = useTimeEntriesStore();
 const { timeEntries, allTimeEntriesLoaded } = storeToRefs(timeEntriesStore);

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import {
     ClockIcon,
-    DocumentTextIcon,
 } from '@heroicons/vue/20/solid';
 import CardTitle from '@/packages/ui/src/CardTitle.vue';
 import { usePage } from '@inertiajs/vue3';
 import { type User } from '@/types/models';
-import { computed, onMounted, watch, type Component } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
@@ -54,31 +53,6 @@ const emit = defineEmits<{
     change: [];
 }>();
 
-type ExtensionMenuItem = {
-    title: string;
-    icon?: string;
-    route?: string;
-    href: string;
-    show?: boolean;
-};
-
-
-const iconMap: Record<string, Component> = {
-    ClockIcon,
-    DocumentTextIcon,
-};
-function resolveIcon(name: string | undefined): Component | undefined {
-    return name && iconMap[name] ? iconMap[name] : undefined;
-}
-
-
-const props = defineProps({
-    title: String,
-});
-
-const extensionMenu = computed<ExtensionMenuItem[]>(() =>
-    (page.props.extensionMenu as ExtensionMenuItem[]) ?? []
-);
 watch(isActive, () => {
     if (isActive.value) {
         startLiveTimer();

@@ -4,7 +4,6 @@ import type {
     Project,
     Tag,
     Task,
-    TimeEntry,
     Client,
     Organization,
 } from '@/packages/api/src';
@@ -19,7 +18,7 @@ import type { TimeEntriesGroupedByType } from '@/types/time-entries';
 import { twMerge } from 'tailwind-merge';
 import TagBadge from '@/packages/ui/src/Tag/TagBadge.vue';
 import ProjectBadge from '@/packages/ui/src/Project/ProjectBadge.vue';
-import { ChevronRightIcon, LockClosedIcon } from '@heroicons/vue/16/solid';
+import { ChevronRightIcon } from '@heroicons/vue/16/solid';
 const props = defineProps<{
     timeEntry: TimeEntriesGroupedByType;
     projects: Project[];
@@ -27,21 +26,9 @@ const props = defineProps<{
     tags: Tag[];
     clients: Client[];
 }>();
-const emit = defineEmits<{
-    selected: [TimeEntry[]];
-    unselected: [TimeEntry[]];
-}>(); 
 const organization = inject<ComputedRef<Organization>>('organization');
 
 const expanded = ref(false);
-
-function onSelectChange(checked: boolean) {
-    if (checked) {
-        emit('selected', [...props.timeEntry.timeEntries]);
-    } else {
-        emit('unselected', [...props.timeEntry.timeEntries]);
-    }
-}
 
 function timeEntryTags(model: string[]) {
     return props.tags.filter((tag) => model.includes(tag.id));
