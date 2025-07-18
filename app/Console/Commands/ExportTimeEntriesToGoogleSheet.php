@@ -4,261 +4,104 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Google_Client;
-use Google_Service_Sheets;
-use Google_Service_Sheets_ValueRange;
-use Google_Service_Sheets_BatchUpdateSpreadsheetRequest;
-use Google_Service_Sheets_Spreadsheet;
-use Google_Service_Sheets_Sheet;
-use Google_Service_Sheets_SheetProperties;
 use Google_Service_Drive;
+use Google_Service_Drive_DriveFile;
 use App\Models\TimeEntry;
+use App\Models\Organization;
+use App\Service\LocalizationService;
+use App\Service\ReportExport\TimeEntriesDetailedExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
-use Exception;
+use App\Enums\ExportFormat;
+use Illuminate\Support\Facades\Storage;
 
 class ExportTimeEntriesToGoogleSheet extends Command
 {
     protected $signature = 'timeentry:export';
-    protected $description = 'Export TimeEntry records to Google Sheets with summaries and charts';
+    protected $description = 'Export TimeEntry records to Excel and upload to Google Drive';
 
     public function handle()
     {
         $now = Carbon::now();
-        $start = $now->copy()->startOfMonth();
-        $end = $now->day <= 15 ? $start->copy()->day(15)->endOfDay() : $start->copy()->endOfMonth();
+        $now = now();
+        $startOfMonth = $now->copy()->startOfMonth();
 
-        $entries = TimeEntry::with(['user', 'project'])
-            ->whereBetween('start', [$start, $end])
-            ->get();
+        if ($now->day <= 15) {
+            $start = $startOfMonth->copy();
+            $end = $startOfMonth->copy()->day(15)->endOfDay();
+            $label = $start->format('Y-F') . '-1-15';
+        } else {
+            $start = $startOfMonth->copy()->day(16)->startOfDay();
+            $end = $startOfMonth->copy()->endOfMonth()->endOfDay();
+            $label = $start->format('Y-F') . '-16-' . $end->format('d');
+        }
 
-        if ($entries->isEmpty()) {
+
+        $entries = TimeEntry::with(['user', 'project', 'task', 'client', 'tagsRelation'])
+            ->whereBetween('start', [$start, $end]);
+
+        if ($entries->get()->isEmpty()) {
             $this->info('No time entries found for export.');
             return 0;
         }
+        $organization = Organization::whereHas('owner', function ($query) {
+            $query->where('email', 'hello@mata.ph');
+        })->with('owner')->first();
 
-        $sheetTitle = 'Detailed '.$now->format('M d, Y');
-        $values = [['User', 'Project', 'Date', 'Hours', 'Description']];
-        $summaryByUserDate = [];
-        $summaryByProject = [];
+        $localizationService = LocalizationService::forOrganization($organization);
 
-        foreach ($entries as $entry) {
-            $duration = $entry->start->diffInMinutes($entry->end);
-            $hours = round($duration / 60, 2);
+        $format = ExportFormat::XLSX;
 
-            $values[] = [
-                $entry->user->name ?? 'N/A',
-                $entry->project->name ?? 'N/A',
-                $entry->start->format('Y-m-d'),
-                $hours,
-                $entry->description,
-            ];
+        $filename = 'time-entries-export-' . $label . '.' . $format->getFileExtension();
 
-            // Summary by user + date
-            $key = $entry->user->name . '|' . $entry->start->format('Y-m-d');
-            $summaryByUserDate[$key] = ($summaryByUserDate[$key] ?? 0) + $hours;
+        $folderPath = 'exports';
+        $path = $folderPath . '/' . $filename;
 
-            // Summary by project
-            $project = $entry->project->name ?? 'N/A';
-            $summaryByProject[$project] = ($summaryByProject[$project] ?? 0) + $hours;
-        }
-
-        // Google Sheets setup
-        $client = new Google_Client();
-        $client->setAuthConfig(config('google.credentials_path') ?? env('GOOGLE_APPLICATION_CREDENTIALS'));
-        $client->addScope(Google_Service_Sheets::SPREADSHEETS);
-        $client->addScope(Google_Service_Drive::DRIVE);
-
-        $sheetsService = new Google_Service_Sheets($client);
-        $spreadsheetId = env('GOOGLE_SHEET_ID');
-
-        if (!$spreadsheetId) {
-            $spreadsheet = new Google_Service_Sheets_Spreadsheet([
-                'properties' => ['title' => 'TimeEntries ' . now()->format('Y-m-d H:i:s')],
-                'sheets' => [['properties' => ['title' => $sheetTitle]]]
-            ]);
-            $createdSpreadsheet = $sheetsService->spreadsheets->create($spreadsheet);
-            $spreadsheetId = $createdSpreadsheet->spreadsheetId;
-            $this->info("Created new spreadsheet: $spreadsheetId");
-        } else {
-            try {
-                $sheetsService->spreadsheets->batchUpdate($spreadsheetId, new Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
-                    'requests' => [[ 'addSheet' => ['properties' => ['title' => $sheetTitle]] ]]
-                ]));
-            } catch (Exception $e) {
-                $this->warn("Sheet already exists or cannot be created: {$e->getMessage()}");
-            }
-        }
-
-        // Insert main data
-        $sheetsService->spreadsheets_values->update(
-            $spreadsheetId,
-            "$sheetTitle!A1",
-            new Google_Service_Sheets_ValueRange(['values' => $values]),
-            ['valueInputOption' => 'RAW']
+        // Save Excel to local private storage
+        Excel::store(
+            new TimeEntriesDetailedExport($entries, $format, 'UTC', $localizationService),
+            $path,
+            config('filesystems.private'),
+            $format->getExportPackageType(),
+            ['visibility' => 'private']
         );
 
-        // === Summary Sheet ===
-        $summaryTitle = 'Summary '.$now->format('M d, Y');
-        try {
-            $sheetsService->spreadsheets->batchUpdate($spreadsheetId, new Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
-                'requests' => [[ 'addSheet' => ['properties' => ['title' => $summaryTitle]] ]]
-            ]));
-        } catch (Exception $e) {
-            $this->warn("Summary sheet exists or cannot be created: {$e->getMessage()}");
-        }
-
-        // Prepare summary rows
-        $userDayHeaders = ['User', 'Date', 'Total Hours'];
-        $userDayRows = [$userDayHeaders];
-
-        $userDayGroup = [];
-        foreach ($summaryByUserDate as $key => $hours) {
-            [$user, $date] = explode('|', $key);
-            $userDayRows[] = [$user, $date, $hours];
-            $userDayGroup[$user][] = $hours;
-        }
-
-        $avgUserHeaders = ['User', 'Average Hours per Day'];
-        $avgUserRows = [$avgUserHeaders];
-        foreach ($userDayGroup as $user => $hoursArr) {
-            $avg = round(array_sum($hoursArr) / count($hoursArr), 2);
-            $avgUserRows[] = [$user, $avg];
-        }
-
-        $projectHeaders = ['Project', 'Total Hours'];
-        $projectRows = [$projectHeaders];
-        foreach ($summaryByProject as $project => $hours) {
-            $projectRows[] = [$project, $hours];
-        }
-
-        // Write to Summary Sheet
-        $sheetsService->spreadsheets_values->update(
-            $spreadsheetId,
-            "$summaryTitle!A1",
-            new Google_Service_Sheets_ValueRange(['values' => array_merge($userDayRows, [['']], $avgUserRows, [['']], $projectRows)]),
-            ['valueInputOption' => 'RAW']
-        );
-
-        // Get Sheet ID for chart injection
-        $spreadsheet = $sheetsService->spreadsheets->get($spreadsheetId);
-        $sheetId = null;
-        foreach ($spreadsheet->getSheets() as $sheet) {
-            if ($sheet->getProperties()->getTitle() === $summaryTitle) {
-                $sheetId = $sheet->getProperties()->getSheetId();
-                break;
-            }
-        }
-
-        if ($sheetId) {
-            $rowCount = count($avgUserRows);
-            $projectCount = count($projectRows);
-
-            $requests = [
-                [ // Chart 1: Avg hours per user
-                    'addChart' => [
-                        'chart' => [
-                            'spec' => [
-                                'title' => 'Avg Hours/Day per User',
-                                'basicChart' => [
-                                    'chartType' => 'COLUMN',
-                                    'legendPosition' => 'BOTTOM_LEGEND',
-                                    'axis' => [
-                                        ['position' => 'BOTTOM_AXIS', 'title' => 'User'],
-                                        ['position' => 'LEFT_AXIS', 'title' => 'Hours']
-                                    ],
-                                    'domains' => [[
-                                        'domain' => [
-                                            'sourceRange' => ['sources' => [[
-                                                'sheetId' => $sheetId,
-                                                'startRowIndex' => count($userDayRows)+1,
-                                                'endRowIndex' => count($userDayRows)+$rowCount,
-                                                'startColumnIndex' => 0,
-                                                'endColumnIndex' => 1,
-                                            ]]]
-                                        ]
-                                    ]],
-                                    'series' => [[
-                                        'series' => [
-                                            'sourceRange' => ['sources' => [[
-                                                'sheetId' => $sheetId,
-                                                'startRowIndex' => count($userDayRows)+1,
-                                                'endRowIndex' => count($userDayRows)+$rowCount,
-                                                'startColumnIndex' => 1,
-                                                'endColumnIndex' => 2,
-                                            ]]]
-                                        ],
-                                        'targetAxis' => 'LEFT_AXIS'
-                                    ]]
-                                ]
-                            ],
-                            'position' => [
-                                'overlayPosition' => [
-                                    'anchorCell' => [
-                                        'sheetId' => $sheetId,
-                                        'rowIndex' => 1,
-                                        'columnIndex' => 5
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                [ // Chart 2: Total hours per project
-                    'addChart' => [
-                        'chart' => [
-                            'spec' => [
-                                'title' => 'Total Hours per Project',
-                                'basicChart' => [
-                                    'chartType' => 'COLUMN',
-                                    'legendPosition' => 'BOTTOM_LEGEND',
-                                    'axis' => [
-                                        ['position' => 'BOTTOM_AXIS', 'title' => 'Project'],
-                                        ['position' => 'LEFT_AXIS', 'title' => 'Hours']
-                                    ],
-                                    'domains' => [[
-                                        'domain' => [
-                                            'sourceRange' => ['sources' => [[
-                                                'sheetId' => $sheetId,
-                                                'startRowIndex' => count($userDayRows)+count($avgUserRows)+3,
-                                                'endRowIndex' => count($userDayRows)+count($avgUserRows)+3+$projectCount,
-                                                'startColumnIndex' => 0,
-                                                'endColumnIndex' => 1
-                                            ]]]
-                                        ]
-                                    ]],
-                                    'series' => [[
-                                        'series' => [
-                                            'sourceRange' => ['sources' => [[
-                                                'sheetId' => $sheetId,
-                                                'startRowIndex' => count($userDayRows)+count($avgUserRows)+3,
-                                                'endRowIndex' => count($userDayRows)+count($avgUserRows)+3+$projectCount,
-                                                'startColumnIndex' => 1,
-                                                'endColumnIndex' => 2
-                                            ]]]
-                                        ],
-                                        'targetAxis' => 'LEFT_AXIS'
-                                    ]]
-                                ]
-                            ],
-                            'position' => [
-                                'overlayPosition' => [
-                                    'anchorCell' => [
-                                        'sheetId' => $sheetId,
-                                        'rowIndex' => 15,
-                                        'columnIndex' => 5
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ];
-
-            $sheetsService->spreadsheets->batchUpdate($spreadsheetId, new Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
-                'requests' => $requests
-            ]));
-        }
-
-        $this->info("Exported to tab '{$sheetTitle}' with summary and charts in '{$summaryTitle}'");
+        $this->uploadToGoogleDrive(storage_path("app/{$path}"), $filename);
         return 0;
     }
+
+    protected function uploadToGoogleDrive(string $filePath, string $fileName)
+    {
+        $client = new \Google_Client();
+        $client->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_DRIVE_CLIENT_SECRET'));
+
+        // Set the refresh token
+        $client->refreshToken(env('GOOGLE_DRIVE_REFRESH_TOKEN'));
+
+        // ✅ IMPORTANT: You must set the access token after refreshing
+        $accessToken = env('GOOGLE_ACCESS_TOKEN');
+        $client->setAccessToken($accessToken);
+
+        $client->addScope(Google_Service_Drive::DRIVE_FILE);
+        $drive = new \Google_Service_Drive($client);
+
+        $fileMetadata = new \Google_Service_Drive_DriveFile([
+            'name' => $fileName,
+            'parents' => [env('GOOGLE_DRIVE_FOLDER_ID')],
+        ]);
+
+        $content = file_get_contents($filePath);
+
+        $file = $drive->files->create($fileMetadata, [
+            'data' => $content,
+            'mimeType' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'uploadType' => 'multipart',
+            'fields' => 'id, webViewLink'
+        ]);
+
+        $this->info("✅ Excel uploaded to Google Drive: " . $file->webViewLink);
+        unlink($filePath);
+    }
+
 }
