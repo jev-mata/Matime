@@ -22,8 +22,7 @@ class ExportTimeEntriesToGoogleSheet extends Command
 
     public function handle()
     {
-        $now = Carbon::now();
-        $now = now();
+        $now = Carbon::now()->day(15);
         $startOfMonth = $now->copy()->startOfMonth();
 
         if ($now->day <= 15) {
@@ -37,17 +36,18 @@ class ExportTimeEntriesToGoogleSheet extends Command
         }
 
 
+
+        $organization = Organization::whereHas('owner', function ($query) {
+            $query->where('email', 'hello@mata.ph');
+        })->with('owner')->first();
+
         $entries = TimeEntry::with(['user', 'project', 'task', 'client', 'tagsRelation'])
-            ->whereBetween('start', [$start, $end]);
+            ->whereBetween('start', [$start, $end])->where('organization_id', '=', $organization->id);
 
         if ($entries->get()->isEmpty()) {
             $this->info('No time entries found for export.');
             return 0;
         }
-        $organization = Organization::whereHas('owner', function ($query) {
-            $query->where('email', 'hello@mata.ph');
-        })->with('owner')->first();
-
         $localizationService = LocalizationService::forOrganization($organization);
 
         $format = ExportFormat::XLSX;
