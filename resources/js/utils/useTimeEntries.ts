@@ -78,8 +78,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
                 'Failed to fetch time entries'
             );
             if (timeEntriesResponse?.data) {
-                timeEntries.value = timeEntriesResponse.data;
-                console.log(timeEntriesResponse.data);
+                timeEntries.value = timeEntriesResponse.data; 
             }
         }
     }
