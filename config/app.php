@@ -84,8 +84,8 @@ return [
     | ahead and set this to a sensible default for you out of the box.
     |
     */
-'timezone' => 'Asia/Manila',
 
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------

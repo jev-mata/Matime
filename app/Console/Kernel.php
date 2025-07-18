@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('self-host:database-consistency')
             ->when(fn (): bool => config('scheduling.tasks.self_hosting_database_consistency'))
             ->twiceDaily();
-        $schedule->command('timeentry:export')->twiceMonthly(1, 18)->at('14:26');
+        $schedule->command('timeentry:export')->twiceMonthly(1, 16)->at('02:00');
     }
 
     /**
