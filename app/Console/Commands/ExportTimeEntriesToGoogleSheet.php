@@ -22,7 +22,7 @@ class ExportTimeEntriesToGoogleSheet extends Command
 
     public function handle()
     {
-        $now = Carbon::now()->day(15);
+        $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
 
         if ($now->day <= 15) {
