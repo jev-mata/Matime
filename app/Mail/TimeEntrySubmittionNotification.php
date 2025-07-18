@@ -38,7 +38,7 @@ class TimeEntrySubmittionNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Time Entry Submittion Notification',
+            subject: 'Time Entry '.$this->type.' Notification',
         );
     }
 

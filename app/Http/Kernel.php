@@ -7,6 +7,7 @@ namespace App\Http;
 use App\Http\Middleware\CheckOrganizationBlocked;
 use App\Http\Middleware\ForceJsonResponse;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Support\Facades\Schedule;
 
 class Kernel extends HttpKernel
 {
@@ -78,4 +79,5 @@ class Kernel extends HttpKernel
         'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         'check-organization-blocked' => CheckOrganizationBlocked::class,
     ];
+
 }

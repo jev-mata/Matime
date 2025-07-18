@@ -1,7 +1,7 @@
 @component('mail::message')
 ## Timesheet {{ $type }}
 
-<table width="100%" cellpadding="10" cellspacing="0" style="border: 1px solid #ccc; margin: 20px 0;">
+<table width="100%" cellpadding="10" cellspacing="0" style="border: 1px solid #ccc; margin: 20px 0; font-family: Poppins;">
     <tr>
         <td>
             <strong>{{ __('Period:') }}</strong> {{ $period }}<br>

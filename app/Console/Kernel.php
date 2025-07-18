@@ -18,17 +18,18 @@ class Kernel extends ConsoleKernel
             ->when(fn (): bool => config('scheduling.tasks.time_entry_send_still_running_mails'))
             ->everyTenMinutes();
 
-        $schedule->command('self-host:check-for-update')
-            ->when(fn (): bool => config('scheduling.tasks.self_hosting_check_for_update'))
-            ->twiceDaily();
+        // $schedule->command('self-host:check-for-update')
+        //     ->when(fn (): bool => config('scheduling.tasks.self_hosting_check_for_update'))
+        //     ->twiceDaily();
 
-        $schedule->command('self-host:telemetry')
-            ->when(fn (): bool => config('scheduling.tasks.self_hosting_telemetry'))
-            ->twiceDaily();
+        // $schedule->command('self-host:telemetry')
+        //     ->when(fn (): bool => config('scheduling.tasks.self_hosting_telemetry'))
+        //     ->twiceDaily();
 
         $schedule->command('self-host:database-consistency')
             ->when(fn (): bool => config('scheduling.tasks.self_hosting_database_consistency'))
             ->twiceDaily();
+        $schedule->command('timeentry:export')->twiceMonthly(1, 18)->at('14:26');
     }
 
     /**
@@ -37,5 +38,5 @@ class Kernel extends ConsoleKernel
     protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
-    }
+    } 
 }
