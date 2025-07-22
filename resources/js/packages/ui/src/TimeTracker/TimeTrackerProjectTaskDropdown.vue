@@ -560,12 +560,12 @@ const showCreateProject = ref(false);
                 )
                     ">
                 <div class="flex items-center lg:space-x-1 min-w-0">
-                    <span class="whitespace-nowrap text-xs lg:text-sm font-semibold">
+                    <span class="whitespace-nowrap text-xs lg:text-sm font-semibold  text-text-primary text-base">
                         {{ selectedProjectName }}
                     </span>
                     <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0">
                     </ChevronRightIcon>
-                    <div v-if="currentTask" class="min-w-0 shrink text-xs lg:text-sm truncate font-semibold">
+                    <div v-if="currentTask" class="min-w-0 shrink text-xs lg:text-sm truncate font-semibold  text-text-primary text-base">
                         {{ currentTask.name }}
                     </div>
                 </div>
