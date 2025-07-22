@@ -260,3 +260,12 @@ body {
 .playBTN:hover{
     background: #00a89dea;
 }
+.stopBTN{
+    background: #ff297e;
+}
+.stopBTN:hover{
+    background: #ff297fd3;
+}
+.stopBTN:hover{
+    background: #ff297fa8;
+}

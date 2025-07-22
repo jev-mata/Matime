@@ -27,7 +27,7 @@ const iconClass = {
 
 const buttonColorClasses = computed(() => {
     if (props.active) {
-        return 'bg-red-400/80 hover:bg-red-500/80 focus:bg-red-500/80';
+        return 'stopBTN';
     } else {
         return 'playBTN';
     }
