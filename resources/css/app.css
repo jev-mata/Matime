@@ -251,3 +251,12 @@ body {
     @apply bg-background text-foreground;
     }
 }
+.playBTN{
+    background: #00a89e;
+}
+.playBTN:hover{
+    background: #00a89db2;
+}
+.playBTN:hover{
+    background: #00a89dea;
+}

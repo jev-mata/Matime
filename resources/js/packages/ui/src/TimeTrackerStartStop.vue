@@ -29,7 +29,7 @@ const buttonColorClasses = computed(() => {
     if (props.active) {
         return 'bg-red-400/80 hover:bg-red-500/80 focus:bg-red-500/80';
     } else {
-        return 'bg-accent-300/70 hover:bg-accent-400/70 focus:bg-accent-700';
+        return 'playBTN';
     }
 });
 
