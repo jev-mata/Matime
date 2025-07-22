@@ -129,7 +129,7 @@ const selectedProjectColor = computed(() => {
                         :name="selectedProjectName"
                         :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'">
                         <div class="flex items-center lg:space-x-1 min-w-0">
-                            <span class="whitespace-nowrap text-xs lg:text-sm">
+                            <span class="whitespace-nowrap text-xs lg:text-sm  font-semibold  text-text-primary text-base">
                                 {{ selectedProjectName }}
                             </span>
                             <ChevronRightIcon
@@ -138,7 +138,7 @@ const selectedProjectColor = computed(() => {
                             </ChevronRightIcon>
                             <div
                                 v-if="currentTask"
-                                class="min-w-0 shrink text-xs lg:text-sm truncate">
+                                class="min-w-0 shrink text-xs lg:text-sm truncate  font-semibold  text-text-primary text-base">
                                 {{ currentTask.name }}
                             </div>
                         </div>

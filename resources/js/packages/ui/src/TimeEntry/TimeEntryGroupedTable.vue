@@ -289,8 +289,8 @@ watch(
                             :create-project :can-create-project :enable-estimated-time
                             :create-time-entry="createTimeEntry" :selected-time-entries="selectedTimeEntries"
                             :create-client :projects="projects" :tasks="tasks" :tags="tags" :clients
-                            :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry
-                            :delete-time-entries :create-tag :currency="currency" :time-entry="entry" @selected="
+                            :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry :duplicate-time-entry="copyTimeEntryFromExisting"
+                            :delete-time-entries :create-tag :currency="currency" :time-entry="entry" @selected=" 
                                 (timeEntries: TimeEntry[]) => {
                                     selectedTimeEntries = [
                                         ...selectedTimeEntries,

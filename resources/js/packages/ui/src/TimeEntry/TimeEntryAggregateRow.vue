@@ -38,6 +38,7 @@ const props = defineProps<{
     updateTimeEntries: (ids: string[], changes: Partial<TimeEntry>) => void;
     updateTimeEntry: (timeEntry: TimeEntry) => void;
     deleteTimeEntries: (timeEntries: TimeEntry[]) => void;
+    duplicateTimeEntry?: (timeEntry: TimeEntry) => void;
     currency: string;
     selectedTimeEntries: TimeEntry[];
     enableEstimatedTime: boolean;
@@ -208,6 +209,7 @@ function onSelectChange(checked: boolean) {
                             filterEntry.id === subEntry.id
                     )
                 "
+                :duplicate-time-entry="duplicateTimeEntry" 
                 :create-client
                 :clients
                 :create-project

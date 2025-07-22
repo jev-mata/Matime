@@ -107,7 +107,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                         tag="button"
                         class="flex focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0">
                         <div class="flex lg:space-x-1 min-w-0">
-                            <span class="whitespace-nowrap text-xs lg:text-sm">
+                            <span class="whitespace-nowrap text-xs lg:text-sm  font-semibold  text-text-primary text-base">
                                 {{ selectedProjectName }}
                             </span>
                             <ChevronRightIcon
@@ -115,7 +115,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                                 class="w-4 lg:w-5 text-text-secondary shrink-0" />
                             <div
                                 v-if="currentTask"
-                                class="min-w-0 shrink text-xs lg:text-sm truncate">
+                                class="min-w-0 shrink text-xs lg:text-sm truncate  font-semibold  text-text-primary text-base">
                                 {{ currentTask.name }}
                             </div>
                         </div>
