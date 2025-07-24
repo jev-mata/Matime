@@ -22,7 +22,7 @@ class ExportTimeEntriesToGoogleSheet extends Command
 
     public function handle()
     {
-        $now = Carbon::now();
+        $now = Carbon::now()->day(15);
         $startOfMonth = $now->copy()->startOfMonth();
 
         if ($now->day <= 15) {
@@ -42,7 +42,7 @@ class ExportTimeEntriesToGoogleSheet extends Command
         })->with('owner')->first();
 
         $entries = TimeEntry::with(['user', 'project', 'task', 'client', 'tagsRelation'])
-        ->where('organization_id', '=', $organization->id);
+        ->whereBetween('start', [$start, $end])->where('organization_id', '=', $organization->id);
 
         if ($entries->get()->isEmpty()) {
             $this->info('No time entries found for export.');
