@@ -28,11 +28,11 @@ class ExportTimeEntriesToGoogleSheet extends Command
         if ($now->day <= 15) {
             $start = $startOfMonth->copy();
             $end = $startOfMonth->copy()->day(15)->endOfDay();
-            $label = $start->format('Y-F') . '-1-15';
+            $label = $start->format('Y-F');
         } else {
             $start = $startOfMonth->copy()->day(16)->startOfDay();
             $end = $startOfMonth->copy()->endOfMonth()->endOfDay();
-            $label = $start->format('Y-F') . '-16-' . $end->format('d');
+            $label = $start->format('Y-F');
         }
 
 
@@ -42,7 +42,7 @@ class ExportTimeEntriesToGoogleSheet extends Command
         })->with('owner')->first();
 
         $entries = TimeEntry::with(['user', 'project', 'task', 'client', 'tagsRelation'])
-            ->whereBetween('start', [$start, $end])->where('organization_id', '=', $organization->id);
+        ->where('organization_id', '=', $organization->id);
 
         if ($entries->get()->isEmpty()) {
             $this->info('No time entries found for export.');
