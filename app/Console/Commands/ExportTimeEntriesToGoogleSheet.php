@@ -69,11 +69,11 @@ class ExportTimeEntriesToGoogleSheet extends Command
             ['visibility' => 'private']
         );
 
-        $this->uploadToGoogleDrive(storage_path("app/{$path}"), $filename);
+        $this->uploadToGoogleDrive(storage_path("app/{$path}"), $filename,$start->format('d-')."-".$end->format('d, F Y'));
         return 0;
     }
 
-    protected function uploadToGoogleDrive(string $filePath, string $fileName)
+    protected function uploadToGoogleDrive(string $filePath, string $fileName,string $periods)
     {
         $client = new Google_Client();
         $client->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
@@ -125,11 +125,11 @@ class ExportTimeEntriesToGoogleSheet extends Command
                     'color' => ['argb' => 'FFFFFFFF'],
                 ],
                 'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
                 ],
             ]);
             // Add divider row
-            $existingSheet->setCellValue('A' . ($highestRow), '--- NEW EXPORT ---');
+            $existingSheet->setCellValue('A' . ($highestRow), "{$periods} -------------------- Time Entries EXPORT ");
 
             // ✅ Append new rows
             $newSheet = $sheet;
