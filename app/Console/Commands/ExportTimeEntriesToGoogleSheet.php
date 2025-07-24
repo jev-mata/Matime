@@ -13,6 +13,9 @@ use App\Service\ReportExport\TimeEntriesDetailedExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Enums\ExportFormat;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+
 use Illuminate\Support\Facades\Storage;
 
 class ExportTimeEntriesToGoogleSheet extends Command
@@ -22,17 +25,17 @@ class ExportTimeEntriesToGoogleSheet extends Command
 
     public function handle()
     {
-        $now = Carbon::now()->day(15);
+        $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
 
         if ($now->day <= 15) {
             $start = $startOfMonth->copy();
             $end = $startOfMonth->copy()->day(15)->endOfDay();
-            $label = $start->format('Y-F');
+            $label = $start->format('Y');
         } else {
             $start = $startOfMonth->copy()->day(16)->startOfDay();
             $end = $startOfMonth->copy()->endOfMonth()->endOfDay();
-            $label = $start->format('Y-F');
+            $label = $start->format('Y');
         }
 
 
@@ -42,7 +45,7 @@ class ExportTimeEntriesToGoogleSheet extends Command
         })->with('owner')->first();
 
         $entries = TimeEntry::with(['user', 'project', 'task', 'client', 'tagsRelation'])
-        ->whereBetween('start', [$start, $end])->where('organization_id', '=', $organization->id);
+            ->whereBetween('start', [$start, $end])->where('organization_id', '=', $organization->id);
 
         if ($entries->get()->isEmpty()) {
             $this->info('No time entries found for export.');
@@ -72,35 +75,107 @@ class ExportTimeEntriesToGoogleSheet extends Command
 
     protected function uploadToGoogleDrive(string $filePath, string $fileName)
     {
-        $client = new \Google_Client();
+        $client = new Google_Client();
         $client->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
         $client->setClientSecret(env('GOOGLE_DRIVE_CLIENT_SECRET'));
-
-        // Set the refresh token
         $client->refreshToken(env('GOOGLE_DRIVE_REFRESH_TOKEN'));
+        $client->addScope(Google_Service_Drive::DRIVE);
 
-        // ✅ IMPORTANT: You must set the access token after refreshing
-        $accessToken = env('GOOGLE_ACCESS_TOKEN');
+        $accessToken = $client->getAccessToken();
         $client->setAccessToken($accessToken);
+        $drive = new Google_Service_Drive($client);
+        $folderId = env('GOOGLE_DRIVE_FOLDER_ID');
 
-        $client->addScope(Google_Service_Drive::DRIVE_FILE);
-        $drive = new \Google_Service_Drive($client);
-
-        $fileMetadata = new \Google_Service_Drive_DriveFile([
-            'name' => $fileName,
-            'parents' => [env('GOOGLE_DRIVE_FOLDER_ID')],
+        // Check if file already exists
+        $files = $drive->files->listFiles([
+            'q' => sprintf("name='%s' and trashed = false", addslashes($fileName)),
+            'fields' => 'files(id, name, parents)',
+            'spaces' => 'drive',
         ]);
 
-        $content = file_get_contents($filePath);
+        $spreadsheet = IOFactory::load($filePath); // Your newly generated Excel export
 
-        $file = $drive->files->create($fileMetadata, [
-            'data' => $content,
-            'mimeType' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'uploadType' => 'multipart',
-            'fields' => 'id, webViewLink'
-        ]);
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->freezePane('A1');
+        if (count($files->getFiles()) > 0) {
+            // ✅ Download existing file
+            $existingFile = $files->getFiles()[0];
+            $existingFileId = $existingFile->getId();
 
-        $this->info("✅ Excel uploaded to Google Drive: " . $file->webViewLink);
+            $response = $drive->files->get($existingFileId, ['alt' => 'media']);
+            $existingTemp = storage_path('app/temp_existing_' . $fileName);
+            file_put_contents($existingTemp, $response->getBody()->getContents());
+
+            // ✅ Load existing spreadsheet
+            $existingSpreadsheet = IOFactory::load($existingTemp);
+            $existingSheet = $existingSpreadsheet->getActiveSheet();
+
+            $highestRow = $existingSheet->getHighestRow() + 1;
+
+            $existingSheet->mergeCells("A{$highestRow}:K{$highestRow}");
+
+            // Apply background color (e.g., light gray)
+            $existingSheet->getStyle("A{$highestRow}:K{$highestRow}")->applyFromArray([
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FF424343'], // light gray
+                ],
+                'font' => [
+                    'bold' => true,
+                    'color' => ['argb' => 'FFFFFFFF'],
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                ],
+            ]);
+            // Add divider row
+            $existingSheet->setCellValue('A' . ($highestRow), '--- NEW EXPORT ---');
+
+            // ✅ Append new rows
+            $newSheet = $sheet;
+            $newData = $newSheet->toArray(null, true, true, true);
+
+            foreach ($newData as $rowIndex => $row) {
+                $targetRow = $highestRow + $rowIndex;
+                $colIndex = 'A';
+                foreach ($row as $cell) {
+                    $existingSheet->setCellValue($colIndex . $targetRow, $cell);
+                    $colIndex++;
+                }
+            }
+
+            // ✅ Save to temp file
+            $finalTempFile = storage_path("app/final_" . $fileName);
+            IOFactory::createWriter($existingSpreadsheet, 'Xlsx')->save($finalTempFile);
+
+            // ✅ Upload final file, replacing the original
+            $fileMetadata = new Google_Service_Drive_DriveFile(['name' => $fileName]);
+            $updated = $drive->files->update($existingFileId, $fileMetadata, [
+                'data' => file_get_contents($finalTempFile),
+                'mimeType' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'uploadType' => 'multipart',
+                'fields' => 'id, webViewLink',
+            ]);
+
+            $this->info("🔁 File updated with appended data: " . $updated->webViewLink);
+
+            unlink($existingTemp);
+            unlink($finalTempFile);
+        } else {
+            // First-time upload
+            $newFile = $drive->files->create(new Google_Service_Drive_DriveFile([
+                'name' => $fileName,
+                'parents' => [$folderId],
+            ]), [
+                'data' => file_get_contents($filePath),
+                'mimeType' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'uploadType' => 'multipart',
+                'fields' => 'id, webViewLink',
+            ]);
+
+            $this->info("✅ File uploaded to Google Drive: " . $newFile->webViewLink);
+        }
+
         unlink($filePath);
     }
 
