@@ -50,8 +50,8 @@ return new class extends Migration
             $table->index('start');
             $table->index('end');
             $table->index('billable');
-            $table->string('approval');
-            $table->uuid('approved_by');
+            $table->string('approval')->default('unsubmitted');
+            $table->uuid('approved_by')->nullable();
             $table->foreign('approved_by')
                 ->references('id')
                 ->on('users')

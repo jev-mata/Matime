@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/16/solid';
 import Dropdown from '@/packages/ui/src/Input/Dropdown.vue';
-import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue';
+import { computed, nextTick, onMounted, ref, watch, watchEffect, type Ref } from 'vue';
 import ProjectDropdownItem from '@/packages/ui/src/Project/ProjectDropdownItem.vue';
 import type {
     CreateClientBody,
@@ -31,27 +31,9 @@ const project = defineModel<string | null>('project', {
 });
 
 const searchInput = ref<HTMLInputElement | null>(null);
-const open = ref(false);
 const dropdownViewport = ref<HTMLElement | null>(null);
 import { UseFocusTrap } from '@vueuse/integrations/useFocusTrap/component';
 import axios from 'axios';
-
-const searchValue = ref('');
-
-watch(open, (isOpen) => {
-    if (isOpen) {
-        nextTick(() => {
-            initializeHighlightedItem();
-            searchInput.value?.focus({ preventScroll: true });
-        });
-    }
-});
-
-type ProjectWithTasks = Project & { expanded: boolean; tasks: Task[] };
-
-type ClientWithProjectsWithTasks = Client & { projects: ProjectWithTasks[] };
-
-type ClientsWithProjectsWithTasks = ClientWithProjectsWithTasks[];
 
 const props = withDefaults(
     defineProps<{
@@ -70,6 +52,8 @@ const props = withDefaults(
         enableEstimatedTime: boolean;
         canCreateProject?: boolean;
         class?: string;
+        open?: boolean;
+        setOpen?: (open: boolean) => void;
     }>(),
     {
         showBadgeBorder: true,
@@ -78,6 +62,26 @@ const props = withDefaults(
         allowReset: false,
     }
 );
+const open = ref(props.open ? props.open : false);
+// const open = ref(false);
+const searchValue = ref('');
+watch(open, (isOpen) => {
+    if (props.setOpen) props.setOpen(isOpen);
+    if (isOpen) {
+        nextTick(() => {
+            initializeHighlightedItem();
+            searchInput.value?.focus({ preventScroll: true });
+        });
+    }
+});
+watch(() => props.open, (newVal) => {
+    if (newVal !== undefined) open.value = newVal;
+});
+type ProjectWithTasks = Project & { expanded: boolean; tasks: Task[] };
+
+type ClientWithProjectsWithTasks = Client & { projects: ProjectWithTasks[] };
+
+type ClientsWithProjectsWithTasks = ClientWithProjectsWithTasks[];
 
 const filteredResults = ref([] as ClientsWithProjectsWithTasks);
 
@@ -88,9 +92,9 @@ const filteredProjects = computed(() => {
 
 const clientsStore = useClientsStore();
 onMounted(() => {
-  if (clientsStore.clients.length === 0) {
-    clientsStore.fetchClients();
-  }
+    if (clientsStore.clients.length === 0) {
+        clientsStore.fetchClients();
+    }
 });
 function addProjectToFilterObject(
     tempFilteredClients: ClientsWithProjectsWithTasks,
@@ -565,7 +569,8 @@ const showCreateProject = ref(false);
                     </span>
                     <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0">
                     </ChevronRightIcon>
-                    <div v-if="currentTask" class="min-w-0 shrink text-xs lg:text-sm truncate font-semibold  text-text-primary text-base">
+                    <div v-if="currentTask"
+                        class="min-w-0 shrink text-xs lg:text-sm truncate font-semibold  text-text-primary text-base">
                         {{ currentTask.name }}
                     </div>
                 </div>
