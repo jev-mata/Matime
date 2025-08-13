@@ -40,14 +40,14 @@ const page = usePage<{
 
     <AuthenticationCard>
         <template #logo>
-            <div class="text-white">
+            <div class="">
                 <AuthenticationCardLogo />
             </div>
         </template>
 
         <template #actions>
             <Link
-                class="py-8 dark:text-[#BFC7D6] text-sm font-medium opacity-90 hover:opacity-100 transition text-white"
+                class="py-8 dark:text-[#BFC7D6] text-sm font-medium opacity-90 hover:opacity-100 transition "
                 :href="route('register')">
             No account yet?
             <span class=" dark:text-[#BFC7D6] text-text-primary  ">Register here!</span>
@@ -79,11 +79,11 @@ const page = usePage<{
 
             <div class="flex items-center justify-end mt-4">
                 <Link v-if="canResetPassword" :href="route('password.request')"
-                    class="underline text-sm dark:text-[#2770DB] hover:text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white">
+                    class="underline text-sm dark:text-[#2770DB] hover:dark:text-gray-300  hover:text-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  ">
                 Forgot your password?
                 </Link>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                <PrimaryButton class="ms-4 hover:bg-transparent hover:text-gray-700" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Log in
                 </PrimaryButton>
             </div>

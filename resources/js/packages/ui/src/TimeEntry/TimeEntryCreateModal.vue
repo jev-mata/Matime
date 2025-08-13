@@ -140,7 +140,7 @@ type BillableOption = {
                         v-model="timeEntry.description"
                         placeholder="What did you work on?"
                         type="text"
-                        class="mt-1 block w-full dark:border-[#303F61]  dark:bg-[#0C101E] hover:dark:border-[#636E88] focus:border-[#303F61] focus:ring-[#303F61]"
+                        class="mt-1 block w-full dark:border-[#303F61]  dark:bg-[#0C101E]  hover:dark:border-[#636E88] focus:border-[#303F61] focus:ring-[#303F61]"
                         @keydown.enter="submit" />
                 </div>
             </div>
@@ -159,7 +159,7 @@ type BillableOption = {
                             :can-create-project="canCreateProjects()"
                             :currency="getOrganizationCurrencyString()"
                             size="xlarge"
-                            class="bg-input-background  dark:border-[#303F61]  dark:bg-[#0C101E] hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] focus:dark:bg-[#303F61]"
+                            class="bg-input-background  dark:border-[#303F61] border-gray-400 bg-white hover:bg-gray-400 dark:bg-[#0C101E] hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] focus:dark:bg-[#303F61]"
                             :projects="projects"
                             :tasks="tasks"
                             :enable-estimated-time="enableEstimatedTime"></TimeTrackerProjectTaskDropdown>
@@ -172,7 +172,7 @@ type BillableOption = {
                                 :tags="tags">
                                 <template #trigger>
                                     <Badge
-                                        class="bg-input-background dark:border-[#303F61]  dark:bg-[#0C101E]  hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"
+                                        class="bg-input-background dark:border-[#303F61]  dark:bg-[#0C101E]  hover:dark:bg-[#303F61] border-gray-400 bg-white hover:bg-gray-400 hover:dark:text-[#BFC7D6] dark:text-[#636E88]"
                                         tag="button"
                                         size="xlarge">
                                         <TagIcon
@@ -209,7 +209,7 @@ type BillableOption = {
                                 ]">
                                 <template #trigger>
                                     <Badge
-                                        class="bg-input-background  dark:border-[#303F61]  dark:bg-[#0C101E] hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"
+                                        class="bg-input-background  dark:border-[#303F61]  dark:bg-[#0C101E] border-gray-400 bg-white hover:bg-gray-400 hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"
                                         tag="button"
                                         size="xlarge">
                                         <BillableIcon

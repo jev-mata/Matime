@@ -5,7 +5,7 @@ import { Link } from '@inertiajs/vue3';
 <template>
     <Link
         :href="route('dashboard')"
-        class="flex   items-center justify-center  gap-2 xl:text-6xl lg:text-6xl sm:text-5xl text-4xl font-bold py-2 text-white">
+        class="flex   items-center justify-center  gap-2 xl:text-6xl lg:text-6xl sm:text-5xl text-4xl font-bold py-2 dark:text-[#BFC7D6] text-black ">
         <img
             src="/panso.png"
             alt="Panso Logo"

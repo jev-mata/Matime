@@ -53,7 +53,7 @@ watch(open, (value) => {
             </PopoverTrigger>
             <PopoverContent
                 :align="align"
-                class="rounded-lg overflow-hidden relative border  dark:border-[#303F61] overflow-none shadow-dropdown  dark:bg-[#5D6370]"
+                class="rounded-lg overflow-hidden relative border  dark:border-[#303F61] overflow-none shadow-dropdown bg-white  dark:bg-[#5D6370]"
                 @open-auto-focus="handleAutofocus"
                 @click="onContentClick">
                 <slot name="content"  />

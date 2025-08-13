@@ -175,7 +175,7 @@ watch(open, () => {
                 ref="dropdownViewport"
                 :class="
                     twMerge(
-                        'py-1.5 max-h-60 overflow-y-scroll  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1]',
+                        'py-1.5 max-h-60 overflow-y-scroll  dark:border-[#303F61]  dark:bg-[#0F1426] bg-white dark:text-[#7D88A1] ',
                         props.class
                     )
                 ">
