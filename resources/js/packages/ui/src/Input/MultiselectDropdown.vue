@@ -173,7 +173,7 @@ const highlightedItem = computed(() => {
                     :key="props.getKeyFromItem(item)"
                     role="option"
                     :value="props.getKeyFromItem(item)"
-                    :style="{color:item?.color}"
+                    :style="{color:(item as any)?.color}"
                     :class="{
                         'dark:bg-[#303F61] dark:text-[#BFC7D6]':
                             props.getKeyFromItem(item) === highlightedItemId,
@@ -184,7 +184,7 @@ const highlightedItem = computed(() => {
                         :name="
                             props.getNameForItem(item)
                         " 
-                    :style="{color:item?.color}"
+                    :style="{color:(item as any)?.color}"
                         @click="toggleItem(props.getKeyFromItem(item))"></MultiselectDropdownItem>
                 </div>
             </div>
