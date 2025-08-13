@@ -21,7 +21,7 @@ import PrimaryButton from '@/packages/ui/src/Buttons/PrimaryButton.vue';
 import TimesheetTable from './Components/TimesheetTable.vue';
 dayjs.extend(isBetween);
 const activeTab = ref<'pending' | 'unsubmitted' | 'archive'>('pending');
-type Bimontly = {
+export type Bimontly = {
     user: {
         id: string;
         name: string;

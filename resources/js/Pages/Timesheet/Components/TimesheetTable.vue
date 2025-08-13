@@ -1,9 +1,12 @@
-<script setup lang="ts"> 
+<script setup lang="ts">
+import type { Bimontly } from '../Index.vue';
+
+ 
 const props =  defineProps<{
         getPeriodInfo: (period: string) => { endDate: string; endDate2: string; isHighlighted: boolean };
         formatDate: (date: string) => string;
         period: string;
-        userEntries: Object[];
+        userEntries: Bimontly[];
     }>();
 </script>
 <template>
