@@ -67,8 +67,8 @@ const showBillableRate = computed(() => {
 <template>
     <AppLayout title="Projects" data-testid="projects_view">
         <MainContainer
-            class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
-            <div class="flex items-center space-x-3 sm:space-x-6">
+            class="py-3 sm:py-5 border-b dark:border-[#303F61] flex justify-between items-center dark:bg-[#0F1426] bg-white  ">
+            <div class="flex items-center space-x-3 sm:space-x-6 ">
                 <PageTitle :icon="FolderIcon" title="Projects"></PageTitle>
                 <TabBar
                 v-model="activeTab"

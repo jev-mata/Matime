@@ -24,7 +24,7 @@ const activeClass = computed(() => {
         tag="button"
         :class="
             twMerge(
-                'cursor-pointer bg-input-background hover:bg-card-background transition flex',
+                'cursor-pointer bg-[#0C101E] border-0  hover:dark:bg-[#303F61] hover:text-gray-100 transition flex',
                 activeClass
             )
         ">

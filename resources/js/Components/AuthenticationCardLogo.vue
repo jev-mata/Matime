@@ -5,7 +5,11 @@ import { Link } from '@inertiajs/vue3';
 <template>
     <Link
         :href="route('dashboard')"
-        class="text-center xl:text-8xl lg:text-8xl sm:text-6xl text-6xl font-bold py-2 text-white">
-        PANSO
+        class="flex   items-center justify-center  gap-2 xl:text-6xl lg:text-6xl sm:text-5xl text-4xl font-bold py-2 text-white">
+        <img
+            src="/panso.png"
+            alt="Panso Logo"
+            class="w-14 h-14 mx-auto  "/>
+        Panso
     </Link>
 </template>

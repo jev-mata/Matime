@@ -43,12 +43,12 @@ const props = defineProps<{
                 </svg>
             </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="min-w-[150px]" align="end">
+        <DropdownMenuContent class="min-w-[150px] dark:bg-[#0F1426]  dark:border-[#303F61]" align="end">
             <DropdownMenuItem
                 v-if="canUpdateClients()"
                 :aria-label="'Edit Client ' + props.client.name"
                 data-testid="client_edit"
-                class="flex items-center space-x-3 cursor-pointer"
+                class="flex items-center space-x-3 cursor-pointer  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click="emit('edit')">
                 <PencilSquareIcon class="w-5 text-icon-active" />
                 <span>Edit</span>
@@ -56,7 +56,7 @@ const props = defineProps<{
             <DropdownMenuItem
                 v-if="canUpdateClients()"
                 :aria-label="'Archive Client ' + props.client.name"
-                class="flex items-center space-x-3 cursor-pointer"
+                class="flex items-center space-x-3 cursor-pointer  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click.prevent="emit('archive')">
                 <ArchiveBoxIcon class="w-5 text-icon-active" />
                 <span>{{ client.is_archived ? 'Unarchive' : 'Archive' }}</span>
@@ -65,7 +65,7 @@ const props = defineProps<{
                 v-if="canDeleteClients()"
                 :aria-label="'Delete Client ' + props.client.name"
                 data-testid="client_delete"
-                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive"
+                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click="emit('delete')">
                 <TrashIcon class="w-5" />
                 <span>Delete</span>

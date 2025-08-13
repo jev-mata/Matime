@@ -86,7 +86,7 @@ const option = computed(() => ({
 
 <template>
     <v-chart
-        class="h-[420px] max-w-[300px] mx-auto bg-transparent"
+        class="h-[420px] max-w-[300px] mx-auto bg-transparent "
         :autoresize="true"
         :option="option" />
 </template>

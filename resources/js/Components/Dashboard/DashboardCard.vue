@@ -2,7 +2,7 @@
     <section class="flex flex-col">
         <CardTitle :title="title" :icon="icon"></CardTitle>
         <div
-            class="rounded-lg bg-card-background border border-card-border flex-1 flex items-stretch shadow-card">
+            class="rounded-lg dark:bg-[#13192B]  bg-white  flex-1 flex items-stretch shadow">
             <div class="w-full flex flex-col">
                 <slot></slot>
             </div>

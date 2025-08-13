@@ -79,7 +79,7 @@ function copyTimeEntryFromExisting(entry: TimeEntry) {
 type GroupedTimeEntries = Record<
     string, // biMonthKey
     {
-        isApproved: boolean;
+        isApproved: 'Approved' | 'Unapproved' | 'Rejected';
         isSubmitted: boolean;
         days: Record<string, TimeEntriesGroupedByType[]>; // daily breakdown
     }
@@ -114,7 +114,7 @@ function groupTimeEntriesFunc() {
 
         if (!grouped[biMonthKey]) {
             grouped[biMonthKey] = {
-                isApproved: entry.approval == "approved",
+                isApproved: entry.approval == "approved"?'Approved':entry.approval != "approved" &&entry.approval != "rejected"?'Unapproved':'Rejected',
                 isSubmitted: entry.approval == "submitted" || entry.approval == "approved",
                 days: {}
             }
@@ -249,36 +249,38 @@ watch(
 
 <template>
 
-    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="">
-        <div class=" border border-1 border-tertiary mt-5 border-b-4">
+    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="border dark:border-[#3F4961] px-4 mb-4 pb-5">
+        <div class="dark:border-[#3F4961] border-b-4 ">
 
-            <div class="  border-1 p-1 ">
+            <div class=" rounded  p-1  ">
 
                 <SecondaryButton @click="SubmitBTN(bimonthlykey, bimonthly.days)"
-                    v-if="!bimonthly.isSubmitted && !bimonthly.isApproved"
+                    v-if="!bimonthly.isSubmitted"
                         :loading="isLoading"
-                    class=" p-2 border-1 mx-2 button text-blue-400">
+                    class=" p-2  mx-2  shadow-none dark:text-[#77D36F] text-[#77D36F] ">
                     submit
                 </SecondaryButton>
                 <SecondaryButton @click="unSubmitBTN(bimonthlykey, bimonthly.days)"
-                    v-if="bimonthly.isSubmitted && !bimonthly.isApproved"
+                    v-if="bimonthly.isSubmitted && bimonthly.isApproved!='Approved'"
                         :loading="isLoading"
-                    class=" p-2 border-1 mx-2 button text-blue-400">
+                    class=" p-2  mx-2  shadow-none   dark:text-[#FFC71E] text-[#FFC71E]">
                     unsubmit
                 </SecondaryButton>
 
-                <button  class=" py-2 border-1  button text-blue-400 opacity-0" v-if="bimonthly.isApproved" >|
+                <button disabled class=" py-2   button text-blue-400 opacity-0" v-if="bimonthly.isApproved" >|
                 </button>
                 <span v-if="bimonthlykey" class="ml-4   p-2 rounded-md font-bold">{{ bimonthlykey }}</span>
                 
-                <span v-if="bimonthly.isApproved" class="ml-4 bg-tertiary p-2 rounded-md font-bold">Approved</span>
-                <span v-if="!bimonthly.isApproved && bimonthly.isSubmitted"
-                    class="ml-4 bg-tertiary p-2 rounded-md font-bold">Pending</span>
+                <span v-if="bimonthly.isApproved=='Approved'" class="ml-4 text-[#77D36F] p-2 rounded-md font-bold">Approved</span>
+                <span v-if="bimonthly.isApproved=='Unapproved' && bimonthly.isSubmitted"
+                    class="ml-4 bg-tertiary text-[#FFC71E] p-2 rounded-md font-bold">Pending</span>
+                <span v-if="bimonthly.isApproved=='Rejected' && bimonthly.isSubmitted"
+                    class="ml-4 bg-tertiary text-[#FF651E] p-2 rounded-md font-bold">Rejected</span>
             </div>
 
 
             <template v-for="(value, key) in bimonthly.days" :key="key" >
-                <div v-if="!isSubmitted(value)" class="   border-1 p-1">
+                <div v-if="!isSubmitted(value)" class=" bg-white dark:bg-[#171E31]   rounded-md">
                     <TimeEntryRowHeading :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
                         selectedTimeEntries.includes(timeEntry)
                     )

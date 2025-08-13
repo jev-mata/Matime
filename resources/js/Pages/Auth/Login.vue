@@ -35,6 +35,7 @@ const page = usePage<{
 </script>
 
 <template>
+
     <Head title="Log in" />
 
     <AuthenticationCard>
@@ -46,63 +47,43 @@ const page = usePage<{
 
         <template #actions>
             <Link
-                class="py-8 dark-text-text-secondary text-sm font-medium opacity-90 hover:opacity-100 transition text-white"
+                class="py-8 dark:text-[#BFC7D6] text-sm font-medium opacity-90 hover:opacity-100 transition text-white"
                 :href="route('register')">
-                No account yet?
-                <span class="text-text-primary text-white">Register here!</span>
+            No account yet?
+            <span class=" dark:text-[#BFC7D6] text-text-primary  ">Register here!</span>
             </Link>
         </template>
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-400">
             {{ status }}
         </div>
-        <div
-            v-if="page.props.flash?.message"
+        <div v-if="page.props.flash?.message"
             class="bg-red-400 text-black text-center w-full px-3 py-1 mb-4 rounded-lg">
             {{ page.props.flash?.message }}
         </div>
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" class="text-white" />
-                <TextInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
+                <InputLabel for="email" value="Email" class="dark:text-[#7D88A1]" />
+                <TextInput id="email" v-model="form.email" type="email" class="mt-1 block w-full" required autofocus
                     autocomplete="username" />
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
-                <InputLabel
-                    for="password"
-                    value="Password"
-                    class="text-white" />
-                <TextInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
+                <InputLabel for="password" value="Password" class="dark:text-[#7D88A1] " />
+                <TextInput id="password" v-model="form.password" type="password" class="mt-1 block w-full" required
                     autocomplete="current-password" />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="underline text-sm text-text-secondary hover:text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white">
-                    Forgot your password?
+                <Link v-if="canResetPassword" :href="route('password.request')"
+                    class="underline text-sm dark:text-[#2770DB] hover:text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-white">
+                Forgot your password?
                 </Link>
 
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing">
+                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Log in
                 </PrimaryButton>
             </div>

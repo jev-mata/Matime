@@ -43,7 +43,7 @@ function getNameForKey(key: BillableKey | undefined) {
 </script>
 
 <template>
-    <SelectDropdown
+    <SelectDropdown class=""
         v-model="model"
         :get-key-from-item="getKeyFromItem"
         :get-name-for-item="getNameFromItem"
@@ -52,7 +52,7 @@ function getNameForKey(key: BillableKey | undefined) {
             <Badge
                 tag="button"
                 size="xlarge"
-                class="bg-input-background cursor-pointer">
+                class="dark:bg-[#0F1426] dark:border-[#303F61] cursor-pointer">
                 <span>
                     {{ getNameForKey(model) }}
                 </span>

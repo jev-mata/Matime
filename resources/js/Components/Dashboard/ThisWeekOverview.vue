@@ -60,7 +60,7 @@ const weekdays = computed(() => {
     }
 });
 
-const accentColor = useCssVar('--theme-color-chart', null, { observe: true });
+const accentColor = "#2770DB";
 
 // Get the organization ID using the utility function
 const organizationId = computed(() => getCurrentOrganizationId());
@@ -140,22 +140,22 @@ const seriesData = computed(() => {
                     borderColor: new LinearGradient(0, 0, 0, 1, [
                         {
                             offset: 0,
-                            color: 'rgba(' + accentColor.value + ',0.7)',
+                            color:  accentColor,
                         },
                         {
                             offset: 1,
-                            color: 'rgba(' + accentColor.value + ',0.5)',
+                            color:  accentColor,
                         },
                     ]),
                     emphasis: {
                         color: new LinearGradient(0, 0, 0, 1, [
                             {
                                 offset: 0,
-                                color: 'rgba(' + accentColor.value + ',0.9)',
+                                color:  accentColor,
                             },
                             {
                                 offset: 1,
-                                color: 'rgba(' + accentColor.value + ',0.7)',
+                                color:  accentColor,
                             },
                         ]),
                     },
@@ -163,11 +163,11 @@ const seriesData = computed(() => {
                     color: new LinearGradient(0, 0, 0, 1, [
                         {
                             offset: 0,
-                            color: 'rgba(' + accentColor.value + ',0.7)',
+                            color:  accentColor,
                         },
                         {
                             offset: 1,
-                            color: 'rgba(' + accentColor.value + ',0.5)',
+                            color:  accentColor,
                         },
                     ]),
                 },
@@ -205,7 +205,7 @@ const option = computed(() => {
                 fontWeight: 600,
                 margin: 24,
                 fontFamily: 'Outfit, sans-serif',
-                color: labelColor.value,
+                color: "#7D88A1",
             },
             axisTick: {
                 lineStyle: {
@@ -217,7 +217,7 @@ const option = computed(() => {
             type: 'value',
             splitLine: {
                 lineStyle: {
-                    color: markLineColor.value,
+                    color: "#7D88A1",
                 },
             },
         },

@@ -129,7 +129,7 @@ function deleteSelected() {
     <AppLayout title="Dashboard" data-testid="time_view">
         <div class="mx-10">
 
-            <MainContainer class="pt-5 lg:pt-8 pb-4 lg:pb-6 bg-default-background p-5 ">
+            <MainContainer class="pt-5 lg:pt-8 pb-4 lg:pb-6 dark:bg-[#171E31] p-5 ">
                 <div
                     class="lg:flex items-end lg:divide-x divide-default-background-separator divide-y lg:divide-y-0 space-y-2 lg:space-y-0 lg:space-x-2 ">
                     <div class="flex-1">
@@ -142,7 +142,7 @@ function deleteSelected() {
                     </div>
                 </div>
             </MainContainer>
-            <div class="bg-default-background mt-5">
+            <div class=" mt-5">
                 <TimeEntryMassActionRow :selected-time-entries="selectedTimeEntries"
                     :enable-estimated-time="isAllowedToPerformPremiumAction()" :can-create-project="canCreateProjects()"
                     :all-selected="selectedTimeEntries.length === timeEntries.length" :delete-selected="deleteSelected"

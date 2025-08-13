@@ -16,6 +16,7 @@ async function getConfig() {
     const additionalPlugins = await collectModulePlugins('extensions');
 
     return defineConfig({
+        
         build: {
             sourcemap: true, // Source map generation must be turned on
         },

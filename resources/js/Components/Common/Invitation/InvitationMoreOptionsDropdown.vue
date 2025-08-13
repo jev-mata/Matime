@@ -36,14 +36,14 @@ const emit = defineEmits<{
         <DropdownMenuContent class="min-w-[150px]" align="end">
             <DropdownMenuItem
                 data-testid="invitation_delete"
-                class="flex items-center space-x-3 cursor-pointer"
+                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click="emit('resend')">
                 <ArrowPathIcon class="w-5 text-icon-active" />
                 <span>Resend Invitation</span>
             </DropdownMenuItem>
             <DropdownMenuItem
                 data-testid="invitation_delete"
-                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive"
+                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click="emit('delete')">
                 <TrashIcon class="w-5" />
                 <span>Delete</span>

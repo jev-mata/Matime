@@ -66,10 +66,7 @@ const max = computed(() => {
 
 const backgroundColor = useCssVar('--color-card-background', null, {
     observe: true,
-});
-const itemBackgroundColor = useCssVar('--color-bg-tertiary', null, {
-    observe: true,
-});
+}); 
 
 const option = computed(() => {
     return {
@@ -82,7 +79,7 @@ const option = computed(() => {
             left: 'center',
             top: 'center',
             inRange: {
-                color: [itemBackgroundColor.value, '#2DBE45'],
+                color: ['#303F61', '#2770DB'],
             },
             show: false,
         },
@@ -108,7 +105,7 @@ const option = computed(() => {
             itemStyle: {
                 color: 'transparent',
                 borderWidth: 8,
-                borderColor: backgroundColor.value,
+                borderColor:'transparent',
             },
             yearLabel: { show: false },
         },
@@ -150,7 +147,7 @@ const option = computed(() => {
 </script>
 
 <template>
-    <DashboardCard title="Activity Graph" :icon="BoltIcon">
+    <DashboardCard title="Activity Graph" :icon="BoltIcon" class="dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]">
         <div class="px-2">
             <div v-if="isLoading" class="flex justify-center items-center h-40">
                 <LoadingSpinner />

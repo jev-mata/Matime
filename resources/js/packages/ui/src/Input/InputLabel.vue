@@ -9,8 +9,8 @@ const props = defineProps<{
 
 <template>
     <label
-        :class="twMerge('block font-medium text-sm text-text-primary', props.class)">
-        <span v-if="value">{{ value }}</span>
+        :class="twMerge('block font-medium text-sm ', props.class)">
+        <span v-if="value" :class="twMerge('block font-medium text-sm ', props.class)">{{ value }}</span>
         <span v-else><slot /></span>
     </label>
 </template>

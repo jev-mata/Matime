@@ -27,9 +27,9 @@ const iconClass = {
 
 const buttonColorClasses = computed(() => {
     if (props.active) {
-        return 'stopBTN';
+        return 'bg-[#ff297e] hover:bg-[#5AB352] hover:scale-110 ring-[#ff297e] focus-visible:ring-[#5AB352]';
     } else {
-        return 'playBTN';
+        return 'bg-[#77D36F] hover:bg-[#5AB352] hover:scale-110 ring-[#77D36F] focus-visible:ring-[#5AB352]';
     }
 });
 

@@ -119,7 +119,7 @@ async function submitBillableRate() {
                         class="mt-1">
                         <template #trigger>
                             <Badge
-                                class="bg-input-background cursor-pointer hover:bg-tertiary"
+                                class=" dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6] cursor-pointer hover:bg-tertiary"
                                 size="xlarge">
                                 <div class="flex items-center space-x-2">
                                     <UserCircleIcon

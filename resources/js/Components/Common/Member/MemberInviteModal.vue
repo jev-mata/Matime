@@ -96,7 +96,7 @@ useFocus(clientNameInput, { initialValue: true });
         <template #content>
             <div v-if="!isAllowedToPerformPremiumAction()">
                 <div
-                    class="rounded-full flex items-center justify-center w-20 h-20 mx-auto border border-border-tertiary bg-secondary">
+                    class="rounded-full flex items-center justify-center w-20 h-20 mx-auto border  dark:bg-[#0F1426]  dark:border-[#303F61]  ">
                     <UserGroupIcon class="w-12"></UserGroupIcon>
                 </div>
                 <div class="max-w-sm text-center mx-auto py-4 text-base">
@@ -133,7 +133,7 @@ useFocus(clientNameInput, { initialValue: true });
                         name="email"
                         type="text"
                         placeholder="Member Email"
-                        class="mt-1 block w-full"
+                        class="mt-1 block w-full  dark:bg-[#0C101E]  dark:border-[#303F61]"
                         required
                         autocomplete="memberName"
                         @keydown.enter="submit" />
@@ -145,14 +145,14 @@ useFocus(clientNameInput, { initialValue: true });
                     <InputError :message="errors.role" class="mt-2" />
 
                     <div
-                        class="relative z-0 mt-1 border border-card-border rounded-lg bg-card-background cursor-pointer">
+                        class="relative z-0 mt-1 border  dark:bg-[#0F1426]  dark:border-[#303F61] rounded-lg   cursor-pointer">
                         <button
                             v-for="(role, i) in filterRoles(availableRoles)"
                             :key="role.key"
                             type="button"
-                            class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                            class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-indigo-500  focus:ring-2 focus:ring-indigo-500"
                             :class="{
-                                'border-t border-card-border focus:border-none rounded-t-none':
+                                'border-t    dark:border-[#303F61] focus:border-none rounded-t-none':
                                     i > 0,
                                 'rounded-b-none':
                                     i != Object.keys(availableRoles).length - 1,

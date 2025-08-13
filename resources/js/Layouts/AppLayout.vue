@@ -142,18 +142,18 @@ onMounted(fetchPermission);
 </script>
 
 <template>
-    <div v-bind="$attrs" class="flex flex-wrap bg-background text-text-secondary">
+    <div v-bind="$attrs" class="flex flex-wrap  text-[#1E273C] dark:text-[#BFC7D6] dark:bg-[#0F1426] bg-[#0F1426] text-[#464D5E] ">
         <div :class="{
-            '!flex bg-default-background w-full z-[9999999999]':
+            '!flex dark:bg-[#0F1426] w-full z-[9999999999]':
                 showSidebarMenu,
         }"
-            class="flex-shrink-0 h-screen hidden fixed w-[230px] 2xl:w-[250px] px-2.5 2xl:px-3 py-4 lg:flex flex-col justify-between">
+            class="flex-shrink-0 h-screen hidden fixed w-[230px] 2xl:w-[250px] px-2.5 2xl:px-3 py-4 lg:flex flex-col justify-between text-[#CDD3DF]">
             <div class="flex flex-col h-full">
-                <div class="border-b border-default-background-separator pb-2 flex justify-between">
+                <div class="border-b dark:border-[#303F61] border-[#303F61]  pb-2 flex justify-between">
                     <OrganizationSwitcher class="w-full"></OrganizationSwitcher>
                     <XMarkIcon class="w-8 lg:hidden" @click="showSidebarMenu = false"></XMarkIcon>
                 </div>
-                <div class="border-b border-default-background-separator">
+                <div class="border-b dark:border-[#303F61] border-[#303F61] ">
                     <CurrentSidebarTimer></CurrentSidebarTimer>
                 </div>
                 <div class="overflow-y-scroll flex-1 w-full" style="
@@ -191,7 +191,10 @@ onMounted(fetchPermission);
                         </ul>
                     </nav>
 
-                    <div class="text-text-tertiary text-sm font-semibold pt-5 pb-1.5">
+                    <div 
+                    :class="[route().current('projects') ||
+                       route().current('clients')||route().current('members') ||route().current('tags') ||route().current('invoices')||route().current('approval.index') ? 'dark:text-[#CDD3DF]' : 'dark:text-[#636E88]']" 
+                    class="text-text-tertiary text-sm font-semibold pt-5 pb-1.5">
                         Manage
                     </div>
 
@@ -230,7 +233,10 @@ onMounted(fetchPermission);
 
                         </ul>
                     </nav>
-                    <div v-if="canUpdateOrganization()" class="text-text-tertiary text-sm font-semibold pt-5 pb-1.5">
+                    <div v-if="canUpdateOrganization()" :class="[route().current('import') ||
+                        route().current('teams.show', page.props.auth.user.current_team.id
+                        ) ? 'dark:text-[#CDD3DF]' : 'dark:text-[#636E88]']" 
+                        class=" text-sm font-semibold pt-5 pb-1.5">
                         Admin
                     </div>
 
@@ -256,9 +262,8 @@ onMounted(fetchPermission);
                     </nav>
                 </div>
                 <div class="justify-self-end">
-                    <!-- <UpdateSidebarNotification></UpdateSidebarNotification> -->
-                    <ul
-                        class="border-t border-default-background-separator pt-3 flex justify-between pr-4 items-center">
+                    <UpdateSidebarNotification></UpdateSidebarNotification>
+                    <ul class="border-t dark:border-[#303F61]  border-[#303F61]  pt-3 flex justify-between pr-4 items-center">
                         <NavigationSidebarItem class="flex-1" title="Profile Settings" :icon="Cog6ToothIcon" :href="route('profile.show')
                             "></NavigationSidebarItem>
 
@@ -267,9 +272,9 @@ onMounted(fetchPermission);
                 </div>
             </div>
         </div>
-        <div class="flex-1 lg:ml-[230px] 2xl:ml-[250px] min-w-0">
+        <div class="flex-1 lg:ml-[230px] 2xl:ml-[250px] min-w-0 dark:bg-[#1E273C] ">
             <div
-                class="lg:hidden w-full px-3 py-1 border-b border-b-default-background-separator text-text-secondary flex justify-between items-center">
+                class="lg:hidden w-full px-3 py-1 border-b dark:border-[#303F61]  border-[#303F61]  text-text-secondary flex justify-between items-center">
                 <Bars3Icon class="w-7 text-text-secondary" @click="showSidebarMenu = !showSidebarMenu"></Bars3Icon>
                 <OrganizationSwitcher></OrganizationSwitcher>
             </div>
@@ -279,10 +284,9 @@ onMounted(fetchPermission);
             <Banner />
             <BillingBanner v-if="isBillingActivated()" />
 
-            <div class="min-h-screen flex flex-col  border-l border-default-background-separator">
+            <div class="min-h-screen flex flex-col  border-l dark:border-[#303F61]">
                 <!-- Page Heading -->
-                <header v-if="$slots.header"
-                    class="bg-default-background border-b border-default-background-separator shadow">
+                <header v-if="$slots.header" class="dark:bg-[#171E31] bg-[#F3F3F4] border-b dark:border-[#303F61] shadow">
                     <div class="pt-8 pb-3">
                         <MainContainer>
                             <slot name="header" />
@@ -292,7 +296,7 @@ onMounted(fetchPermission);
                 </header>
 
                 <!-- Page Content -->
-                <main class="pb-28 flex-1">
+                <main class="pb-28 flex-1  bg-[#F3F3F4] dark:bg-[#1E273C]">
                     <div v-if="isOrganizationLoading" class="flex items-center justify-center h-screen">
                         <LoadingSpinner />
                     </div>

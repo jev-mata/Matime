@@ -14,9 +14,9 @@ const model = defineModel<string[]>({
 });
 const iconColorClasses = computed(() => {
     if (model.value.length > 0) {
-        return 'text-input-select-active focus:text-input-select-active-hover hover:text-input-select-active-hover';
+        return ' dark:text-[#BFC7D6] focus:text-input-select-active-hover hover:dark:text-[#7D88A1]';
     } else {
-        return 'text-icon-default hover:text-icon-active focus:text-icon-active';
+        return ' dark:text-[#7D88A1] text-icon-default hover:text-[#BFC7D6] focus:text-icon-active';
     }
 });
 defineProps<{
@@ -36,7 +36,7 @@ defineProps<{
                 data-testid="tag_dropdown"
                 :class="
                     twMerge(
-                        iconColorClasses,
+                        iconColorClasses,'',
                         'flex-shrink-0 ring-0 focus:outline-none focus:ring-2 focus:ring-ring transition focus-visible:bg-card-background-separator hover:bg-card-background-separator rounded-full w-10 h-10 flex items-center justify-center'
                     )
                 ">

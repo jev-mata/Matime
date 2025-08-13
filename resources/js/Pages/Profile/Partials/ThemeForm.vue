@@ -23,7 +23,7 @@ const appName = import.meta.env.VITE_APP_NAME ?? 'this system';
             <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="theme" value="Theme" />
                 <select id="theme" v-model="themeSetting" name="theme" required
-                    class="mt-1 block w-full border-input-border bg-input-background text-text-primary focus:border-input-border-active rounded-md shadow-sm">
+                    class="mt-1 block w-full border-input-border  dark:bg-[#0C101E]  dark:border-[#3F4961] text-text-primary focus:border-input-border-active rounded-md shadow">
                     <option value="system">System</option>
                     <option value="light">Light</option>
                     <option value="dark">Dark</option>

@@ -27,7 +27,7 @@ const close = () => {
     <Modal
         :show="show"
         :max-width="maxWidth"
-        :closeable="closeable"
+        :closeable="closeable" 
         @close="close">
         <div class="px-6 py-4">
             <div class="text-lg font-medium text-text-primary" role="heading">
@@ -40,7 +40,7 @@ const close = () => {
         </div>
 
         <div
-            class="flex flex-row justify-end px-6 py-4 border-t border-card-background-separator bg-default-background rounded-b-2xl text-end">
+            class="flex flex-row justify-end px-6 py-4 border-t border-[#303F61] bg-default-background rounded-b-2xl text-end">
             <slot name="footer" />
         </div>
     </Modal>

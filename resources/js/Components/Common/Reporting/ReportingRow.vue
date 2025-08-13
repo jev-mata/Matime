@@ -29,7 +29,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
 
 <template>
     <div
-        class="contents text-text-primary [&>*]:transition [&>*]:border-card-background-separator [&>*]:border-b [&>*]:h-[50px]">
+        class="contents text-text-primary [&>*]:transition   hover:border-b [&>*]:h-[50px] ">
         <div
             :class="
                 twMerge(
@@ -47,7 +47,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 {{ entry.description }}
             </span>
         </div>
-        <div class="justify-end flex items-center">
+        <div class="justify-end flex items-center pr-2">
             {{
                 formatHumanReadableDuration(
                     entry.seconds,
@@ -56,20 +56,12 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 )
             }}
         </div>
-        <div class="justify-end pr-6 flex items-center">
-            {{ entry.cost ? formatCents(
-                entry.cost,
-                props.currency,
-                organization?.currency_format,
-                organization?.currency_symbol,
-                organization?.number_format
-            ) : '--' }}
-        </div>
+ 
     </div>
     <div
         v-if="expanded && entry.grouped_data"
-        class="col-span-3 grid bg-quaternary"
-        style="grid-template-columns: 1fr 150px 150px">
+        class="col-span-2 grid bg-quaternary " 
+        style="grid-template-columns: 1fr 150px ">
         <ReportingRow
             v-for="subEntry in entry.grouped_data"
             :key="subEntry.description ?? 'none'"

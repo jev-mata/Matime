@@ -107,7 +107,7 @@ const page = usePage<{
             <!-- Profile Photo -->
             <div
                 v-if="page.props.jetstream.managesProfilePhotos"
-                class="col-span-6 sm:col-span-4">
+                class="col-span-6 sm:col-span-4 ">
                 <!-- Profile Photo File Input -->
                 <input
                     id="photo"
@@ -124,7 +124,7 @@ const page = usePage<{
                     <img
                         :src="user.profile_photo_url"
                         :alt="user.name"
-                        class="rounded-full h-20 w-20 object-cover" />
+                        class="rounded-full h-20 w-20 object-cover  dark:bg-[#0C101E] " />
                 </div>
 
                 <!-- New Profile Photo Preview -->
@@ -214,7 +214,7 @@ const page = usePage<{
                     v-model="form.timezone"
                     name="timezone"
                     required
-                    class="mt-1 block w-full border-input-border bg-input-background text-text-primary focus:border-input-border-active rounded-md shadow-sm">
+                    class="mt-1 block w-full dark:bg-[#0C101E]  dark:border-[#3F4961]  bg-input-background text-text-primary focus:dark:border-[#3F4961]  rounded-md shadow">
                     <option value="" disabled>Select a Timezone</option>
                     <option
                         v-for="(timezoneTranslated, timezoneKey) in $page.props
@@ -235,7 +235,7 @@ const page = usePage<{
                     v-model="form.week_start"
                     name="week_start"
                     required
-                    class="mt-1 block w-full border-input-border bg-input-background text-text-primary focus:border-input-border-active rounded-md shadow-sm">
+                    class="mt-1 block w-full  dark:bg-[#0C101E]  bg-input-background text-text-primary focus: dark:bg-[#0C101E] rounded-md shadow">
                     <option value="" disabled>Select a week day</option>
                     <option
                         v-for="(weekdayTranslated, weekdayKey) in $page.props

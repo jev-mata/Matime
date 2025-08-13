@@ -1,11 +1,11 @@
 <script setup lang="ts">
 
-import {ProjectBadge} from "@/packages/ui/src";
-import type {TimeEntry} from "@/packages/api/src";
-import {twMerge} from "tailwind-merge";
-import {ChevronRightIcon} from "@heroicons/vue/16/solid";
-import {computed} from "vue";
-import type {Project, Task} from "@/packages/api/src";
+import { ProjectBadge } from "@/packages/ui/src";
+import type { TimeEntry } from "@/packages/api/src";
+import { twMerge } from "tailwind-merge";
+import { ChevronRightIcon } from "@heroicons/vue/16/solid";
+import { computed } from "vue";
+import type { Project, Task } from "@/packages/api/src";
 
 const props = defineProps<{
     timeEntry: TimeEntry,
@@ -26,33 +26,23 @@ const task = computed(() => {
 </script>
 
 <template>
-    <button
-        tabindex="-1"
-        :data-select-id="timeEntry.id"
-        :class="twMerge('px-2 py-1.5 flex justify-between items-center space-x-2 w-full rounded overflow-hidden', props.highlighted && 'bg-card-background-active')">
+    <button tabindex="-1" :data-select-id="timeEntry.id"
+        :class="twMerge('px-2 py-1.5 flex justify-between items-center space-x-2 w-full rounded overflow-hidden  hover:dark:text-[#BFC7D6] ', props.highlighted && 'bg-card-background-active')">
         <span v-if="timeEntry.description !== ''" class="text-sm font-medium whitespace-nowrap ">
             {{
-                    timeEntry.description
+                timeEntry.description
             }}
         </span>
         <span v-else class="text-sm text-text-tertiary font-medium">
             No Description
         </span>
-        <ProjectBadge
-            ref="projectDropdownTrigger"
-            :color="project?.color"
-            :name="project?.name"
-            class="">
+        <ProjectBadge ref="projectDropdownTrigger" :color="project?.color" :name="project?.name"  class="">
             <div v-if="project" class="flex items-center lg:space-x-1 min-w-0 ">
-                    <span class="whitespace-nowrap text-xs ">
-                        {{ project?.name }}
-                    </span>
-                <ChevronRightIcon
-                    v-if="task"
-                    class="w-4 lg:w-5 text-text-secondary shrink-0"></ChevronRightIcon>
-                <div
-                    v-if="task"
-                    class="min-w-0 shrink text-xs truncate ">
+                <span class="whitespace-nowrap text-xs ">
+                    {{ project?.name }}
+                </span>
+                <ChevronRightIcon v-if="task" class="w-4 lg:w-5 text-text-secondary shrink-0"></ChevronRightIcon>
+                <div v-if="task" class="min-w-0 shrink text-xs truncate ">
                     {{ task.name }}
                 </div>
             </div>
@@ -63,6 +53,4 @@ const task = computed(() => {
     </button>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

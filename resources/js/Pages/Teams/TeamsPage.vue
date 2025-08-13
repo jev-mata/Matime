@@ -176,13 +176,13 @@ function openDeleteModal(team: Team) {
 
             <div class="flex mb-4 gap-2">
                 <input v-model="search" placeholder="Search team name..."
-                    class="border  border-gray-300 rounded px-3 py-2 w-full " />
+                    class="border  border-gray-300 rounded px-3 py-2 w-full dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]" />
             </div>
 
             <form @submit.prevent="createTeam" class="mb-6 flex gap-2">
                 <input v-model="newTeamName" placeholder="New team name"
-                    class="border  border-gray-300  p-2 rounded flex-1 " />
-                <button class="bg-blue-600 px-4 py-2 rounded">Add Team</button>
+                    class="border  border-gray-300  p-2 rounded flex-1 dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]" />
+                <button class="dark:border-[#303F61]  dark:bg-[#2770DB] dark:text-[#FFFFFF] hover:dark:text-[#BFC7D6] px-4 py-2 rounded">Add Team</button>
             </form>
 
             <table class="w-full">

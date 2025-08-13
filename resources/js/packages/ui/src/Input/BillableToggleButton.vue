@@ -20,9 +20,9 @@ const props = withDefaults(
 
 const iconColorClasses = computed(() => {
     if (active.value) {
-        return 'text-input-select-active focus:text-input-select-active-hover hover:text-input-select-active-hover';
+        return ' dark:text-[#BFC7D6] focus:dark:text-[#BFC7D6] hover:dark:text-[#BFC7D6]';
     } else {
-        return 'text-icon-default focus:text-icon-active hover:text-icon-active';
+        return ' dark:text-[#7D88A1] focus:text-[#BFC7D6] hover:text-[#BFC7D6]';
     }
 });
 

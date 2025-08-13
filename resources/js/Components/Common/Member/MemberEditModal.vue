@@ -125,13 +125,13 @@ const roleDescription = computed(() => {
         </template>
 
         <template #content>
-            <div class="pb-5 pt-2 divide-y divide-border-secondary">
+            <div class="pb-5 pt-2 divide-y dark:divide-[#303F61]">
                 <div class="pb-5 flex space-x-6">
                     <div>
                         <InputLabel for="role" value="Role" />
                         <MemberRoleSelect
                             v-model="memberBody.role"
-                            class="mt-2"
+                            class=" "
                             name="role"></MemberRoleSelect>
                     </div>
                     <div class="flex-1 text-xs flex items-center pt-6">
@@ -146,7 +146,7 @@ const roleDescription = computed(() => {
                                 v-model="
                                     billableRateSelect
                                 "
-                                class="mt-2"
+                                class=" "
                                 name="billableType"></MemberBillableSelect>
                         </div>
                         <div

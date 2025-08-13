@@ -84,7 +84,7 @@ function updateValue(client: { id: string | null; name: string }) {
             <slot name="trigger"></slot>
         </template>
         <template #content>
-            <UseFocusTrap
+            <UseFocusTrap class="dark:bg-[#0F1426] dark:border-[#303F61] dark:text-[#BFC7D6] bg-white text-text-primary border border-default-background-separator rounded-lg shadow-md"
                 v-if="open"
                 :options="{ immediate: true, allowOutsideClick: true }">
                 <ComboboxRoot
@@ -96,7 +96,7 @@ function updateValue(client: { id: string | null; name: string }) {
                     <ComboboxAnchor>
                         <ComboboxInput
                             ref="searchInput"
-                            class="bg-card-background border-0 placeholder-muted text-sm text-text-primary py-2.5 focus:ring-0 border-b border-card-background-separator focus:border-card-background-separator w-full"
+                            class="dark:bg-[#0F1426] dark:border-[#303F61] dark:text-[#BFC7D6]  border-0 placeholder-muted text-sm text-text-primary py-2.5 focus:ring-0 border-b border-card-background-separator focus:border-card-background-separator w-full"
                             placeholder="Search for a client..." />
                     </ComboboxAnchor>
                     <ComboboxContent>
@@ -104,7 +104,7 @@ function updateValue(client: { id: string | null; name: string }) {
                             class="w-60 max-h-60 overflow-y-scroll">
                             <ComboboxItem
                                 :value="{ id: null, name: 'No Client' }"
-                                class="data-[highlighted]:bg-card-background-active">
+                                class="data-[highlighted]:dark:bg-[#3F4961] ">
                                 <ClientDropdownItem
                                     :selected="model === null"
                                     name="No Client" />
@@ -113,7 +113,7 @@ function updateValue(client: { id: string | null; name: string }) {
                                 v-for="client in filteredClients"
                                 :key="client.id"
                                 :value="client"
-                                class="data-[highlighted]:bg-card-background-active"
+                                class="data-[highlighted]:dark:bg-[#3F4961]"
                                 :data-client-id="client.id">
                                 <ClientDropdownItem
                                     :selected="isClientSelected(client.id)"

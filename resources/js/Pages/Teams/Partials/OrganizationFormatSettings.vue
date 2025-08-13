@@ -85,10 +85,10 @@ async function submit() {
                 <div class="col-span-6 sm:col-span-4">
                     <InputLabel
                         for="numberFormat"
-                        class="mb-2"
+                        class="mb-2 "
                         value="Number Format" />
-                    <Select v-model="form.number_format">
-                        <SelectTrigger id="numberFormat">
+                    <Select v-model="form.number_format" class="w-full">
+                        <SelectTrigger id="numberFormat" >
                             <SelectValue placeholder="Select number format" />
                         </SelectTrigger>
                         <SelectContent>

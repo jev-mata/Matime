@@ -140,7 +140,7 @@ type BillableOption = {
                         v-model="timeEntry.description"
                         placeholder="What did you work on?"
                         type="text"
-                        class="mt-1 block w-full"
+                        class="mt-1 block w-full dark:border-[#303F61]  dark:bg-[#0C101E] hover:dark:border-[#636E88] focus:border-[#303F61] focus:ring-[#303F61]"
                         @keydown.enter="submit" />
                 </div>
             </div>
@@ -159,7 +159,7 @@ type BillableOption = {
                             :can-create-project="canCreateProjects()"
                             :currency="getOrganizationCurrencyString()"
                             size="xlarge"
-                            class="bg-input-background"
+                            class="bg-input-background  dark:border-[#303F61]  dark:bg-[#0C101E] hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] focus:dark:bg-[#303F61]"
                             :projects="projects"
                             :tasks="tasks"
                             :enable-estimated-time="enableEstimatedTime"></TimeTrackerProjectTaskDropdown>
@@ -172,7 +172,7 @@ type BillableOption = {
                                 :tags="tags">
                                 <template #trigger>
                                     <Badge
-                                        class="bg-input-background"
+                                        class="bg-input-background dark:border-[#303F61]  dark:bg-[#0C101E]  hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"
                                         tag="button"
                                         size="xlarge">
                                         <TagIcon
@@ -209,7 +209,7 @@ type BillableOption = {
                                 ]">
                                 <template #trigger>
                                     <Badge
-                                        class="bg-input-background"
+                                        class="bg-input-background  dark:border-[#303F61]  dark:bg-[#0C101E] hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"
                                         tag="button"
                                         size="xlarge">
                                         <BillableIcon
@@ -230,7 +230,7 @@ type BillableOption = {
                 <div class="flex-1">
                     <InputLabel>Duration</InputLabel>
                     <div class="space-y-2 mt-1 flex flex-col">
-                        <DurationHumanInput
+                        <DurationHumanInput class=" dark:border-[#303F61]  dark:bg-[#0C101E]"
                             v-model:start="localStart"
                             v-model:end="localEnd"
                             name="Duration"></DurationHumanInput>
@@ -248,25 +248,26 @@ type BillableOption = {
                     <InputLabel>Start</InputLabel>
                     <div class="flex flex-col items-center space-y-2 mt-1">
                         <TimePickerSimple
-
+class=" dark:border-[#303F61]  dark:bg-[#0C101E]"
                             v-model="localStart"
                             size="large"></TimePickerSimple>
-                        <DatePicker
+                        <DatePicker 
                             v-model="localStart"
                             tabindex="1"
-                            class="text-xs text-text-tertiary max-w-28 px-1.5 py-1.5"></DatePicker>
+                            class="text-xs text-text-tertiary max-w-28 px-1.5 py-1.5 dark:border-[#303F61]  cursor-pointer dark:bg-[#0C101E] hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"></DatePicker>
                     </div>
                 </div>
                 <div class="">
                     <InputLabel>End</InputLabel>
                     <div class="flex flex-col items-center space-y-2 mt-1">
-                        <TimePickerSimple
+                        <TimePickerSimple 
+class=" dark:border-[#303F61]  dark:bg-[#0C101E] "
                             v-model="localEnd"
                             size="large"></TimePickerSimple>
-                        <DatePicker
+                        <DatePicker 
                             v-model="localEnd"
                             tabindex="1"
-                            class="text-xs text-text-tertiary max-w-28 px-1.5 py-1.5"></DatePicker>
+                            class="text-xs text-text-tertiary max-w-28 px-1.5 py-1.5 dark:border-[#303F61] cursor-pointer dark:bg-[#0C101E] hover:dark:bg-[#303F61] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"></DatePicker>
                     </div>
                 </div>
             </div>
@@ -275,7 +276,7 @@ type BillableOption = {
             <SecondaryButton tabindex="2" @click="show = false"> Cancel</SecondaryButton>
             <PrimaryButton
                 tabindex="2"
-                class="ms-3"
+                class="ms-3 dark:bg-[#2770DB]  transition"
                 :class="{ 'opacity-25': saving }"
                 :disabled="saving"
                 @click="submit">

@@ -31,29 +31,35 @@ const open = useSessionStorage('nav-collapse-state-' + props.title, true);
         </NavigationSidebarLink>
         <CollapsibleRoot v-else v-model:open="open">
             <CollapsibleTrigger class="w-full group py-0.5">
-                <div
-                    class="text-text-secondary group-hover:text-text-primary group-hover:bg-menu-active group flex gap-x-2 rounded-md transition leading-6 py-1 px-2 font-medium text-sm items-center justify-between">
+                <div :class="[
+                    current
+                        ? 'dark:text-[#CDD3DF]'
+                        : 'dark:text-[#636E88] group-hover:text-[#CDD3DF]']"
+                    class="group-hover:text-[#CDD3DF]   group flex gap-x-2 rounded-md transition leading-6 py-1 px-2 font-medium text-sm items-center justify-between">
                     <div class="flex items-center gap-x-2">
                         <component :is="icon" v-if="icon" :class="[
                             current
-                                ? 'text-icon-active'
-                                : 'text-icon-default group-hover:text-icon-active',
+                                ? 'dark:text-[#CDD3DF]'
+                                : 'dark:text-[#W303F61] group-hover:text-[#CDD3DF]',
                             'transition h-5 w-5 shrink-0',
                         ]" aria-hidden="true" />
-                        <span>
+                        <span >
                             {{ title }}
                         </span>
                     </div>
 
-                    <ChevronRightIcon :class="[
-                        'w-5 text-text-secondary',
-                        { 'transform rotate-90': open },
+                    <ChevronRightIcon :class="[current ?
+                        'w-5 dark:text-[#303F61]  group-hover:text-[#CDD3DF]' : 'w-5 dark:text-[#CDD3DF]  group-hover:text-[#CDD3DF]',
+                    { 'transform rotate-90': open },
                     ]"></ChevronRightIcon>
                 </div>
             </CollapsibleTrigger>
             <CollapsibleContent class="CollapsibleContent">
                 <div class="px-3.5">
-                    <ul v-if="subItems"
+                    <ul v-if="subItems" :class="[
+                    current
+                        ? 'dark:text-[#CDD3DF]'
+                        : 'dark:text-[#636E88] hover:text-[#CDD3DF]']"
                         class="flex min-w-0 flex-col border-l border-border-secondary px-3 w-full my-0.5">
                         <li v-for="subItem in subItems" :key="subItem.title" class="w-full relative">
                             <NavigationSidebarLink v-if="subItem.show" :title="subItem.title"

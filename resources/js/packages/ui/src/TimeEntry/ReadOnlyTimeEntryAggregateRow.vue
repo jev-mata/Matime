@@ -87,77 +87,59 @@ const selectedProjectColor = computed(() => {
 </script>
 
 <template>
-    <div
-        class="border-b border-default-background-separator bg-row-background min-w-0 transition"
-        data-testid="time_entry_row"
+    <div class="hover:border-y dark:border-[#3F4961] bg-row-background min-w-0 transition" data-testid="time_entry_row"
         title="Editing disabled for submitted entries">
         <MainContainer class="min-w-0 opacity-40">
-            <div
-                class="grid grid-cols-8 py-1.5 items-center min-w-0 justify-between group">
+            <div class="grid grid-cols-10 py-1.5 items-center min-w-0 justify-between group">
                 <div class="flex items-center col-span-2 min-w-0">
-                    <Checkbox
-                        :checked="
-                            timeEntry.timeEntries.every(
-                                (aggregateTimeEntry: TimeEntry) =>
-                                    selectedTimeEntries.includes(
-                                        aggregateTimeEntry
-                                    )
+                    <Checkbox :checked="timeEntry.timeEntries.every(
+                        (aggregateTimeEntry: TimeEntry) =>
+                            selectedTimeEntries.includes(
+                                aggregateTimeEntry
                             )
-                        "
-                        @update:checked="onSelectChange" />
+                    )
+                        " @update:checked="onSelectChange" />
                     <div class="flex items-center min-w-0">
-                        <GroupedItemsCountButton
-                            :expanded="expanded"
-                            @click="expanded = !expanded">
+                        <GroupedItemsCountButton :expanded="expanded" @click="expanded = !expanded">
                             {{ timeEntry?.timeEntries?.length }}
                         </GroupedItemsCountButton>
-                        <div
-                            class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate"
+                        <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary font-medium truncate"
                             title="{{timeEntry.description}}">
                             {{ timeEntry.description }}
                         </div>
                     </div>
                 </div>
-                <div
-                    class="flex items-center px-2 w-full col-span-3 bg-secondary min-w-0"
+                <div class="flex items-center px-2 w-full col-span-3 bg-secondary min-w-0"
                     title="{{selectedProjectName +currentTask.name}}">
-                    <ProjectBadge
-                        :color="selectedProjectColor"
-                        :border="false"
-                        tag="button"
-                        @click="expanded = !expanded"
-                        :name="selectedProjectName"
-                        :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'">
+                    <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
+                        @click="expanded = !expanded" :name="selectedProjectName"
+                        :class="'focus:dark:border-[#3F4961] w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'">
                         <div class="flex items-center lg:space-x-1 min-w-0">
-                            <span class="whitespace-nowrap text-xs lg:text-sm  font-semibold  text-text-primary text-base">
+                            <span
+                                class="whitespace-nowrap text-xs lg:text-sm  font-semibold  text-text-primary text-base">
                                 {{ selectedProjectName }}
                             </span>
-                            <ChevronRightIcon
-                                v-if="currentTask"
-                                class="w-4 lg:w-5 text-text-secondary shrink-0">
+                            <ChevronRightIcon v-if="currentTask" class="w-4 lg:w-5 text-text-secondary shrink-0">
                             </ChevronRightIcon>
-                            <div
-                                v-if="currentTask"
+                            <div v-if="currentTask"
                                 class="min-w-0 shrink text-xs lg:text-sm truncate  font-semibold  text-text-primary text-base">
                                 {{ currentTask.name }}
                             </div>
                         </div>
                     </ProjectBadge>
                 </div>
-                <div
-                    class="flex items-center px-2 w-full col-span-1 bg-secondary min-w-0">
-                    <TagBadge
-                        :border="false"
-                        size="large"
-                        class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary"
-                        :name="
-                            timeEntryTags(timeEntry.tags)
-                                .map((tag: Tag) => tag.name)
-                                .join(', ')
-                        "></TagBadge>
+                <div class="flex items-center   col-span-1 bg-secondary min-w-0">
+                    <div class="flex-1 ">
+                        <TagBadge :border="false" size="large"
+                            class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary"
+                            :name="timeEntryTags(timeEntry.tags)
+                                    .map((tag: Tag) => tag.name)
+                                    .join(', ')
+                                "></TagBadge>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-2 justify-end pl-4">
-                    <div class="text-sm font-medium whitespace-nowrap">
+                <div class="flex items-center space-x-2 col-span-4 justify-end">
+                    <div class=" text-sm   whitespace-nowrap  px-4">
                         {{
                             formatStartEnd(
                                 timeEntry.start,
@@ -166,10 +148,8 @@ const selectedProjectColor = computed(() => {
                             )
                         }}
                     </div>
-                </div>
-                <div class="flex items-center font-medium lg:space-x-2">
                     <button
-                        class="flex-1 text-text-primary min-w-[90px] px-2.5 py-1.5 bg-transparent text-right hover:bg-card-background rounded-lg border border-transparent hover:border-card-border text-sm font-semibold focus-visible:outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-tertiary"
+                        class="  text-text-primary min-w-[90px] px-2.5 py-1.5 bg-transparent text-right hover:bg-card-background rounded-lg border border-transparent hover:dark:border-[#3F4961] text-sm font-semibold focus-visible:outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-tertiary"
                         @click="expanded = !expanded">
                         {{
                             formatHumanReadableDuration(
@@ -180,44 +160,25 @@ const selectedProjectColor = computed(() => {
                         }}
                     </button>
 
-                    <TimeTrackerStartStop
-                        :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden sm:flex group-hover:opacity-100 focus-visible:opacity-100"
-                        @changed="
+                    <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
+                        class="opacity-20 hidden sm:flex group-hover:opacity-100 focus-visible:opacity-100" @changed="
                             onStartStopClick(timeEntry)
-                        "></TimeTrackerStartStop>
+                            "></TimeTrackerStartStop>
 
-                    <div
-                        class=""
-                        title="Editing disabled for submitted entries">
-                        <LockClosedIcon
-                            class="w-4"
-                            title="Editing disabled for submitted entries"></LockClosedIcon>
+                    <div class="px-2" title="Editing disabled for submitted entries">
+                        <LockClosedIcon class="w-4" title="Editing disabled for submitted entries"></LockClosedIcon>
                     </div>
                 </div>
             </div>
         </MainContainer>
-        <div
-            v-if="expanded"
-            class="w-full border-t border-default-background-separator bg-black/15">
-            <TimeEntryRow
-                v-for="subEntry in timeEntry.timeEntries"
-                :key="subEntry.id"
-                :projects="projects"
-                :enable-estimated-time
-                :tasks="tasks"
-                :selected="
-                    !!selectedTimeEntries.find(
-                        (filterEntry: TimeEntry) =>
-                            filterEntry.id === subEntry.id
-                    )
-                "
-                :clients
-                :currency="currency"
-                :tags="tags"
-                :delete-time-entry="() => deleteTimeEntries([subEntry])"
-                :time-entry="subEntry"
-                @selected="emit('selected', [subEntry])"
+        <div v-if="expanded" class="w-full border-t dark:border-[#3F4961] bg-black/15">
+            <TimeEntryRow v-for="subEntry in timeEntry.timeEntries" :key="subEntry.id" :projects="projects"
+                :enable-estimated-time :tasks="tasks" :selected="!!selectedTimeEntries.find(
+                    (filterEntry: TimeEntry) =>
+                        filterEntry.id === subEntry.id
+                )
+                    " :clients :currency="currency" :tags="tags" :delete-time-entry="() => deleteTimeEntries([subEntry])"
+                :time-entry="subEntry" @selected="emit('selected', [subEntry])"
                 @unselected="emit('unselected', [subEntry])"></TimeEntryRow>
         </div>
     </div>

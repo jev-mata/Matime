@@ -14,7 +14,7 @@ defineProps<{
         role="row"
         :class="
             twMerge(
-                'contents group [&>*]:transition [&>*]:border-row-separator [&>*]:bg-row-background [&>*]:border-b',
+                'contents group [&>*]:transition [&>*]:dark:border-[#3F4961]  [&>*]:bg-row-background [&>*]:border-b',
                 href ? '[&>*]:cursor-pointer [&>*]:hover:bg-white/5' : ''
             )
         ">

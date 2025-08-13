@@ -54,11 +54,11 @@ watch(focused, (newValue, oldValue) => {
 <template>
     <div
         ref="dropdownContent"
-        class="grid grid-cols-2 divide-x divide-card-background-separator text-center py-2">
+        class="grid grid-cols-2 divide-x dark:bg-[#13192B] dark:text-[#7D88A1]  text-center py-2">
         <div
             class="px-2"
             @keydown.enter.prevent="nextTick(() => emit('close'))">
-            <div class="font-semibold text-text-primary text-sm pb-2">Start</div>
+            <div class="font-semibold dark:text-[#7D88A1] text-sm pb-2">Start</div>
             <div class="space-y-2">
                 <TimePickerSimple
                     v-model="tempStart"
@@ -75,7 +75,7 @@ watch(focused, (newValue, oldValue) => {
             </div>
         </div>
         <div class="px-2">
-            <div class="font-semibold text-text-primary text-sm pb-2">End</div>
+            <div class="font-semibold dark:text-[#7D88A1] text-sm pb-2">End</div>
             <div v-if="tempEnd !== null" class="space-y-2">
                 <TimePickerSimple
                     v-model="tempEnd"
@@ -83,10 +83,10 @@ watch(focused, (newValue, oldValue) => {
                     @changed="updateTimeEntry"></TimePickerSimple>
                 <DatePicker
                     v-model="tempEnd"
-                    class="text-xs text-text-tertiary max-w-24 px-1.5 py-1.5"
+                    class="text-xs dark:text-[#7D88A1] max-w-24 px-1.5 py-1.5"
                     @changed="updateTimeEntry"></DatePicker>
             </div>
-            <div v-else class="text-text-secondary">-- : --</div>
+            <div v-else class="dark:text-[#7D88A1]">-- : --</div>
             <div tabindex="0" @focusin="emit('close')"></div>
         </div>
     </div>

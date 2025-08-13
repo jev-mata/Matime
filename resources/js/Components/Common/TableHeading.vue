@@ -2,7 +2,7 @@
 
 <template>
     <div
-        class="contents [&>*]:border-row-separator text-xs sm:text-sm [&>*]:border-b [&>*]:border-t [&>*]:bg-row-heading-background">
+        class="contents [&>*]:dark:border-[#3F4961]  text-xs sm:text-sm [&>*]:border-b [&>*]:border-t [&>*]:bg-row-heading-background">
         <slot></slot>
     </div>
 </template>

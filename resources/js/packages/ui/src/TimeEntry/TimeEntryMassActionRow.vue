@@ -65,12 +65,12 @@ const showMassUpdateModal = ref(false);
         :class="
             twMerge(
                 props.class,
-                'text-sm py-1.5 font-medium border-t border-b bg-secondary border-border-secondary flex items-center space-x-3'
+                'text-sm py-1.5 font-medium  dark:text-[#7D88A1] flex items-center space-x-3'
             )
         ">
         <Checkbox
             id="selectAll"
-            :checked="allSelected"
+            :checked="allSelected" 
             @update:checked="
                 allSelected ? emit('unselectAll') : emit('selectAll')
             ">

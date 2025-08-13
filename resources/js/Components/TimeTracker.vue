@@ -119,9 +119,9 @@ const sortedTasks = computed(() => {
 </script>
 
 <template>
-    <CardTitle title="Time Tracker" :icon="ClockIcon">
+    <CardTitle title="Time Tracker" :icon="ClockIcon" class="dark:text-[#7D88A1]">
     </CardTitle> 
-    <div class="relative">
+    <div class="relative dark:text-[#7D88A1] ">
         <TimeTrackerRunningInDifferentOrganizationOverlay v-if="
             isRunningInDifferentOrganization
         " @switch-organization="switchToTimeEntryOrganization"></TimeTrackerRunningInDifferentOrganizationOverlay>

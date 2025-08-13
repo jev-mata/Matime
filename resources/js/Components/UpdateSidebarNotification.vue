@@ -4,11 +4,7 @@ import { SecondaryButton } from '@/packages/ui/src';
 import { useStorage } from '@vueuse/core';
 const showReleaseInfo = useStorage('showReleaseInfo-desktop', true);
 
-function openDesktopGithubRepo() {
-    window
-        .open('https://github.com/solidtime-io/solidtime-desktop', '_blank')
-        ?.focus();
-}
+ 
 </script>
 
 <template>
@@ -29,16 +25,9 @@ function openDesktopGithubRepo() {
             </div>
 
             <p class="text-xs">
-                <span class="font-semibold">Solidtime Desktop Beta</span> is
-                here! Test our brand new clients for Windows, macOS and Linux
-                now.
-            </p>
-            <SecondaryButton
-                size="small"
-                class="w-full text-center justify-center mt-1.5"
-                @click="openDesktopGithubRepo"
-                >Download now</SecondaryButton
-            >
+                <span class="font-semibold">New Design</span> is
+                here! Test it out and let us know what you think.
+            </p> 
         </div>
     </div>
 </template>

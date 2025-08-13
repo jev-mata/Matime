@@ -97,14 +97,14 @@ function onSelectChange(checked: boolean) {
 </script>
 
 <template>
-    <div class="border-b border-default-background-separator transition min-w-0 bg-row-background"
+    <div class="hover:border-y hover:dark:text-gray-100 dark:border-[#3F4961] transition min-w-0 bg-row-background"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0">
-            <div class="grid grid-cols-8   py-2 min-w-0 items-center  group">
+            <div class="grid grid-cols-10   py-2 min-w-0    group">
                 <div class="flex col-span-2  items-center min-w-0">
                     <Checkbox :checked="selected" @update:checked="onSelectChange" />
                     <div v-if="indent === true" class="w-10 h-7"></div>
-                    <TimeEntryDescriptionInput class="min-w-0 mr-4" :model-value="timeEntry.description
+                    <TimeEntryDescriptionInput class="min-w-0 mx-4 dark:text-[#7D88A1] hover:dark:bg-[#0C101E] py-2 rounded" :model-value="timeEntry.description
                         " @changed="updateTimeEntryDescription"></TimeEntryDescriptionInput>
                     <div v-if="showMember && members" class="text-sm px-2">
                         {{ memberName }}
@@ -116,7 +116,7 @@ function onSelectChange(checked: boolean) {
                         :currency="currency" :enable-estimated-time :task="timeEntry.task_id
                             " @changed="updateProjectAndTask"></TimeTrackerProjectTaskDropdown>
                 </div>
-                <div class="px-2 flex  bg-secondary min-w-0">
+                <div class="px-2 flex col-span-1  bg-secondary min-w-0">
                     <div class="flex-1 ">
                     <TimeEntryRowTagDropdown :create-tag :tags="tags" :model-value="timeEntry.tags"
                         @changed="updateTimeEntryTags"></TimeEntryRowTagDropdown></div>
@@ -128,18 +128,18 @@ function onSelectChange(checked: boolean) {
                             "></BillableToggleButton>
                     </div> -->
                 </div>
-                <div class="flex items-center space-x-2 col-span-2 justify-end  ">
-                    <TimeEntryRangeSelector class="hidden lg:block" :start="timeEntry.start" :end="timeEntry.end"
+                <div class="flex items-center space-x-2 col-span-4 justify-end   ">
+                    <TimeEntryRangeSelector class="hidden lg:block   " :start="timeEntry.start" :end="timeEntry.end"
                         :show-date @changed="
                             updateStartEndTime
                         "></TimeEntryRangeSelector>
-                    <TimeEntryRowDurationInput :start="timeEntry.start" :end="timeEntry.end" @changed="
+                    <TimeEntryRowDurationInput :start="timeEntry.start" :end="timeEntry.end"   @changed="
                         updateStartEndTime
                     "></TimeEntryRowDurationInput>
                     <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100"
+                        class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100 "
                         @changed="onStartStopClick"></TimeTrackerStartStop>
-                    <TimeEntryMoreOptionsDropdown :entry="timeEntry" @duplicate="duplicateTimeEntry"
+                    <TimeEntryMoreOptionsDropdown :entry="timeEntry" @duplicate="duplicateTimeEntry"  
                         :haveduplicate="true" @delete="deleteTimeEntry"></TimeEntryMoreOptionsDropdown>
                 </div>
             </div>

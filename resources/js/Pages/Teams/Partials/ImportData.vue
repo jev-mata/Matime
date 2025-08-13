@@ -141,22 +141,22 @@ const showResultModal = ref(false);
             </div>
 
             <div
-                class="py-2.5 px-3 border-t border-t-card-background-separator">
+                class="py-2.5 px-3 border-t  dark:border-[#3F4961]">
                 <span class="text-text-primary font-semibold">Clients created:</span>
                 {{ reportResult?.report.clients.created }}
             </div>
             <div
-                class="py-2.5 px-3 border-t border-t-card-background-separator">
+                class="py-2.5 px-3 border-t  dark:border-[#3F4961]">
                 <span class="text-text-primary font-semibold">Projects created:</span>
                 {{ reportResult?.report.projects.created }}
             </div>
             <div
-                class="py-2.5 px-3 border-t border-t-card-background-separator">
+                class="py-2.5 px-3 border-t  dark:border-[#3F4961]">
                 <span class="text-text-primary font-semibold">Tasks created:</span>
                 {{ reportResult?.report.tasks.created }}
             </div>
             <div
-                class="py-2.5 px-3 border-t border-t-card-background-separator">
+                class="py-2.5 px-3 border-t  dark:border-[#3F4961]">
                 <span class="text-text-primary font-semibold"
                     >Time entries created:</span
                 >
@@ -194,7 +194,7 @@ const showResultModal = ref(false);
                         id="importType"
                         v-model="importType"
                         name="importType"
-                        class="mt-1 block w-full border-input-border bg-input-background text-text-primary focus:border-input-border-active rounded-md shadow-sm">
+                        class="mt-1 block w-full  dark:bg-[#171E31] dark:border-[#3F4961] text-text-primary focus:dark:border-[#3F4961] rounded-md shadow-sm">
                         <option :value="null" selected disabled>
                             Select an import type to get instructions...
                         </option>
@@ -218,7 +218,7 @@ const showResultModal = ref(false);
                 </div>
 
                 <div
-                    class="mt-2 flex justify-center rounded-lg border border-dashed border-border-primary px-6 py-10">
+                    class="mt-2 flex justify-center rounded-lg border border-dashed  dark:border-[#3F4961] px-6 py-10">
                     <div class="text-center">
                         <DocumentIcon
                             class="mx-auto h-8 w-8 text-text-secondary"
@@ -249,7 +249,7 @@ const showResultModal = ref(false);
             </div>
 
             <div
-                class="flex items-center justify-end px-4 py-3 bg-card-background border-t border-card-background-separator text-end sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
+                class="flex items-center justify-end px-4 py-3 bg-card-background border-t  dark:border-[#3F4961] text-end sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
                 <PrimaryButton :loading @click="importData"
                     >Import Data
                 </PrimaryButton>

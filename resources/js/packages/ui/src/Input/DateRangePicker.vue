@@ -211,7 +211,7 @@ watch(open, (value) => {
             <button
                 :class="
                     twMerge(
-                        'flex w-full items-center justify-between whitespace-nowrap rounded-md border border-input-border bg-input-background px-3 h-[34px] shadow-sm data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
+                        'flex w-full items-center justify-between whitespace-nowrap rounded-md  dark:bg-[#0C101E]    hover:dark:bg-[#303F61] hover:text-gray-100 px-3 h-[34px] shadow-sm data-[placeholder]:dark:text-[#636E88] focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
                         !modelValue && 'text-muted-foreground'
                     )
                 ">
@@ -244,7 +244,7 @@ watch(open, (value) => {
                 <template v-else> Pick a date </template>
             </button>
         </PopoverTrigger>
-        <PopoverContent class="w-auto p-0">
+        <PopoverContent class="w-auto p-0 dark:text-[#BFC7D6]">
             <div class="flex divide-x divide-border-secondary">
                 <div
                     class="text-text-primary text-sm flex flex-col space-y-0.5 items-start py-2 px-2 [&_button:hover]:bg-tertiary [&_button]:rounded [&_button]:px-2 [&_button]:py-1">

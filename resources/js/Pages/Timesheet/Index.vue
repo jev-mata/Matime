@@ -8,14 +8,17 @@ import { ref } from 'vue';
 import dayjs from 'dayjs';
 
 import { router, usePage } from '@inertiajs/vue3';
-import { useNotificationsStore } from '@/utils/notification';
-import { SecondaryButton } from '@/packages/ui/src';
+import { useNotificationsStore } from '@/utils/notification'; 
 import PageTitle from '@/Components/Common/PageTitle.vue';
 import TabBarItem from '@/Components/Common/TabBar/TabBarItem.vue';
 import TabBar from '@/Components/Common/TabBar/TabBar.vue';
 import { HandThumbUpIcon } from '@heroicons/vue/20/solid';
 import isBetween from 'dayjs/plugin/isBetween';
 import axios from 'axios';
+import DangerButton from '@/packages/ui/src/Buttons/DangerButton.vue';
+import SecondaryButton from '@/packages/ui/src/Buttons/SecondaryButton.vue';
+import PrimaryButton from '@/packages/ui/src/Buttons/PrimaryButton.vue';
+import TimesheetTable from './Components/TimesheetTable.vue';
 dayjs.extend(isBetween);
 const activeTab = ref<'pending' | 'unsubmitted' | 'archive'>('pending');
 type Bimontly = {
@@ -150,7 +153,7 @@ function formatDate(dateString: string, format?: string) {
 <template>
     <AppLayout title="Dashboard" data-testid="dashboard_view">
         <MainContainer
-            class="py-5 border-b border-default-background-separator flex justify-between items-center w-full">
+            class="py-5 border-b dark:bg-[#171E31] dark:border-[#303F61] flex justify-between items-center w-full">
             <div class="flex items-center space-x-1 sm:space-x-3 w-full">
                 <PageTitle :icon="HandThumbUpIcon" title="Approval" />
                 <TabBar v-model="activeTab">
@@ -158,35 +161,35 @@ function formatDate(dateString: string, format?: string) {
                     <TabBarItem value="unsubmitted">Unsubmitted</TabBarItem>
                     <TabBarItem value="archive">Archive</TabBarItem>
                 </TabBar>
-                <div class="w-full flex items-end justify-end ">
-                    <SecondaryButton
+                <div class="w-full flex items-end justify-end  dark:text-[#7D88A1] ">
+                    <PrimaryButton
                         v-if="activeTab == 'archive'"
                         :loading="isLoading"
-                        class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                        class="border-0 px-2  mx-2 "
                         @click="UnsubmittedRemindAll('withdraw')">
                         WITHDRAW ALL
-                    </SecondaryButton>
-                    <SecondaryButton
+                    </PrimaryButton>
+                    <PrimaryButton
                         v-if="activeTab == 'unsubmitted'"
                         :loading="isLoading"
-                        class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                        class="border-0 px-2  mx-2 "
                         @click="UnsubmittedRemindAll('remind')">
                         REMIND ALL
-                    </SecondaryButton>
-                    <SecondaryButton
+                    </PrimaryButton>
+                    <PrimaryButton
                         v-if="activeTab == 'pending'"
                         :loading="isLoading"
-                        class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                        class="border-0 px-2  mx-2 "
                         @click="approveRejectAll('approve')">
                         APPROVE ALL
-                    </SecondaryButton>
-                    <SecondaryButton
+                    </PrimaryButton>
+                    <DangerButton
                         v-if="activeTab == 'pending'"
                         :loading="isLoading"
-                        class="border-0 px-2 bg-red-600 mx-2 text-quaternary"
+                        class="border-1 px-2  mx-2  "
                         @click="approveRejectAll('reject')">
                         REJECT ALL
-                    </SecondaryButton>
+                    </DangerButton>
                 </div>
             </div>
         </MainContainer>
@@ -209,35 +212,11 @@ function formatDate(dateString: string, format?: string) {
                     <template
                         v-for="(userEntries, period) in page.props.grouped"
                         :key="period">
-                        <div
-                            class="p-3 font-bold"
-                            :class="
-                                getPeriodInfo(period).isHighlighted
-                                    ? 'bg-green-900 text-white'
-                                    : 'bg-transparent'
-                            ">
-                            {{ formatDate(period) }} -
-                            {{ getPeriodInfo(period).endDate }}
-                        </div>
-                        <a
-                            v-for="entry in userEntries"
-                            :key="entry.user.id"
-                            class="flex border p-3"
-                            :href="
-                                route('approval.ApprovalOverview', {
-                                    user_id: entry.user.member.id,
-                                    date_start: period,
-                                    date_end: getPeriodInfo(period).endDate2,
-                                })
-                            ">
-                            <div class="flex-1">{{ entry.user.name }}</div>
-                            <div class="flex-1">
-                                {{
-                                    entry.user.groups?.[0]?.manager?.name ?? '—'
-                                }}
-                            </div>
-                            <div class="flex-1">{{ entry.totalHours }}</div>
-                        </a>
+                        <TimesheetTable
+                            :get-period-info="getPeriodInfo"
+                            :format-date="formatDate"
+                            :period="period"
+                            :user-entries="userEntries" />
                     </template>
                 </div>
                 <div
@@ -257,35 +236,12 @@ function formatDate(dateString: string, format?: string) {
                         v-for="(userEntries, period) in page.props
                             .unsubmitted_grouped"
                         :key="period">
-                        <div
-                            class="p-3 font-bold"
-                            :class="
-                                getPeriodInfo(period).isHighlighted
-                                    ? 'bg-green-900 text-white'
-                                    : 'bg-transparent'
-                            ">
-                            {{ formatDate(period) }} -
-                            {{ getPeriodInfo(period).endDate }}
-                        </div>
-                        <a
-                            v-for="entry in userEntries"
-                            :key="entry.user.id"
-                            class="flex border p-3"
-                            :href="
-                                route('approval.ApprovalOverview', {
-                                    user_id: entry.user.member.id,
-                                    date_start: period,
-                                    date_end: getPeriodInfo(period).endDate2,
-                                })
-                            ">
-                            <div class="flex-1">{{ entry.user.name }}</div>
-                            <div class="flex-1">
-                                {{
-                                    entry.user.groups?.[0]?.manager?.name ?? '—'
-                                }}
-                            </div>
-                            <div class="flex-1">{{ entry.totalHours }}</div>
-                        </a>
+                        
+                        <TimesheetTable
+                            :get-period-info="getPeriodInfo"
+                            :format-date="formatDate"
+                            :period="period"
+                            :user-entries="userEntries" />
                     </template>
                 </div>
                 <div
@@ -305,35 +261,11 @@ function formatDate(dateString: string, format?: string) {
                         v-for="(userEntries, period) in page.props
                             .archive_grouped"
                         :key="period">
-                        <div
-                            class="p-3 font-bold"
-                            :class="
-                                getPeriodInfo(period).isHighlighted
-                                    ? 'bg-green-900 text-white'
-                                    : 'bg-transparent'
-                            ">
-                            {{ formatDate(period) }} -
-                            {{ getPeriodInfo(period).endDate }}
-                        </div>
-                        <a
-                            v-for="entry in userEntries"
-                            :key="entry.user.id"
-                            class="flex border p-3"
-                            :href="
-                                route('approval.ApprovalOverview', {
-                                    user_id: entry.user.member.id,
-                                    date_start: period,
-                                    date_end: getPeriodInfo(period).endDate2,
-                                })
-                            ">
-                            <div class="flex-1">{{ entry.user.name }}</div>
-                            <div class="flex-1">
-                                {{
-                                    entry.user.groups?.[0]?.manager?.name ?? '—'
-                                }}
-                            </div>
-                            <div class="flex-1">{{ entry.totalHours }}</div>
-                        </a>
+                        <TimesheetTable
+                            :get-period-info="getPeriodInfo"
+                            :format-date="formatDate"
+                            :period="period"
+                            :user-entries="userEntries" />
                     </template>
                 </div>
             </div>

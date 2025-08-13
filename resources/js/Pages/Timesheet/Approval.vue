@@ -117,7 +117,7 @@ function duration(entry: { start: string; end: string }) {
         <h2 class="text-lg font-semibold mb-1">My Entries</h2>
         <div class="text-md mb-2">{{ formattedFrom }} - {{ formattedTo }}</div>
         <div class="max-h-20 overflow-y-scroll " style="max-height: 50vh;">
-          <div v-for="(entries, date2) in props.entries" :key="date2" class="mt-4 mb-4 border">
+          <div v-for="(entries, date2) in props.entries" :key="date2" class="mt-4 mb-4 border dark:border-[#303F61]">
             <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">{{ formatDate(date2) }}</h2>
 
             <ul class="">
@@ -131,7 +131,7 @@ function duration(entry: { start: string; end: string }) {
                 </div>
                 <div class="basis-64">
 
-                  <ProjectBadge v-if="entry.project" :color="entry.project.color" :size="'large'" :border="true" :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative '
+                  <ProjectBadge v-if="entry.project" :color="entry.project.color" :size="'large'" :border="true" :class="'focus:border-border-tertiary w-full  dark:border-[#303F61] focus:outline-0 focus:bg-card-background-separator min-w-0 relative '
                     ">
 
                     <div class="flex items-center lg:space-x-1 min-w-0">

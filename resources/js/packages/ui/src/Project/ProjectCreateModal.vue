@@ -81,7 +81,7 @@ const currentClientName = computed(() => {
 
         <template #content>
             <div
-                class="sm:flex items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                class="sm:flex items-center space-y-2 sm:space-y-0 sm:space-x-4 ">
                 <div class="flex-1 flex items-center">
                     <div class="text-center pr-5">
                         <InputLabel for="color" value="Color" />
@@ -114,7 +114,7 @@ const currentClientName = computed(() => {
                         <template #trigger>
                             <Badge
                                 tag="button"
-                                class="bg-input-background cursor-pointer hover:bg-tertiary"
+                                class=" dark:bg-[#0F1426] dark:border-[#303F61] hover:dark:bg-[#3F4961] cursor-pointer  "
                                 size="xlarge">
                                 <div class="flex items-center space-x-2">
                                     <UserCircleIcon

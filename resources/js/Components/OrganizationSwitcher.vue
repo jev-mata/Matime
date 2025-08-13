@@ -35,7 +35,7 @@ const switchToTeam = (organization: Organization) => {
         <template #trigger>
             <div
                 data-testid="organization_switcher"
-                class="flex hover:bg-white/10 cursor-pointer transition px-2 py-1 rounded-lg w-full items-center justify-between font-medium">
+                class="flex hover:bg-white/10 cursor-pointer transition px-2 py-1 rounded-lg w-full items-center justify-between font-medium ">
                 <div
                     class="flex flex-1 space-x-2 items-center w-[calc(100%-30px)]">
                     <div
@@ -61,14 +61,14 @@ const switchToTeam = (organization: Organization) => {
         </template>
 
         <template #content>
-            <div class="w-60">
+            <div class="w-60 dark:bg-[#171E31] bg-[#171E31] dark:text-[#BFC7D6] text-[#BFC7D6] dark:border-[#303F61]  border-[#303F61] ">
                 <!-- Organization Management -->
                 <div class="block px-4 py-2 text-xs text-text-secondary">
                     Manage Organization
                 </div>
 
                 <!-- Organization Settings -->
-                <DropdownLink
+                <DropdownLink class="cursor-pointer hover:dark:text-[#636E88]"
                     :href="
                         route(
                             'teams.show',
@@ -78,13 +78,13 @@ const switchToTeam = (organization: Organization) => {
                     Organization Settings
                 </DropdownLink>
 
-                <DropdownLink
+                <DropdownLink  class="cursor-pointer hover:dark:text-[#636E88]"
                     v-if="canManageBilling() && isBillingActivated()"
                     href="/billing">
                     Billing
                 </DropdownLink>
 
-                <DropdownLink
+                <DropdownLink  class="cursor-pointer hover:dark:text-[#636E88]"
                     v-if="page.props.jetstream.canCreateTeams"
                     :href="route('teams.create')">
                     Create new organization
@@ -92,7 +92,7 @@ const switchToTeam = (organization: Organization) => {
 
                 <!-- Organization Switcher -->
                 <template v-if="page.props.auth.user.all_teams.length > 1">
-                    <div class="border-t border-card-background-separator" />
+                    <div class="border-t  border-[#303F61] " />
 
                     <div class="block px-4 py-2 text-xs text-text-secondary">
                         Switch Organizations

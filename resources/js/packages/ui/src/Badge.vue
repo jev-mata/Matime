@@ -26,7 +26,7 @@ const badgeClasses = {
 
 const borderClasses = computed(() => {
     if (props.border) {
-        return 'border-input-border border';
+        return ' border border-[#388A7B] bg-[#173937] hover:bg-[#1B2A28] dark:text-[#BFC7D6] ';
     }
     return '';
 });

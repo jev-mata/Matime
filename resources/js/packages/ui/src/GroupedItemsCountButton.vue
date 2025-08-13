@@ -9,15 +9,15 @@ const props = withDefaults(
     }>(),
     {
         expanded: false,
-        size: 'w-7 h-7',
+        size: 'w-5 h-5',
     }
 );
 
 const expandedStatusClasses = computed(() => {
     if (props.expanded) {
-        return 'border-card-border border bg-card-background-active text-text-primary';
+        return 'dark:border-[#0C101E] dark:bg-[#0C101E] bg-[#E0E3E6] ';
     }
-    return 'border-card-border border bg-card-background hover:bg-card-background-active hover:text-text-primary transition text-text-secondary';
+    return 'dark:border-[#0C101E] dark:bg-[#0C101E] bg-[#E0E3E6] hover:bg-card-background-active hover:transition text-text-secondary';
 });
 </script>
 
@@ -25,7 +25,7 @@ const expandedStatusClasses = computed(() => {
     <button
         :class="
             twMerge(
-                'font-medium rounded flex items-center transition justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent',
+                'ml-2 font-medium rounded flex text-xs items-center transition justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent',
                 expandedStatusClasses,
                 props.size
             )

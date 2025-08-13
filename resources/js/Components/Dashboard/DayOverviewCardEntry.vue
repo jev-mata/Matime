@@ -18,9 +18,9 @@ defineProps<{
 
 <template>
     <div
-        class="px-3.5 py-2 flex justify-between @container border-b border-card-background-separator">
+        class="px-3.5 py-2 flex justify-between @container    dark:text-[#BFC7D6]">
         <div class="flex items-center min-w-[70px]">
-            <p class="font-semibold text-sm text-text-primary">
+            <p class=" text-sm text-text-primary">
                 {{ formatHumanReadableDate(date) }}
             </p>
         </div>

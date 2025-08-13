@@ -79,7 +79,7 @@ const updateTeamName = () => {
                     id="name"
                     v-model="form.name"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full "
                     :disabled="!permissions.canUpdateTeam" />
 
                 <InputError :message="form.errors.name" class="mt-2" />
@@ -93,7 +93,7 @@ const updateTeamName = () => {
                     v-model="form.currency"
                     name="currency"
                     :disabled="!permissions.canUpdateTeam"
-                    class="mt-1 block w-full border-input-border bg-input-background text-text-primary focus:border-input-border-active rounded-md shadow-sm">
+                    class="mt-1 block w-full dark:border-[#0C101E]   dark:text-[#BFC7D6] dark:bg-[#0C101E] focus:border-input-border-active rounded-md shadow-sm">
                     <option value="" disabled>Select a currency</option>
                     <option
                         v-for="(currencyTranslated, currencyKey) in $page.props

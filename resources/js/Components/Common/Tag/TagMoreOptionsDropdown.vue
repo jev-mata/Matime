@@ -36,11 +36,11 @@ const props = defineProps<{
                 </svg>
             </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="min-w-[150px]" align="end">
+        <DropdownMenuContent class="min-w-[150px] dark:border-[#303F61] dark:bg-[#0F1426] " align="end">
             <DropdownMenuItem
                 :aria-label="'Delete Tag ' + props.tag.name"
                 data-testid="tag_delete"
-                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive"
+                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6] "
                 @click="emit('delete')">
                 <TrashIcon class="w-5" />
                 <span>Delete</span>

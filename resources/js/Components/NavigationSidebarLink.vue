@@ -13,8 +13,8 @@ defineProps<{
     <Link :href="href" class="block group">
     <div :class="[
         current
-            ? ' bg-menu-active text-text-primary'
-            : 'text-text-secondary group-hover:text-text-primary group-hover:bg-menu-active ',
+            ? 'dark:text-[#CDD3DF] '
+            : 'dark:text-[#636E88]  group-hover:text-[#CDD3DF] ',
         'relative group flex gap-x-2 rounded-md transition leading-6 py-1 px-2 font-medium text-sm items-center',
     ]">
         <component :is="icon" v-if="icon" :class="[

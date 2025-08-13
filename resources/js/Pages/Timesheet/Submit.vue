@@ -175,15 +175,15 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
 <template>
   <Modal :show="true" max-width="5xl">
     <template #default>
-      <div class="col-span-full my-1 p-5">
+      <div class="col-span-full my-1 px-5 pt-5">
         <h2 class="text-lg font-semibold mb-1">My Entries</h2> 
         <div class="max-h-20 overflow-y-scroll " style="max-height: 50vh;">
-          <div v-for="(entries, date2) in props.groupEntries" :key="date2" class="mt-4 mb-4 border">
+          <div v-for="(entries, date2) in props.groupEntries" :key="date2" class="mt-4 mb-4   dark:bg-[#171E31] bg-[#E0E3E5] rounded-lg">
             <h2 class="font-semibold text-md py-2 px-3 bg-quaternary text-secondary">2{{ date2 }}
             </h2>
 
             <ul class="">
-              <li v-for="(entry) in entries" :key="entry.id" class="flex flex-row px-3 rounded border py-2">
+              <li v-for="(entry) in entries" :key="entry.id" class="flex flex-row px-3 rounded border dark:border-[#303F61] dark:bg-[#171E31] bg-[#F3F3F4] py-2">
 
                 <div class="basis-64 flex content-center">
                   {{ formatTime(entry.start) }} - {{ entry.end && formatTime(entry.end) }}
@@ -197,8 +197,8 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
                 <div class="basis-64">
 
                   <ProjectBadge v-if="entry.project_id" :color="selectProject(entry.project_id, props.projects)?.color"
-                    :size="'large'" :border="true" :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative '
-                      ">
+                    :size="'large'" :border="true" :class="'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative  dark:bg-[#171E31] bg-[#E0E3E5]'" :project="selectProject(entry.project_id, props.projects)"
+                      >
 
                     <div class="flex items-center lg:space-x-1 min-w-0">
                       <span class="whitespace-nowrap text-xs lg:text-sm">
@@ -227,7 +227,7 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
         </div>
 
         <div
-          class=" text-muted-foreground text-sm bold text-text-primary font-semibold text-sm lg:text-base flex items-center ">
+          class=" text-muted-foreground text-sm bold text-text-primary font-semibold text-sm lg:text-base flex items-center mt-2">
           Total Hours:
           <component :is="ClockIcon" v-if="ClockIcon" class="w-5 lg:w-4 text-icon-default ml-2 mr-1"></component>
           <div>{{ durationAll(props.groupEntries) }}</div>
@@ -239,12 +239,12 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
       <form @submit.prevent="submit" class="space-y-4 w-full px-5 pb-5">
         <div class="flex w-full items-center space-x-2 lg:space-x-2.5">
 
-                    <SecondaryButton class="px-4 py-2 bg-blue-600 text-white rounded"
+                    <SecondaryButton class="px-4 py-2  text-white rounded"
                         :loading="isLoading"
                         @click="emit('clear')">Close
                     </SecondaryButton> 
 
-                    <SecondaryButton   type="submit" class="px-4 py-2 bg-green-600 text-white rounded"
+                    <SecondaryButton   type="submit" class="px-4 py-2  text-white rounded"
                         :loading="isLoading"
                          >Submit
                     </SecondaryButton>  

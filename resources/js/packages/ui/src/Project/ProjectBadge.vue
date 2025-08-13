@@ -16,7 +16,7 @@ const props = withDefaults(
         size: 'base',
         tag: 'div',
         color: 'var(--theme-color-icon-default)',
-        border: true,
+        border: false,
     }
 );
 
@@ -29,15 +29,12 @@ const indicatorClasses = {
 
 <template>
     <Badge :name :size :tag :class="props.class" :color :border>
-        <div
-            :style="{ backgroundColor: props.color }"
-            :class="
-                twMerge(
-                    indicatorClasses[size],
-                    'inline-block rounded-full shrink-0'
-                )
+        <div :style="{ backgroundColor: props.color, color: color }" :class="twMerge(
+            indicatorClasses[size],
+            'inline-block rounded-full shrink-0'
+        )
             "></div>
-        <div class="min-w-0">
+        <div class="min-w-0"  :style="{   color: color, fontWeight:'normal !important'  }">
             <slot>
                 {{ name }}
             </slot>

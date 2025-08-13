@@ -184,7 +184,7 @@ const showCreateTagModal = ref(false);
                     ref="searchInput"
                     :value="searchValue"
                     data-testid="tag_dropdown_search"
-                    class="bg-card-background border-0 placeholder-muted text-sm text-text-primary py-2.5 focus:ring-0 border-b border-card-background-separator focus:border-card-background-separator w-full"
+                    class="dark:bg-[#171E31] dark:text-[#BFC7D6] border-0 placeholder-muted text-sm text-text-primary py-2.5 focus:ring-0 border-b border-card-background-separator focus:border-card-background-separator w-full"
                     placeholder="Search for a Tag..."
                     @input="updateSearchValue"
                     @keydown.esc.prevent="open = false"
@@ -211,7 +211,7 @@ const showCreateTagModal = ref(false);
                 </div>
                 <div class="hover:bg-card-background-active rounded-b-lg">
                     <button
-                        class="text-text-primary w-full flex space-x-3 items-center px-4 py-3 text-xs font-semibold border-t border-card-background-separator"
+                        class="dark:bg-[#171E31] dark:text-[#BFC7D6]  w-full flex space-x-3 items-center px-4 py-3 text-xs font-semibold border-t dark:border-[#303F61] "
                         @click="
                         open = false;
                         showCreateTagModal = true;

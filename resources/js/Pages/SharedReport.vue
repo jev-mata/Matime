@@ -183,9 +183,9 @@ onMounted(async () => {
 <template>
     <Head :title="sharedReportResponseData?.name" />
 
-    <div class="text-text-secondary">
+    <div class="text-text-secondary  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#BFC7D6] ">
         <MainContainer
-            class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
+            class="py-3 sm:py-5 border-b dark:border-[#3F4961]  flex justify-between items-center ">
             <div class="flex items-center space-x-3 sm:space-x-6">
                 <PageTitle :icon="ChartBarIcon" title="Reporting"></PageTitle>
             </div>
@@ -202,9 +202,9 @@ onMounted(async () => {
         <MainContainer>
             <div class="sm:grid grid-cols-4 pt-6 items-start">
                 <div
-                    class="col-span-3 bg-card-background rounded-lg border border-card-border pt-3">
+                    class="col-span-3 bg-card-background rounded-lg border dark:border-[#3F4961]  pt-3">
                     <div
-                        class="text-sm flex text-text-primary items-center font-medium px-6 border-b border-card-background-separator pb-3">
+                        class="text-sm flex text-text-primary items-center font-medium px-6 border-b dark:border-[#3F4961]  pb-3">
                         Group by
                         <strong class="px-2">{{ getGroupLabel(group) }}</strong>
                         and
@@ -213,13 +213,12 @@ onMounted(async () => {
                         }}</strong>
                     </div>
                     <div
-                        class="grid items-center"
-                        style="grid-template-columns: 1fr 100px 150px">
+                        class="grid items-center "
+                        style="grid-template-columns: 1fr 100px  ">
                         <div
-                            class="contents [&>*]:border-card-background-separator [&>*]:border-b [&>*]:bg-tertiary [&>*]:pb-1.5 [&>*]:pt-1 text-text-secondary text-sm">
+                            class="contents [&>*]:dark:border-[#3F4961]  [&>*]:border-b [&>*]:bg-tertiary [&>*]:pb-1.5 [&>*]:pt-1 text-text-secondary text-sm">
                             <div class="pl-6">Name</div>
-                            <div class="text-right">Duration</div>
-                            <div class="text-right pr-6">Cost</div>
+                            <div class="text-right pr-2">Duration</div> 
                         </div>
                         <template
                             v-if="
@@ -231,15 +230,18 @@ onMounted(async () => {
                                 v-for="entry in tableData"
                                 :key="entry.description ?? 'none'"
                                 :currency="reportCurrency"
-                                :currency-format="reportCurrencyFormat"
+                                :currency-format="reportCurrencyFormat" 
+                                :grouped-type="
+                                aggregatedTableTimeEntries.grouped_type
+                                "
                                 :entry="entry"></ReportingRow>
                             <div
-                                class="contents [&>*]:transition text-text-tertiary [&>*]:h-[50px]">
+                                class="contents [&>*]:transition text-text-tertiary [&>*]:h-[50px] ">
                                 <div class="flex items-center pl-6 font-medium">
                                     <span>Total</span>
                                 </div>
                                 <div
-                                    class="justify-end flex items-center font-medium">
+                                    class="justify-end flex items-center font-medium pr-2">
                                     {{
                                         formatHumanReadableDuration(
                                             aggregatedTableTimeEntries.seconds,
@@ -247,18 +249,7 @@ onMounted(async () => {
                                             reportNumberFormat
                                         )
                                     }}
-                                </div>
-                                <div
-                                    class="justify-end pr-6 flex items-center font-medium">
-                                    {{
-                                        formatCents(
-                                            aggregatedTableTimeEntries.cost,
-                                            reportCurrency,
-                                            reportCurrencyFormat,
-                                            reportCurrencySymbol
-                                        )
-                                    }}
-                                </div>
+                                </div> 
                             </div>
                         </template>
                         <div

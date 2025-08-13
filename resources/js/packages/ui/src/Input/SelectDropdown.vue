@@ -175,12 +175,12 @@ watch(open, () => {
                 ref="dropdownViewport"
                 :class="
                     twMerge(
-                        'w-60 py-1.5 max-h-60 overflow-y-scroll',
+                        'py-1.5 max-h-60 overflow-y-scroll  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1]',
                         props.class
                     )
                 ">
                 <div
-                    v-for="item in filteredItems"
+                    v-for="item in filteredItems" class="hover:dark:border-y dark:border-[#303F61] px-5 "
                     :key="props.getKeyFromItem(item) ?? 'none'"
                     role="option"
                     :data-select-id="props.getKeyFromItem(item)"

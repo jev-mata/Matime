@@ -290,7 +290,7 @@ const tableData = computed(() => {
         v-model:show="showExportModal"
         :export-url="exportUrl"></ReportingExportModal>
     <MainContainer
-        class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
+        class="py-3 sm:py-5 dark:border-[#3F4961] flex justify-between items-center dark:bg-[#171E31]">
         <div class="flex items-center space-x-3 sm:space-x-6">
             <PageTitle :icon="ChartBarIcon" title="Reporting"></PageTitle>
             <ReportingTabNavbar active="reporting"></ReportingTabNavbar>
@@ -302,7 +302,7 @@ const tableData = computed(() => {
                 :report-properties="reportProperties"></ReportSaveButton>
         </div>
     </MainContainer>
-    <div class="py-2.5 w-full border-b border-default-background-separator">
+    <div class="py-2.5 w-full dark:border-[#3F4961] dark:bg-[#171E31]">
         <MainContainer class="sm:flex space-y-4 sm:space-y-0 justify-between">
             <div
                 class="flex flex-wrap items-center space-y-2 sm:space-y-0 space-x-4">
@@ -365,7 +365,7 @@ const tableData = computed(() => {
                     </template>
                 </TagDropdown>
 
-                <SelectDropdown
+                <!-- <SelectDropdown
                     v-model="billable"
                     :get-key-from-item="(item) => item.value"
                     :get-name-for-item="(item) => item.label"
@@ -394,7 +394,7 @@ const tableData = computed(() => {
                             "
                             :icon="BillableIcon"></ReportingFilterBadge>
                     </template>
-                </SelectDropdown>
+                </SelectDropdown> -->
             </div>
             <div>
                 <DateRangePicker
@@ -416,13 +416,13 @@ const tableData = computed(() => {
     <MainContainer>
         <div class="sm:grid grid-cols-4 pt-6 items-start">
             <div
-                class="col-span-3 bg-card-background rounded-lg border border-card-border pt-3">
+                class="col-span-3 dark:bg-[#171E31] rounded-lg">
                 <div
-                    class="text-sm flex text-text-primary items-center space-x-3 font-medium px-6 border-b border-card-background-separator pb-3">
+                    class="text-sm flex text-text-primary rounded-t-lg pt-3 dark:bg-[#0C101E] items-center space-x-3 font-medium px-6  pb-3">
                     <span>Group by</span>
                     <ReportingGroupBySelect
                         v-model="group"
-                        :group-by-options="groupByOptions"
+                        :group-by-options="groupByOptions" 
                         @changed="
                             updateTableReporting
                         "></ReportingGroupBySelect>
@@ -437,13 +437,12 @@ const tableData = computed(() => {
                         "></ReportingGroupBySelect>
                 </div>
                 <div
-                    class="grid items-center"
-                    style="grid-template-columns: 1fr 100px 150px">
+                    class="grid items-center pt-3 pr-5" 
+                    style="grid-template-columns: 1fr 100px">
                     <div
-                        class="contents [&>*]:border-card-background-separator [&>*]:border-b [&>*]:bg-tertiary [&>*]:pb-1.5 [&>*]:pt-1 text-text-secondary text-sm">
+                        class="contents [&>*]: [&>*]:[&>*]:bg-tertiary [&>*]:pb-1.5 [&>*]:pt-1 text-text-secondary text-sm">
                         <div class="pl-6">Name</div>
-                        <div class="text-right">Duration</div>
-                        <div class="text-right pr-6">Cost</div>
+                        <div class="text-right">Duration</div> 
                     </div>
                     <template
                         v-if="
@@ -470,21 +469,7 @@ const tableData = computed(() => {
                                         organization?.number_format
                                     )
                                 }}
-                            </div>
-                            <div
-                                class="justify-end pr-6 flex items-center font-medium">
-                                {{
-                                    aggregatedTableTimeEntries.cost
-                                        ? formatCents(
-                                              aggregatedTableTimeEntries.cost,
-                                              getOrganizationCurrencyString(),
-                                              organization?.currency_format,
-                                              organization?.currency_symbol,
-                                              organization?.number_format
-                                          )
-                                        : '--'
-                                }}
-                            </div>
+                            </div> 
                         </div>
                     </template>
                     <div

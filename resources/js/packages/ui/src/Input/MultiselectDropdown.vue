@@ -159,7 +159,7 @@ const highlightedItem = computed(() => {
             <input
                 ref="searchInput"
                 :value="searchValue"
-                class="bg-card-background border-0 placeholder-muted text-sm text-text-primary py-2.5 focus:ring-0 border-b border-card-background-separator focus:border-card-background-separator w-full"
+                class="border-0 placeholder-muted text-sm font-bold dark:text-[#BFC7D6]  dark:bg-[#171E31]   py-2.5 focus:ring-0 border-b   focus:border-card-background-separator w-full"
                 :placeholder="searchPlaceholder"
                 @input="updateSearchValue"
                 @keydown.up.prevent="moveHighlightUp"
@@ -173,16 +173,18 @@ const highlightedItem = computed(() => {
                     :key="props.getKeyFromItem(item)"
                     role="option"
                     :value="props.getKeyFromItem(item)"
+                    :style="{color:item?.color}"
                     :class="{
-                        'bg-card-background-active':
+                        'dark:bg-[#303F61] dark:text-[#BFC7D6]':
                             props.getKeyFromItem(item) === highlightedItemId,
                     }"
-                    :data-item-id="props.getKeyFromItem(item)">
+                    :data-item-id="props.getKeyFromItem(item)"> 
                     <MultiselectDropdownItem
                         :selected="isItemSelected(props.getKeyFromItem(item))"
                         :name="
                             props.getNameForItem(item)
-                        "
+                        " 
+                    :style="{color:item?.color}"
                         @click="toggleItem(props.getKeyFromItem(item))"></MultiselectDropdownItem>
                 </div>
             </div>

@@ -56,7 +56,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     v-bind="forwarded" 
     :locale="locale"
     :format-options="formatOptions"
-    :class="cn('grid gap-1.5', props.class)">
+    :class="cn('grid gap-1.5', props.class,'dark:bg-[#0C101E] dark:text-[#BFC7D6]  dark:border-[#0C101E]')">
     <slot />
   </NumberFieldRoot>
 </template>

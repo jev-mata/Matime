@@ -27,7 +27,7 @@ const props = defineProps<{
     <DropdownMenu>
         <DropdownMenuTrigger as-child>
             <button
-                class="focus-visible:outline-none focus-visible:bg-card-background rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:opacity-100 hover:bg-card-background group-hover:opacity-100 opacity-20 transition-opacity text-text-secondary"
+                class="focus-visible:outline-none focus-visible:dark:bg-[#3F4961]  rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:opacity-100 hover:dark:bg-[#3F4961] group-hover:opacity-100 opacity-20 transition-opacity dark:text-[#BFC7D6]"
                 :aria-label="'Actions for Project ' + props.project.name">
                 <svg
                     class="h-8 w-8 p-1 rounded-full"
@@ -43,12 +43,12 @@ const props = defineProps<{
                 </svg>
             </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="min-w-[150px]" align="end">
+        <DropdownMenuContent class="min-w-[150px] dark:bg-[#0F1426]  dark:border-[#303F61] " align="end">
             <DropdownMenuItem
                 v-if="canUpdateProjects()"
                 :aria-label="'Edit Project ' + props.project.name"
                 data-testid="project_edit"
-                class="flex items-center space-x-3 cursor-pointer"
+                class="flex items-center space-x-3 cursor-pointer  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click.prevent="emit('edit')">
                 <PencilSquareIcon class="w-5 text-icon-active" />
                 <span>Edit</span>
@@ -56,7 +56,7 @@ const props = defineProps<{
             <DropdownMenuItem
                 v-if="canUpdateProjects()"
                 :aria-label="'Archive Project ' + props.project.name"
-                class="flex items-center space-x-3 cursor-pointer"
+                class="flex items-center space-x-3 cursor-pointer  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click.prevent="emit('archive')">
                 <ArchiveBoxIcon class="w-5 text-icon-active" />
                 <span>{{ project.is_archived ? 'Unarchive' : 'Archive' }}</span>
@@ -65,7 +65,7 @@ const props = defineProps<{
                 v-if="canDeleteProjects()"
                 :aria-label="'Delete Project ' + props.project.name"
                 data-testid="project_delete"
-                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive"
+                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive  dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
                 @click.prevent="emit('delete')">
                 <TrashIcon class="w-5" />
                 <span>Delete</span>

@@ -555,11 +555,11 @@ const showCreateProject = ref(false);
             <span>Add new project</span>
         </Badge>
     </div>
-    <Dropdown v-else v-model="open" :close-on-content-click="false" align="center">
+    <Dropdown v-else v-model="open" :close-on-content-click="false" align="center" class="">
         <template #trigger>
             <ProjectBadge ref="projectDropdownTrigger" :color="selectedProjectColor" :size="size"
                 :border="showBadgeBorder" tag="button" :name="selectedProjectName" :class="twMerge(
-                    'focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative',
+                    'focus:dark:border-[#5D6370] w-full focus:outline-0 focus:dark:bg-[#0C101E] min-w-0 relative dark:text-[#7D88A1] hover:dark:bg-[#0C101E]',
                     props.class
                 )
                     ">
@@ -587,12 +587,12 @@ const showCreateProject = ref(false);
         <template #content>
             <UseFocusTrap v-if="open" :options="{ immediate: true, allowOutsideClick: true }">
                 <input ref="searchInput" :value="searchValue" data-testid="client_dropdown_search"
-                    class="bg-card-background border-0 placeholder-muted text-sm text-text-primary py-2.5 focus:ring-0 border-b border-card-background-separator focus:border-card-background-separator w-full"
+                    class="dark:bg-[#13192B] border-0 placeholder-muted text-sm text-text-primary py-2.5 focus:ring-0 border-b  dark:border-[#5D6370] focus:dark:border-[#5D6370] w-full"
                     placeholder="Search for a project or task..." @input="updateSearchValue"
                     @keydown.enter.prevent="addClientIfNoneExists" @keydown.esc.prevent="open = false"
                     @keydown.up.prevent="moveHighlightUp" @keydown.down.prevent="moveHighlightDown"
                     @keydown.right.prevent="expandProject" @keydown.left.prevent="collapseProject" />
-                <div ref="dropdownViewport" class="min-w-[350px] max-h-[350px] overflow-y-scroll relative"
+                <div ref="dropdownViewport" class="min-w-[350px] max-h-[350px] overflow-y-scroll relative dark:bg-[#13192B]  dark:text-[#7D88A1]"
                     @mousemove="mouseEnterHighlightActivated = true">
                     <template v-for="client in filteredResults" :key="client.id">
                         <div v-if="client.id !== 'no_project_no_client'"
@@ -662,9 +662,9 @@ const showCreateProject = ref(false);
                         </template>
                     </template>
                 </div>
-                <div v-if="canCreateProject" class="hover:bg-card-background-active rounded-b-lg">
+                <div v-if="canCreateProject" class="hover:bg-card-background-active rounded-b-lg dark:bg-[#13192B]  dark:text-[#7D88A1] border-t  dark:border-[#5D6370]">
                     <button
-                        class="text-text-primary flex space-x-3 items-center px-4 py-3 text-xs font-semibold border-t border-card-background-separator"
+                        class="text-text-primary flex space-x-3 items-center px-4 py-3 text-xs font-semibold  "
                         @click="
                             open = false;
                         showCreateProject = true;

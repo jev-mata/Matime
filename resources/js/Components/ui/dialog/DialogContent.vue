@@ -25,27 +25,19 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 <template>
   <DialogPortal>
     <DialogOverlay
-      class="fixed inset-0 z-50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-    >
-    <div
-                            class="absolute inset-0 bg-default-background opacity-30" />
-</DialogOverlay>
-    <DialogContent
-      v-bind="forwarded"
-      :class="
-        cn(
-          'fixed top-0 left-0 z-50 w-screen h-screen flex items-start pt-6 md:pt-20 xl:pt-32 justify-center overflow-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-          
-        )"
-    >
-    <div
-:class="cn(
-          'bg-default-background grid w-full max-w-lg border shadow-lg duration-200 sm:rounded-lg',
-          props.class,
-        )"
-      >
+      class="fixed inset-0 z-50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+      <div class="absolute inset-0  dark:bg-[#13192B] bg-[#E0E3E5] dark:text-[#BFC7D6]  opacity-30" />
+    </DialogOverlay>
+    <DialogContent v-bind="forwarded" :class="cn(
+      'fixed top-0 left-0 z-50 w-screen h-screen flex items-start pt-6 md:pt-20 xl:pt-32 justify-center overflow-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+
+    )">
+      <div :class="cn(
+        ' dark:bg-[#13192B]  bg-white dark:text-[#BFC7D6] grid w-full max-w-lg border border-[#303F61] shadow-lg duration-200 sm:rounded-lg',
+        props.class,
+      )">
         <slot />
-    </div>
+      </div>
     </DialogContent>
   </DialogPortal>
 </template>

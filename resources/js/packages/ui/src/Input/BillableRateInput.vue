@@ -28,13 +28,13 @@ function formatValue(modelValue: number | null) {
 </script>
 
 <template>
-    <div class="relative">
+    <div class="relative ">
         <NumberField
             :id="name"
             ref="billableRateInput"
             :model-value="formatValue(model)"
             :step-snapping="false"
-            class="block w-full"
+            class="block w-full dark:bg-[#0C101E] dark:text-[#BFC7D6]  dark:border-[#0C101E]"
             :format-options="{
                 style: 'currency',
                 currency: currency,

@@ -31,15 +31,15 @@ function onCopyClick() {
                 </svg>
             </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="min-w-[150px]" align="end">
+        <DropdownMenuContent class="min-w-[150px] dark:bg-[#0F1426] dark:border-[#303F61]" align="end">
             <DropdownMenuItem v-if="haveduplicate" data-testid="time_entry_duplicate"
-                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive"
+                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive hover:dark:bg-[#171E31] hover:dark:text-[#BFC7D6] dark:text-[#636E88]"
                 @click="onCopyClick">
                 <DocumentDuplicateIcon class="w-5" />
                 <span>Duplicate</span>
             </DropdownMenuItem>
             <DropdownMenuItem data-testid="time_entry_delete"
-                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive"
+                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive  hover:dark:bg-[#171E31] hover:dark:text-[#BFC7D6] dark:text-[#636E88] "
                 @click="emit('delete')">
                 <TrashIcon class="w-5" />
                 <span>Delete</span>

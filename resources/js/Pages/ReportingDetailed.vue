@@ -255,8 +255,8 @@ async function downloadExport(format: ExportFormat) {
             v-model:show="showExportModal"
             :export-url="exportUrl"></ReportingExportModal>
         <MainContainer
-            class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
-            <div class="flex items-center space-x-3 sm:space-x-6">
+            class="py-3 sm:py-5 border-b dark:border-[#3F4961] dark:bg-[#171E31] flex justify-between items-center">
+            <div class="flex items-center space-x-3 sm:space-x-6 ">
                 <PageTitle :icon="ChartBarIcon" title="Reporting"></PageTitle>
                 <ReportingTabNavbar active="detailed"></ReportingTabNavbar>
             </div>
@@ -264,7 +264,7 @@ async function downloadExport(format: ExportFormat) {
                 :download="downloadExport"></ReportingExportButton>
         </MainContainer>
 
-        <div class="py-2.5 w-full border-b border-default-background-separator">
+        <div class="py-2.5 w-full border-b dark:border-[#3F4961] dark:bg-[#171E31]">
             <MainContainer
                 class="sm:flex space-y-4 sm:space-y-0 justify-between">
                 <div
@@ -442,9 +442,9 @@ async function downloadExport(format: ExportFormat) {
             show-edges>
             <PaginationList
                 v-slot="{ items }"
-                class="flex items-center space-x-1 relative">
+                class="flex items-center space-x-1 relative  dark:text-[#BFC7D6] ">
                 <div
-                    class="pr-2 flex items-center space-x-1 border-r border-border-primary mr-1">
+                    class="pr-2 flex items-center space-x-1 border-r dark:border-[#3F4961]  dark:text-[#BFC7D6] hover:dark:text-gray-100 mr-1">
                     <PaginationFirst class="navigation-item">
                         <ChevronDoubleLeftIcon class="w-4">
                         </ChevronDoubleLeftIcon>
@@ -459,7 +459,7 @@ async function downloadExport(format: ExportFormat) {
                     <PaginationListItem
                         v-if="page.type === 'page'"
                         :key="index"
-                        class="pagination-item"
+                        class="pagination-item hover:dark:text-gray-100"
                         :value="page.value">
                         {{ page.value }}
                     </PaginationListItem>
@@ -472,7 +472,7 @@ async function downloadExport(format: ExportFormat) {
                     </PaginationEllipsis>
                 </template>
                 <div
-                    class="!ml-2 pl-2 flex items-center space-x-1 border-l border-border-primary">
+                    class="!ml-2 pl-2 flex items-center space-x-1 border-l dark:border-[#3F4961] ">
                     <PaginationNext class="navigation-item">
                         <ChevronRightIcon
                             class="w-4 text-text-tertiary hover:text-text-primary"></ChevronRightIcon>
@@ -486,9 +486,9 @@ async function downloadExport(format: ExportFormat) {
         </PaginationRoot>
     </AppLayout>
 </template>
-<style lang="postcss">
+<!-- <style lang="postcss">
 .navigation-item {
-    @apply bg-quaternary h-8 w-8 flex items-center justify-center rounded border border-border-primary text-text-tertiary hover:text-text-primary transition cursor-pointer hover:border-border-secondary hover:bg-secondary focus-visible:text-text-primary focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-ring;
+    @apply bg-quaternary h-8 w-8 flex items-center justify-center rounded border dark:border-[#3F4961]  text-text-tertiary hover:text-text-primary transition cursor-pointer hover:border-border-secondary hover:bg-secondary focus-visible:text-text-primary focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-ring;
 }
 
 .pagination-item {
@@ -497,4 +497,4 @@ async function downloadExport(format: ExportFormat) {
 .pagination-item[data-selected] {
     @apply text-text-primary bg-accent-300/10 border border-accent-300/20 rounded-md font-medium hover:bg-accent-300/20 active:bg-accent-300/20 outline-0 focus-visible:ring-2 focus:ring-ring transition ease-in-out duration-150;
 }
-</style>
+</style> -->

@@ -37,7 +37,7 @@ const shownClients = computed(() => {
 <template>
     <AppLayout title="Clients" data-testid="clients_view">
         <MainContainer
-            class="py-5 border-b border-default-background-separator flex justify-between items-center">
+            class="py-5 border-b dark:border-[#303F61] flex justify-between items-center dark:bg-[#0F1426]">
             <div class="flex items-center space-x-3 sm:space-x-6">
                 <PageTitle :icon="UserCircleIcon" title="Clients"> </PageTitle>
                 <TabBar

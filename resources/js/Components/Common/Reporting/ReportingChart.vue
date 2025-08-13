@@ -47,8 +47,8 @@ const xAxisLabels = computed(() => {
         formatDate(el.key ?? '', organization?.value?.date_format)
     );
 });
-const accentColor = useCssVar('--theme-color-chart', null, { observe: true });
-const labelColor = useCssVar('--color-text-secondary', null, { observe: true });
+const accentColor ="#2770DB";
+const labelColor =  "#636E88";
 
 const seriesData = computed(() => {
     return props?.groupedData?.map((el) => {
@@ -59,22 +59,22 @@ const seriesData = computed(() => {
                     borderColor: new LinearGradient(0, 0, 0, 1, [
                         {
                             offset: 0,
-                            color: 'rgba(' + accentColor.value + ',0.7)',
+                            color:  accentColor,
                         },
                         {
                             offset: 1,
-                            color: 'rgba(' + accentColor.value + ',0.5)',
+                            color:  accentColor ,
                         },
                     ]),
                     emphasis: {
                         color: new LinearGradient(0, 0, 0, 1, [
                             {
                                 offset: 0,
-                                color: 'rgba(' + accentColor.value + ',0.9)',
+                                color:  accentColor ,
                             },
                             {
                                 offset: 1,
-                                color: 'rgba(' + accentColor.value + ',0.7)',
+                                color:  accentColor,
                             },
                         ]),
                     },
@@ -82,11 +82,11 @@ const seriesData = computed(() => {
                     color: new LinearGradient(0, 0, 0, 1, [
                         {
                             offset: 0,
-                            color: 'rgba(' + accentColor.value + ',0.7)',
+                            color:  accentColor,
                         },
                         {
                             offset: 1,
-                            color: 'rgba(' + accentColor.value + ',0.5)',
+                            color:  accentColor ,
                         },
                     ]),
                 },
@@ -123,9 +123,9 @@ const option = computed(() => ({
         axisLabel: {
             fontSize: 12,
             fontWeight: 600,
-            color: labelColor.value,
+            color: labelColor,
             margin: 16,
-            fontFamily: 'Outfit, sans-serif',
+            fontFamily: 'Inter, sans-serif',
         },
         axisTick: {
             lineStyle: {
@@ -165,7 +165,7 @@ const option = computed(() => ({
             v-if="groupedData && groupedData?.length > 0"
             ref="chart"
             :autoresize="true"
-            class="chart"
+            class="chart  "
             :option="option" />
         <div v-else class="chart flex flex-col items-center justify-center">
             <p class="text-lg text-text-primary font-semibold">

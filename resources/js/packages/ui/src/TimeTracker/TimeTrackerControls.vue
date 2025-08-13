@@ -216,21 +216,21 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
 </script>
 
 <template>
-    <div class="flex items-center relative @container" data-testid="dashboard_timer">
+    <div class="flex items-center relative @container " data-testid="dashboard_timer">
         <div
-            class="flex flex-col @2xl:flex-row w-full justify-between relative  rounded-lg bg-card-background border-card-border border transition shadow-card">
+            class="flex flex-col @2xl:flex-row w-full justify-between relative  rounded-lg dark:bg-[#13192B] bg-white  transition shadow">
             <div class="  flex-1 items-center pr-6   w-full  ">
                 <input ref="currentTimeEntryDescriptionInput" v-model="tempDescription"
                     placeholder="What are you working on?" data-testid="time_entry_description"
-                    class="w-full rounded-l-lg py-4 sm:py-2.5 px-3.5 border-b border-b-card-background-separator @2xl:px-4 text-base   text-text-primary font-medium bg-transparent border-none placeholder-muted focus:ring-0 transition"
+                    class="w-full rounded-l-lg py-4 sm:py-2.5 px-3.5   @2xl:px-4 text-base   text-text-primary font-medium bg-transparent border-none placeholder-muted focus:ring-0 transition"
                     type="text" required @keydown.enter="startTimerIfNotActive" @keydown.esc="showDropdown = false"
                     @blur="updateTimeEntryDescription" />
                 <div v-if="showDropdown && filteredRecentlyTrackedTimeEntries.length > 0" ref="floating"
                     class="z-50 absolute w-full" :style="floatingStyles">
                     <div
-                        class="rounded-lg w-full fixed min-w-xl top-0 left-0  border border-card-border overflow-none shadow-dropdown bg-card-background">
+                        class="rounded-lg w-full fixed min-w-xl top-0 left-0   overflow-none shadow dark:bg-[#13192B] border dark:border-[#5D6370]  ">
                         <div
-                            class="text-text-tertiary text-xs font-semibold border-b border-border-tertiary px-2 py-1.5">
+                            class="text-text-tertiary text-xs font-semibold   px-2 py-1.5">
                             Recently Tracked Time Entries
                         </div>
                         <div class="text-text-secondary py-1 px-1.5">
@@ -245,10 +245,10 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                 </div>
             </div>
             <div class="flex items-center justify-between pl-2 shrink min-w-0">
-                <div class="flex items-center w-[130px] @2xl:w-auto shrink min-w-0">
+                <div class="flex items-center w-[130px] @2xl:w-auto shrink min-w-0 ">
                     <TimeTrackerProjectTaskDropdown v-model:project="currentTimeEntry.project_id" v-model:task="currentTimeEntry.task_id
                         " :create-client :can-create-project :clients :create-project :currency="currency"
-                        :projects="projects" :tasks="tasks" :enable-estimated-time="enableEstimatedTime"
+                        :projects="projects" :tasks="tasks" :enable-estimated-time="enableEstimatedTime" class=" border-[#77D36F] bg-[#D4FFD1] hover:bg-[#C1F7B0] dark:border-[#5D6370] dark:bg-[#13192B] dark:hover:bg-[#0C101E] "
                         :setOpen="OpenProject" :open="ProjectOpen" ref="currentTimeEntryProjectInput" @changed="updateProject">
                     </TimeTrackerProjectTaskDropdown>
                 </div>
@@ -259,7 +259,7 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                     <BillableToggleButton v-model="currentTimeEntry.billable
                         " @changed="$emit('updateTimeEntry')"></BillableToggleButton>
                 </div>
-                <div class="border-l border-card-border">
+                <div class=" ">
                     <TimeTrackerRangeSelector v-model:current-time-entry="currentTimeEntry"
                         v-model:live-timer="liveTimer" @start-live-timer="emit('startLiveTimer')"
                         @stop-live-timer="emit('stopLiveTimer')" @update-timer="emit('updateTimeEntry')"

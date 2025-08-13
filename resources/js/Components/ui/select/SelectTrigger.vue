@@ -23,7 +23,7 @@ const sizeClasses = computed(() => {
   <SelectTrigger
     v-bind="forwardedProps"
     :class="cn(
-      'flex w-full items-center justify-between whitespace-nowrap rounded-md border border-input-border bg-input-background px-3 py-2.5 shadow-sm data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
+      'flex w-full items-center dark:bg-[#0C101E] dark:text-[#BFC7D6]  dark:border-[#0C101E] justify-between whitespace-nowrap rounded-md border border-input-border bg-input-background px-3 py-2.5 shadow-sm data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
       sizeClasses,
       props.class,
     )"

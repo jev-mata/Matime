@@ -46,17 +46,17 @@ watch(open, (value) => {
 </script>
 
 <template>
-    <div class="min-w-0 isolate">
+    <div class="min-w-0 isolate ">
         <Popover v-model:open="open" @update:open="onOpenChange">
             <PopoverTrigger as-child>
                 <slot class="min-w-0 flex items-center" name="trigger" />
             </PopoverTrigger>
             <PopoverContent
                 :align="align"
-                class="rounded-lg overflow-hidden relative border border-card-border overflow-none shadow-dropdown bg-card-background"
+                class="rounded-lg overflow-hidden relative border  dark:border-[#303F61] overflow-none shadow-dropdown  dark:bg-[#5D6370]"
                 @open-auto-focus="handleAutofocus"
                 @click="onContentClick">
-                <slot name="content" />
+                <slot name="content"  />
             </PopoverContent>
         </Popover>
     </div>
