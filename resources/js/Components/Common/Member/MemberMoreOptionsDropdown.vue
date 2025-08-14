@@ -40,11 +40,11 @@ const props = defineProps<{
                 </svg>
             </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="min-w-[150px]  dark:bg-[#0F1426]  dark:border-[#303F61]" align="end">
+        <DropdownMenuContent class="min-w-[150px]  dark:bg-[#0F1426]  dark:border-[#303F61] border-[#DFDFDF] bg-[#F3F3F4]  " align="end">
             <DropdownMenuItem
                 v-if="canUpdateMembers()"
                 :aria-label="'Edit Member ' + props.member.name"
-                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
+                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6] hover:text-[#1E273C]  hover:bg-[#E0E3E5]"
                 @click="emit('edit')">
                 <PencilSquareIcon class="w-5 text-icon-active" />
                 <span>Edit</span>
@@ -53,7 +53,7 @@ const props = defineProps<{
                 v-if="canDeleteMembers()"
                 :aria-label="'Delete Member ' + props.member.name"
                 data-testid="member_delete"
-                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
+                class="flex items-center space-x-3 cursor-pointer text-destructive focus:text-destructive dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6] hover:bg-[#E0E3E5]"
                 @click="emit('delete')">
                 <TrashIcon class="w-5" />
                 <span>Delete</span>
@@ -62,7 +62,7 @@ const props = defineProps<{
                 v-if="props.member.role === 'placeholder' && canMergeMembers()"
                 :aria-label="'Merge Member ' + props.member.name"
                 data-testid="member_merge"
-                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
+                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6] hover:bg-[#E0E3E5]"
                 @click="emit('merge')">
                 <ArrowDownOnSquareStackIcon class="w-5 text-icon-active" />
                 <span>Merge</span>
@@ -70,7 +70,7 @@ const props = defineProps<{
             <DropdownMenuItem
                 v-if="props.member.role !== 'placeholder' && canMakeMembersPlaceholders()"
                 :aria-label="'Make Member ' + props.member.name + ' a placeholder'"
-                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6]"
+                class="flex items-center space-x-3 cursor-pointer dark:border-[#303F61]  dark:bg-[#0F1426] dark:text-[#7D88A1] hover:dark:text-[#BFC7D6] hover:bg-[#E0E3E5]"
                 @click="emit('makePlaceholder')">
                 <UserCircleIcon class="w-5 text-icon-active" />
                 <span>Deactivate</span>

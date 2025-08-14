@@ -228,7 +228,7 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                 <div v-if="showDropdown && filteredRecentlyTrackedTimeEntries.length > 0" ref="floating"
                     class="z-50 absolute w-full" :style="floatingStyles">
                     <div
-                        class="rounded-lg w-full fixed min-w-xl top-0 left-0   overflow-none shadow dark:bg-[#13192B] border dark:border-[#5D6370]  ">
+                        class="rounded-lg w-full fixed min-w-xl top-0 left-0   overflow-none shadow dark:bg-[#13192B] bg-white border dark:border-[#5D6370]  ">
                         <div
                             class="text-text-tertiary text-xs font-semibold   px-2 py-1.5">
                             Recently Tracked Time Entries

@@ -10,6 +10,7 @@
         leave-to-class="opacity-0">
         <div
             v-if="show"
+            :class="type === 'success' ? 'bg-green-100' :type==='error'? 'bg-red-100': 'bg-gray-100'"
             class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg border border-card-border bg-card-background shadow-lg ring-1 ring-black text-text-primary ring-opacity-5">
             <div class="p-4">
                 <div class="flex items-start">

@@ -180,7 +180,7 @@ watch(open, () => {
                     )
                 ">
                 <div
-                    v-for="item in filteredItems" class="hover:dark:border-y dark:border-[#303F61] px-5 "
+                    v-for="item in filteredItems" class="hover:dark:border-y dark:border-[#303F61] px-5   hover:bg-[#F3F3F4] "
                     :key="props.getKeyFromItem(item) ?? 'none'"
                     role="option"
                     :data-select-id="props.getKeyFromItem(item)"

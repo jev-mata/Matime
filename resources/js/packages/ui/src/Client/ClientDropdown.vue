@@ -104,16 +104,16 @@ function updateValue(client: { id: string | null; name: string }) {
                             class="w-60 max-h-60 overflow-y-scroll">
                             <ComboboxItem
                                 :value="{ id: null, name: 'No Client' }"
-                                class="data-[highlighted]:dark:bg-[#3F4961] ">
+                                class="data-[highlighted]:dark:bg-[#3F4961]  data-[highlighted]:bg-[#F3F3F4]">
                                 <ClientDropdownItem
                                     :selected="model === null"
                                     name="No Client" />
-                            </ComboboxItem>
+                            </ComboboxItem>  
                             <ComboboxItem
                                 v-for="client in filteredClients"
                                 :key="client.id"
                                 :value="client"
-                                class="data-[highlighted]:dark:bg-[#3F4961]"
+                                class="data-[highlighted]:dark:bg-[#3F4961] data-[highlighted]:bg-[#F3F3F4]"
                                 :data-client-id="client.id">
                                 <ClientDropdownItem
                                     :selected="isClientSelected(client.id)"

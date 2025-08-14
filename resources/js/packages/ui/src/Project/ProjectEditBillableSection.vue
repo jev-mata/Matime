@@ -64,7 +64,7 @@ const emit = defineEmits(['submit']);
             </div>
             <ProjectBillableSelect
                 v-model="billableRateSelect"
-                class=" dark:bg-[#0F1426] dark:border-[#303F61] dark:text-[#636E88]"></ProjectBillableSelect>
+                class=" dark:bg-[#0F1426] dark:border-[#303F61] dark:text-[#636E88] "></ProjectBillableSelect>
         </div>
         <div v-if="billableRateSelect === 'custom-rate'">
             <InputLabel for="billableRate" value="Billable Rate" class="mb-2 " />

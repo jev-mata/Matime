@@ -114,7 +114,7 @@ const currentClientName = computed(() => {
                         <template #trigger>
                             <Badge
                                 tag="button"
-                                class=" dark:bg-[#0F1426] dark:border-[#303F61] hover:dark:bg-[#3F4961] cursor-pointer  "
+                                class=" dark:bg-[#0F1426] dark:border-[#303F61] hover:dark:bg-[#3F4961] border-[#DFDFDF] bg-[#E0E3E5] hover:bg-[#BFC7D6]  cursor-pointer  "
                                 size="xlarge">
                                 <div class="flex items-center space-x-2">
                                     <UserCircleIcon

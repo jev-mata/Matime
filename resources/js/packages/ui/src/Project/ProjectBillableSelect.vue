@@ -52,7 +52,7 @@ function getNameForKey(key: BillableKey | undefined) {
             <Badge
                 tag="button"
                 size="xlarge"
-                class="dark:bg-[#0F1426] dark:border-[#303F61] cursor-pointer">
+                class="dark:bg-[#0F1426] dark:border-[#303F61] border-[#DFDFDF] bg-[#E0E3E5] hover:bg-[#BFC7D6]  cursor-pointer">
                 <span>
                     {{ getNameForKey(model) }}
                 </span>
