@@ -52,27 +52,30 @@ class ProjectController extends Controller
         $user = $this->user();
         $team = User::with('groups')->where('id', '=', Auth::user()->id)->first();
 
-        $projectsQuery = Project::with(['groups', 'client'])->orderBy('client_id')
+        $projectsQuery = Project::with(['groups', 'client', 'members'])
+            ->orderBy('client_id')
             ->whereBelongsTo($organization, 'organization');
 
         $ownerId = optional($organization->owner()->first())->id;
         $userId = auth()->id();
+
         if ($this->member($organization)->role === Role::Admin->value) {
             Log::info("admin");
         } else if ($ownerId !== $userId) {
             $groupIds = $team->groups->pluck('id');
+
             if ($groupIds->isNotEmpty()) {
-                $projectIDs = $projectsQuery->whereHas(
-                    'groups',
-                    fn($query) =>
-                    $query->whereIn('id', $groupIds)
-                )->with('tasks')->orderBy('name')->pluck('id');
-                $projectsQuery = $projectsQuery->whereIn('id', $projectIDs); // ✅ correct
+                $projectsQuery = $projectsQuery->where(function ($query) use ($groupIds, $userId) {
+                    $query->whereHas('groups', fn($q) => $q->whereIn('id', $groupIds))
+                        ->orWhereHas('members', fn($q) => $q->where('user_id', $userId));
+                })->with('tasks')->orderBy('name');
             } else {
-                // User has no groups, return empty result
-                $projectsQuery->whereRaw('1 = 0');
+                // User has no groups, filter only by membership
+                $projectsQuery = $projectsQuery->whereHas('members', fn($q) => $q->where('user_id', $userId))
+                    ->with('tasks')->orderBy('name');
             }
         }
+
         $projectsQuery->orderByRaw("
     CASE 
         WHEN name IS NOT NULL AND name ~ '^[0-9]+' 
