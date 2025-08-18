@@ -87,7 +87,7 @@ const selectedProjectColor = computed(() => {
 </script>
 
 <template>
-    <div class="hover:border-y dark:border-[#3F4961] bg-row-background min-w-0 transition" data-testid="time_entry_row"
+    <div class="hover:border-y dark:border-[#3F4961] dark:bg-[#171E31] bg-row-background min-w-0 transition" data-testid="time_entry_row"
         title="Editing disabled for submitted entries">
         <MainContainer class="min-w-0 opacity-40">
             <div class="grid grid-cols-10 py-1.5 items-center min-w-0 justify-between group">

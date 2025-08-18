@@ -32,7 +32,7 @@ function selectUnselectAll(value: boolean) {
 
 <template>
     <div
-        class="dark:bg-[#0C101E] bg-[#E0E3E6] dark:bg-[#171E31] shadow rounded-md  py-1 text-xs sm:text-sm">
+        class="dark:bg-[#0C101E] bg-[#E0E3E6] dark:bg-[#0C101E] shadow rounded-md  py-1 text-xs sm:text-sm">
         <MainContainer>
             <div class="flex group justify-between items-center">
                 <div class="flex items-center space-x-2 py-2">

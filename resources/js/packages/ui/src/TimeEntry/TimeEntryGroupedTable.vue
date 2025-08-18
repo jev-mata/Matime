@@ -249,7 +249,7 @@ watch(
 
 <template>
 
-    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="border dark:border-[#3F4961] px-4 mb-4 pb-5">
+    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="border  dark:border-[#3F4961] px-4 mb-4 pb-5">
         <div class="dark:border-[#3F4961] border-b-4 ">
 
             <div class=" rounded  p-1  ">

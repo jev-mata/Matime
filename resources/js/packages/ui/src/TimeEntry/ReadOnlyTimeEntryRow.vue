@@ -80,7 +80,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
 </script>
 
 <template>
-    <div class="hover:border-y  dark:border-[#3F4961] transition min-w-0 bg-row-background" data-testid="time_entry_row"
+    <div class="hover:border-y  dark:border-[#3F4961] transition min-w-0  dark:bg-[#171E31]" data-testid="time_entry_row"
         title="Editing disabled for submitted entries">
         <MainContainer class="min-w-0 opacity-40">
             <div class="grid sm:grid-cols-6 md:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-10 items-center py-2 group">

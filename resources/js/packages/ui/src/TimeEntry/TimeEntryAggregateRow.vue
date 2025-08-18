@@ -91,7 +91,7 @@ function onSelectChange(checked: boolean) {
 </script>
 
 <template>
-    <div class="hover:border-y hover:dark:text-gray-100 dark:border-[#3F4961] bg-row-background min-w-0 transition"
+    <div class="hover:border-y hover:dark:text-gray-100 dark:border-[#3F4961]  dark:bg-[#171E31] min-w-0 transition"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0">
             <div class="grid grid-cols-10 py-1.5 items-center min-w-0 justify-between group">

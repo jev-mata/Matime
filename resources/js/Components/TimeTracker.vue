@@ -53,6 +53,8 @@ const emit = defineEmits<{
     change: [];
 }>();
 
+let intervalId: ReturnType<typeof setInterval> | null = null;
+
 watch(isActive, () => {
     if (isActive.value) {
         startLiveTimer();

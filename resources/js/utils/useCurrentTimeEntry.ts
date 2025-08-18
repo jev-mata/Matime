@@ -46,17 +46,24 @@ export const useCurrentTimeEntryStore = defineStore('currentTimeEntry', () => {
     const now = ref<null | Dayjs>(null);
     const interval = ref<ReturnType<typeof setInterval> | null>(null);
 
+function formatTime(time: Dayjs): string {
+  return time.format('HH:mm:ss'); // you can change this to mm:ss if you prefer
+}
     function startLiveTimer() {
         stopLiveTimer();
         now.value = dayjs().utc();
         interval.value = setInterval(() => {
             now.value = dayjs().utc();
+
+            document.title = `⏱ ${formatTime(now.value)} - Panso`;
         }, 1000);
     }
 
     function stopLiveTimer() {
         if (interval.value !== null) {
             clearInterval(interval.value);
+            
+            document.title = `Panso`;
         }
     }
 
