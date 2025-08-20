@@ -158,7 +158,7 @@ Route::prefix('v1')->name('v1.')->group(static function (): void {
         // Client routes
         Route::name('clients.')->prefix('/organizations/{organization}')->group(static function (): void {
             Route::get('/clients', [ClientController::class, 'index'])->name('index');
-            Route::get('/clientsall', [ClientController::class, 'indexall'])->name('index');
+            Route::get('/clientsall', [ClientController::class, 'indexall'])->name('/indexall');
             Route::post('/clients', [ClientController::class, 'store'])->name('store')->middleware('check-organization-blocked');
             Route::put('/clients/{client}', [ClientController::class, 'update'])->name('update')->middleware('check-organization-blocked');
             Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('destroy');

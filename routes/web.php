@@ -34,7 +34,7 @@ Route::middleware([
 ])->group(function (): void {
     Route::get('/invitations/{invitation}', [TeamInvitationController::class, 'showAcceptPage'])->name('invitations.accept');
     Route::post('/invitations/{invitation}', [TeamInvitationController::class, 'accept'])
-        ->name('team-invitations.accept');
+        ->name('team.invitations.accept');
 });
 Route::middleware([
     'auth:web',

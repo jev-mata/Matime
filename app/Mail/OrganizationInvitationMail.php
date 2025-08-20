@@ -32,7 +32,7 @@ class OrganizationInvitationMail extends Mailable
     public function build(): self
     {
         return $this->markdown('emails.organization-invitation', [
-            'acceptUrl' => URL::signedRoute('team-invitations.accept', [
+            'acceptUrl' => URL::signedRoute('team.invitations.accept', [
                 'invitation' => $this->invitation,
             ]),
         ])->subject(__('Organization Invitation'));
