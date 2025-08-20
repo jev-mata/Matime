@@ -38,7 +38,7 @@ async function createClient(
 }
 const { clients } = storeToRefs(useClientsStore());
 const gridTemplate = computed(() => {
-    return `grid-template-columns: minmax(300px, 1fr) minmax(150px, auto) minmax(140px, auto) minmax(130px, auto) ${props.showBillableRate ? 'minmax(130px, auto)' : ''} minmax(120px, auto) 80px;`;
+    return `grid-template-columns: minmax(300px, 1fr) minmax(150px, auto) minmax(100px, auto) minmax(100px, auto) ${props.showBillableRate ? 'minmax(70px, auto)' : ''} minmax(120px, auto) 80px;`;
 });
 import { isAllowedToPerformPremiumAction } from '@/utils/billing';
 
@@ -63,7 +63,7 @@ const getClient = (clientID: string) => {
     <ProjectCreateModal v-model:show="showCreateProjectModal" :create-project :create-client
         :currency="getOrganizationCurrencyString()" :clients="clients"
         :enable-estimated-time="isAllowedToPerformPremiumAction"></ProjectCreateModal>
-    <div class="flow-root max-w-[100vw] overflow-x-auto">
+    <div class="flow-root  overflow-x-hidden">
         <div class="inline-block min-w-full align-middle">
             <div data-testid="project_table" class="grid min-w-full" :style="gridTemplate">
                 <ProjectTableHeading :show-billable-rate="props.showBillableRate

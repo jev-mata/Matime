@@ -127,12 +127,12 @@ function deleteSelected() {
         :create-client="createClient" :create-tag="createTag" :create-time-entry="createTimeEntry" :projects :tasks
         :tags :clients></TimeEntryCreateModal>
     <AppLayout title="Dashboard" data-testid="time_view">
-        <div class="mx-10">
+        <div class="mx-10 relative">
 
-            <MainContainer class="pt-5 lg:pt-8 pb-4 lg:pb-6 dark:bg-[#171E31] p-5 ">
+            <MainContainer class="pt-5 lg:pt-8 pb-4 lg:pb-6 dark:bg-[#171E31] p-5  sticky top-0 z-10 ">
                 <div
-                    class="lg:flex items-end lg:divide-x divide-default-background-separator divide-y lg:divide-y-0 space-y-2 lg:space-y-0 lg:space-x-2 ">
-                    <div class="flex-1">
+                    class="lg:flex items-endlg:divide-x divide-default-background-separator divide-y lg:divide-y-0 space-y-2 lg:space-y-0 lg:space-x-2 ">
+                    <div class="flex-1 ">
                         <TimeTracker></TimeTracker>
                     </div>
                     <div class="pb-2 pt-2 lg:pt-0 lg:pl-4 flex justify-center">
@@ -142,7 +142,7 @@ function deleteSelected() {
                     </div>
                 </div>
             </MainContainer>
-            <div class=" mt-5">
+            <div class=" pt-10">
                 <TimeEntryMassActionRow :selected-time-entries="selectedTimeEntries"
                     :enable-estimated-time="isAllowedToPerformPremiumAction()" :can-create-project="canCreateProjects()"
                     :all-selected="selectedTimeEntries.length === timeEntries.length" :delete-selected="deleteSelected"

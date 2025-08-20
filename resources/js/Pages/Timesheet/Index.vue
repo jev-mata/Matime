@@ -153,7 +153,7 @@ function formatDate(dateString: string, format?: string) {
 <template>
     <AppLayout title="Dashboard" data-testid="dashboard_view">
         <MainContainer
-            class="py-5 border-b dark:bg-[#171E31] dark:border-[#303F61] flex justify-between items-center w-full">
+            class="py-5 border-b dark:bg-[#171E31] dark:border-[#303F61]   fixed w-[83%] z-10  flex justify-between items-center w-full">
             <div class="flex items-center space-x-1 sm:space-x-3 w-full">
                 <PageTitle :icon="HandThumbUpIcon" title="Approval" />
                 <TabBar v-model="activeTab">
@@ -194,7 +194,7 @@ function formatDate(dateString: string, format?: string) {
             </div>
         </MainContainer>
 
-        <div class="flow-root max-w-[100vw] overflow-x-auto">
+        <div class="flow-root max-w-[100vw] overflow-x-auto pt-[7%]">
             <div class="inline-block w-full align-middle">
                 <div
                     data-testid="client_table"

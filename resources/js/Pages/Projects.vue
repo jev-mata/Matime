@@ -67,38 +67,25 @@ const showBillableRate = computed(() => {
 <template>
     <AppLayout title="Projects" data-testid="projects_view">
         <MainContainer
-            class="py-3 sm:py-5 border-b dark:border-[#303F61] flex justify-between items-center dark:bg-[#0F1426] bg-white  ">
+            class="py-3 sm:py-5 border-b dark:border-[#303F61] sticky top-0 z-10 flex justify-between items-center dark:bg-[#0F1426] bg-white  ">
             <div class="flex items-center space-x-3 sm:space-x-6 ">
                 <PageTitle :icon="FolderIcon" title="Projects"></PageTitle>
-                <TabBar
-                v-model="activeTab"
-                >
-                    <TabBarItem
-                        value="active"
-                        >Active</TabBarItem
-                    >
-                    <TabBarItem
-                        value="archived"
-                        >Archived</TabBarItem>
+                <TabBar v-model="activeTab">
+                    <TabBarItem value="active">Active</TabBarItem>
+                    <TabBarItem value="archived">Archived</TabBarItem>
                 </TabBar>
             </div>
-            <SecondaryButton
-                v-if="canCreateProjects()"
-                :icon="PlusIcon"
-                @click="showCreateProjectModal = true"
-                >Create Project
+            <SecondaryButton v-if="canCreateProjects()" :icon="PlusIcon" @click="showCreateProjectModal = true">Create
+                Project
             </SecondaryButton>
-            <ProjectCreateModal
-                v-model:show="showCreateProjectModal"
-                :create-project
-                :enable-estimated-time="isAllowedToPerformPremiumAction"
-                :create-client
-                :currency="getOrganizationCurrencyString()"
-                :clients="clients"
-                @submit="createProject"></ProjectCreateModal>
+            <ProjectCreateModal v-model:show="showCreateProjectModal" :create-project
+                :enable-estimated-time="isAllowedToPerformPremiumAction" :create-client
+                :currency="getOrganizationCurrencyString()" :clients="clients" @submit="createProject">
+            </ProjectCreateModal>
         </MainContainer>
-        <ProjectTable
-            :show-billable-rate="showBillableRate"
-            :projects="shownProjects"></ProjectTable>
+        <div class=" ">
+
+            <ProjectTable :show-billable-rate="showBillableRate" :projects="shownProjects"></ProjectTable>
+        </div>
     </AppLayout>
 </template>

@@ -37,32 +37,24 @@ const shownClients = computed(() => {
 <template>
     <AppLayout title="Clients" data-testid="clients_view">
         <MainContainer
-            class="py-5 border-b dark:border-[#303F61] flex justify-between items-center dark:bg-[#0F1426]">
+            class="py-5 border-b  sticky top-0 z-10 dark:border-[#303F61] flex justify-between items-center dark:bg-[#0F1426]">
             <div class="flex items-center space-x-3 sm:space-x-6">
                 <PageTitle :icon="UserCircleIcon" title="Clients"> </PageTitle>
-                <TabBar
-                v-model="activeTab"
-                >
-                    <TabBarItem
-                        value="active"
-                        >Active</TabBarItem
-                    >
-                    <TabBarItem
-                        value="archived"
-                        >
+                <TabBar v-model="activeTab">
+                    <TabBarItem value="active">Active</TabBarItem>
+                    <TabBarItem value="archived">
                         Archived
                     </TabBarItem>
                 </TabBar>
             </div>
-            <SecondaryButton
-                v-if="canCreateClients()"
-                :icon="PlusIcon"
-                @click="createClient = true"
-                >Create Client</SecondaryButton
-            >
+            <SecondaryButton v-if="canCreateClients()" :icon="PlusIcon" @click="createClient = true">Create Client
+            </SecondaryButton>
             <ClientCreateModal v-model:show="createClient"></ClientCreateModal>
         </MainContainer>
-        <ClientTable :clients="shownClients"></ClientTable>
-        
+
+        <div class=" ">
+            <ClientTable :clients="shownClients"></ClientTable>
+        </div>
+
     </AppLayout>
 </template>

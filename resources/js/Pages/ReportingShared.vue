@@ -73,9 +73,9 @@ watch(currentPage, () => {
     <AppLayout
         title="Reporting"
         data-testid="reporting_view"
-        class="overflow-hidden">
+        class=" ">
         <MainContainer
-            class="py-3 sm:py-5 min-h-[79px] border-b dark:border-[#3F4961]  dark:bg-[#0F1426] dark:text-[#7D88A1]  flex justify-between items-center">
+            class="py-3 sm:py-5 min-h-[79px] border-b dark:border-[#3F4961] sticky top-0 dark:bg-[#0F1426] dark:text-[#7D88A1]  flex justify-between items-center">
             <div class="flex items-center space-x-3 sm:space-x-6">
                 <PageTitle :icon="ChartBarIcon" title="Reporting"></PageTitle>
                 <ReportingTabNavbar active="shared"></ReportingTabNavbar>

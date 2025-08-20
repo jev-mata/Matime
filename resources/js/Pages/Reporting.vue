@@ -9,7 +9,7 @@ import ReportingOverview from "@/Components/Common/Reporting/ReportingOverview.v
     <AppLayout
         title="Reporting"
         data-testid="reporting_view"
-        class="overflow-hidden">
+        class=" ">
         <ReportingOverview></ReportingOverview>
     </AppLayout>
 </template>

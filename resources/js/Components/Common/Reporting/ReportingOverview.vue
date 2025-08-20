@@ -290,7 +290,7 @@ const tableData = computed(() => {
         v-model:show="showExportModal"
         :export-url="exportUrl"></ReportingExportModal>
     <MainContainer
-        class="py-3 sm:py-5 dark:border-[#3F4961] flex justify-between items-center dark:bg-[#171E31]">
+        class="py-3 sm:py-4 sticky top-0 dark:border-[#3F4961] z-10 flex justify-between items-center dark:bg-[#171E31]">
         <div class="flex items-center space-x-3 sm:space-x-6">
             <PageTitle :icon="ChartBarIcon" title="Reporting"></PageTitle>
             <ReportingTabNavbar active="reporting"></ReportingTabNavbar>
@@ -302,7 +302,7 @@ const tableData = computed(() => {
                 :report-properties="reportProperties"></ReportSaveButton>
         </div>
     </MainContainer>
-    <div class="py-2.5 w-full dark:border-[#3F4961] dark:bg-[#171E31]">
+    <div class="py-2.5 sticky top-16 z-10 w-full dark:border-[#3F4961] dark:bg-[#171E31]">
         <MainContainer class="sm:flex space-y-4 sm:space-y-0 justify-between">
             <div
                 class="flex flex-wrap items-center space-y-2 sm:space-y-0 space-x-4">

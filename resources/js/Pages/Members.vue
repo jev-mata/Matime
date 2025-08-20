@@ -23,11 +23,13 @@ defineProps<{
 }>();
 
 const activeTab = ref<'all' | 'invitations' | 'teams'>('all');
+
 </script>
 
 <template>
     <AppLayout title="Members" data-testid="members_view">
-        <MainContainer class="py-5 border-b  dark:border-[#303F61]  dark:bg-[#0F1426]  flex justify-between items-center">
+        <MainContainer
+            class="py-5 border-b sticky top-0   z-10  dark:border-[#303F61]  dark:bg-[#0F1426]  flex justify-between items-center">
             <div class="flex items-center space-x-4 sm:space-x-6">
                 <PageTitle :icon="UserGroupIcon" title="Members"> </PageTitle>
                 <TabBar v-model="activeTab">
@@ -43,7 +45,7 @@ const activeTab = ref<'all' | 'invitations' | 'teams'>('all');
         </MainContainer>
         <MemberTable v-if="activeTab === 'all'"></MemberTable>
         <InvitationTable v-if="activeTab === 'invitations'"></InvitationTable>
-        <TeamsPage v-if="activeTab === 'teams'"  >
+        <TeamsPage v-if="activeTab === 'teams'">
         </TeamsPage>
     </AppLayout>
 </template>

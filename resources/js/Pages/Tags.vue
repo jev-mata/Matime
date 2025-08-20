@@ -20,7 +20,7 @@ async function createTag(tag: string) {
 <template>
     <AppLayout title="Tags" data-testid="tags_view">
         <MainContainer
-            class="py-5 border-b dark:border-[#303F61] dark:bg-[#0F1426]  flex justify-between items-center">
+            class="py-5 border-b sticky top-0 dark:border-[#303F61] dark:bg-[#0F1426]  flex justify-between items-center">
             <div class="flex items-center space-x-6">
                 <PageTitle :icon="TagIcon" title="Tags"></PageTitle>
             </div>

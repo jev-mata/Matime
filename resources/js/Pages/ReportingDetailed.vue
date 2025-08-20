@@ -250,12 +250,12 @@ async function downloadExport(format: ExportFormat) {
     <AppLayout
         title="Reporting"
         data-testid="reporting_view"
-        class="overflow-hidden">
+        class=" ">
         <ReportingExportModal
             v-model:show="showExportModal"
             :export-url="exportUrl"></ReportingExportModal>
         <MainContainer
-            class="py-3 sm:py-5 border-b dark:border-[#3F4961] dark:bg-[#171E31] flex justify-between items-center">
+            class="py-3 sm:py-5 sticky top-0 z-10 border-b dark:border-[#3F4961] dark:bg-[#171E31] flex justify-between items-center">
             <div class="flex items-center space-x-3 sm:space-x-6 ">
                 <PageTitle :icon="ChartBarIcon" title="Reporting"></PageTitle>
                 <ReportingTabNavbar active="detailed"></ReportingTabNavbar>
@@ -264,7 +264,7 @@ async function downloadExport(format: ExportFormat) {
                 :download="downloadExport"></ReportingExportButton>
         </MainContainer>
 
-        <div class="py-2.5 w-full border-b dark:border-[#3F4961] dark:bg-[#171E31]">
+        <div class="py-2.5 w-full border-b sticky top-16 z-10 dark:border-[#3F4961] dark:bg-[#171E31]">
             <MainContainer
                 class="sm:flex space-y-4 sm:space-y-0 justify-between">
                 <div
