@@ -135,8 +135,8 @@ function deleteSelected() {
                     <div class="flex-1 ">
                         <TimeTracker></TimeTracker>
                     </div>
-                    <div class="pb-2 pt-2 lg:pt-0 lg:pl-4 flex justify-center">
-                        <SecondaryButton class="w-full text-center flex justify-center" :icon="PlusIcon"
+                    <div class="pb-2 lg:pt-12 xl:pt-11 lg:pl-4  flex justify-center items-center  ">
+                        <SecondaryButton class="w-full text-center flex  justify-center  " :icon="PlusIcon"
                             @click="showManualTimeEntryModal = true">Manual time entry
                         </SecondaryButton>
                     </div>

@@ -100,8 +100,8 @@ function onSelectChange(checked: boolean) {
     <div class="hover:border-y hover:dark:text-gray-100 dark:border-[#3F4961]  dark:bg-[#171E31] transition min-w-0 bg-row-background"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0">
-            <div class="grid grid-cols-10   py-2 min-w-0    group">
-                <div class="flex col-span-2  items-center min-w-0">
+            <div class="grid  sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-10 py-2 min-w-0    group">
+                <div class="flex 2xl:col-span-2 xl:col-span-2 md:col-span-3 sm:col-span-3  items-center min-w-0  ">
                     <Checkbox :checked="selected" @update:checked="onSelectChange" />
                     <div v-if="indent === true" class="w-10 h-7"></div>
                     <TimeEntryDescriptionInput class="min-w-0 mx-4 dark:text-[#7D88A1] hover:dark:bg-[#0C101E] py-2 rounded" :model-value="timeEntry.description
@@ -110,13 +110,13 @@ function onSelectChange(checked: boolean) {
                         {{ memberName }}
                     </div>
                 </div>
-                <div class="flex w-full col-span-3 text-sm  px-2">
+                <div class="flex w-full  2xl:col-span-3 xl:col-span-3 md:col-span-5 sm:col-span-5  px-2">
                     <TimeTrackerProjectTaskDropdown :create-project :create-client :can-create-project :clients
                         :projects="projects" :tasks="tasks" :show-badge-border="false" :project="timeEntry.project_id"
                         :currency="currency" :enable-estimated-time :task="timeEntry.task_id
                             " @changed="updateProjectAndTask"></TimeTrackerProjectTaskDropdown>
                 </div>
-                <div class="px-2 flex col-span-1  bg-secondary min-w-0">
+                <div class="px-2 flex   :col-span-2 sm:col-span-2 xl:col-span-1 2xl:col-span-1 bg-secondary min-w-0">
                     <div class="flex-1 ">
                     <TimeEntryRowTagDropdown :create-tag :tags="tags" :model-value="timeEntry.tags"
                         @changed="updateTimeEntryTags"></TimeEntryRowTagDropdown></div>
@@ -128,8 +128,8 @@ function onSelectChange(checked: boolean) {
                             "></BillableToggleButton>
                     </div> -->
                 </div>
-                <div class="flex items-center space-x-2 col-span-4 justify-end   ">
-                    <TimeEntryRangeSelector class="hidden lg:block   " :start="timeEntry.start" :end="timeEntry.end"
+                <div class="flex items-center space-x-2 md:col-span-6 xl:col-span-4 2xl:col-span-4 justify-end sm:col-span-6">
+                    <TimeEntryRangeSelector class="   " :start="timeEntry.start" :end="timeEntry.end"
                         :show-date @changed="
                             updateStartEndTime
                         "></TimeEntryRangeSelector>
@@ -137,7 +137,7 @@ function onSelectChange(checked: boolean) {
                         updateStartEndTime
                     "></TimeEntryRowDurationInput>
                     <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden sm:flex focus-visible:opacity-100 group-hover:opacity-100 "
+                        class="opacity-20 hidden   focus-visible:opacity-100 group-hover:opacity-100 "
                         @changed="onStartStopClick"></TimeTrackerStartStop>
                     <TimeEntryMoreOptionsDropdown :entry="timeEntry" @duplicate="duplicateTimeEntry"  
                         :haveduplicate="true" @delete="deleteTimeEntry"></TimeEntryMoreOptionsDropdown>

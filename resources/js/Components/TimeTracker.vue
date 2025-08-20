@@ -121,7 +121,7 @@ const sortedTasks = computed(() => {
 </script>
 
 <template>
-    <CardTitle title="Time Tracker" :icon="ClockIcon" class="dark:text-[#7D88A1]">
+    <CardTitle title="Time Tracker" :icon="ClockIcon" class="dark:text-[#7D88A1] w-full  flex-1">
     </CardTitle> 
     <div class="relative dark:text-[#7D88A1] ">
         <TimeTrackerRunningInDifferentOrganizationOverlay v-if="
@@ -134,5 +134,6 @@ const sortedTasks = computed(() => {
             :currency="getOrganizationCurrencyString()" @start-live-timer="startLiveTimer"
             @stop-live-timer="stopLiveTimer" @start-timer="setActiveState(true)" @stop-timer="setActiveState(false)"
             @update-time-entry="updateTimeEntry"></TimeTrackerControls>
+            
     </div>
 </template>
