@@ -137,7 +137,7 @@ function onSelectChange(checked: boolean) {
                         updateStartEndTime
                     "></TimeEntryRowDurationInput>
                     <TimeTrackerStartStop :active="!!(timeEntry.start && !timeEntry.end)"
-                        class="opacity-20 hidden   focus-visible:opacity-100 group-hover:opacity-100 "
+                        class="opacity-20    focus-visible:opacity-100 group-hover:opacity-100 "
                         @changed="onStartStopClick"></TimeTrackerStartStop>
                     <TimeEntryMoreOptionsDropdown :entry="timeEntry" @duplicate="duplicateTimeEntry"  
                         :haveduplicate="true" @delete="deleteTimeEntry"></TimeEntryMoreOptionsDropdown>
