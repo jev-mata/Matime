@@ -28,6 +28,7 @@ import { useClientsStore } from '@/utils/useClients';
 import { getOrganizationCurrencyString } from '@/utils/money';
 import { isAllowedToPerformPremiumAction } from '@/utils/billing';
 import { canCreateProjects } from '@/utils/permissions';
+import { useTimeEntriesStore } from '@/utils/useTimeEntries';
 const page = usePage<{
     auth: {
         user: User;
@@ -40,7 +41,7 @@ dayjs.extend(utc);
 const currentTimeEntryStore = useCurrentTimeEntryStore();
 const { currentTimeEntry, isActive, now } = storeToRefs(currentTimeEntryStore);
 const { startLiveTimer, stopLiveTimer, setActiveState } = currentTimeEntryStore;
-
+const { discardTimer } = useTimeEntriesStore();
 const projectStore = useProjectsStore();
 const { projects } = storeToRefs(projectStore);
 const taskStore = useTasksStore();
@@ -109,19 +110,19 @@ async function createTag(tag: string) {
 const { tags } = storeToRefs(useTagsStore());
 
 const sortedTasks = computed(() => {
-  const collator = new Intl.Collator(undefined, {
-    numeric: true,
-    sensitivity: 'base',
-  });
+    const collator = new Intl.Collator(undefined, {
+        numeric: true,
+        sensitivity: 'base',
+    });
 
-  // Copy first, then sort
-  return [...tasks.value].sort((a, b) => collator.compare(a.name, b.name));
+    // Copy first, then sort
+    return [...tasks.value].sort((a, b) => collator.compare(a.name, b.name));
 });
 </script>
 
 <template>
     <CardTitle title="Time Tracker" :icon="ClockIcon" class="dark:text-[#7D88A1] w-full  flex-1">
-    </CardTitle> 
+    </CardTitle>
     <div class="relative dark:text-[#7D88A1] ">
         <TimeTrackerRunningInDifferentOrganizationOverlay v-if="
             isRunningInDifferentOrganization
@@ -132,7 +133,7 @@ const sortedTasks = computed(() => {
             :create-client :clients :tags :tasks="sortedTasks" :projects :create-tag :is-active
             :currency="getOrganizationCurrencyString()" @start-live-timer="startLiveTimer"
             @stop-live-timer="stopLiveTimer" @start-timer="setActiveState(true)" @stop-timer="setActiveState(false)"
-            @update-time-entry="updateTimeEntry"></TimeTrackerControls>
-            
+            @discard="discardTimer" @update-time-entry="updateTimeEntry"></TimeTrackerControls>
+
     </div>
 </template>

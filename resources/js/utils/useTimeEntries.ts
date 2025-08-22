@@ -14,7 +14,8 @@ import {
 import dayjs from 'dayjs';
 import { useNotificationsStore } from '@/utils/notification';
 import type { UpdateMultipleTimeEntriesChangeset } from '@/packages/api/src';
-import { useQueryClient } from "@tanstack/vue-query";
+import { useQueryClient } from '@tanstack/vue-query';
+import { useCurrentTimeEntryStore } from './useCurrentTimeEntry';
 
 export const useTimeEntriesStore = defineStore('timeEntries', () => {
     const timeEntries = ref<TimeEntry[]>(reactive([]));
@@ -36,7 +37,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
             const timeEntriesResponse = await handleApiRequestNotifications(
                 () =>
                     api.getTimeEntries({
-                        params: { 
+                        params: {
                             organization: organizationId,
                         },
                         queries: queryParams,
@@ -78,7 +79,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
                 'Failed to fetch time entries'
             );
             if (timeEntriesResponse?.data) {
-                timeEntries.value = timeEntriesResponse.data; 
+                timeEntries.value = timeEntriesResponse.data;
             }
         }
     }
@@ -160,10 +161,10 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
             timeEntries.value = timeEntries.value.map((entry) =>
                 entry.id === timeEntry.id ? response.data : entry
             );
-            queryClient.invalidateQueries({queryKey: ['timeEntry']});
+            queryClient.invalidateQueries({ queryKey: ['timeEntry'] });
         }
-        
-            await fetchTimeEntries();
+
+        await fetchTimeEntries();
     }
 
     async function createTimeEntry(
@@ -208,7 +209,42 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
         }
     }
 
-    async function deleteTimeEntries(timeEntries: TimeEntry[],resMSG?:string) {
+    async function discardTimer(
+        isActive: boolean,
+        currentTimeEntry: TimeEntry[]
+    ) {
+        if (isActive) { 
+            const organizationId = getCurrentOrganizationId();
+            const timeEntryIds = currentTimeEntry.map((entry) => entry.id);
+            if (organizationId) {
+                await handleApiRequestNotifications(
+                    () =>
+                        api.deleteTimeEntries(undefined, {
+                            queries: {
+                                ids: timeEntryIds,
+                            },
+                            params: {
+                                organization: organizationId,
+                            },
+                        }),
+                    'Time entries discarded successfully',
+                    'Failed to discarded time entries'
+                );
+                useCurrentTimeEntryStore().$reset();
+                await fetchTimeEntries();
+            }
+        } else {
+            useNotificationsStore().addNotification(
+                'error',
+                'Entries not found'
+            );
+        }
+        fetchTimeEntries();
+    }
+    async function deleteTimeEntries(
+        timeEntries: TimeEntry[],
+        resMSG?: string
+    ) {
         const organizationId = getCurrentOrganizationId();
         const timeEntryIds = timeEntries.map((entry) => entry.id);
         if (organizationId) {
@@ -222,7 +258,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
                             organization: organizationId,
                         },
                     }),
-                resMSG?resMSG:'Time entries deleted successfully',
+                resMSG ? resMSG : 'Time entries deleted successfully',
                 'Failed to delete time entries'
             );
             await fetchTimeEntries();
@@ -230,6 +266,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
     }
 
     return {
+        discardTimer,
         timeEntries,
         fetchTimeEntries,
         updateTimeEntry,

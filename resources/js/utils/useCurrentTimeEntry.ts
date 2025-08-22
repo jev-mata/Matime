@@ -46,21 +46,23 @@ export const useCurrentTimeEntryStore = defineStore('currentTimeEntry', () => {
     const now = ref<null | Dayjs>(null);
     const interval = ref<ReturnType<typeof setInterval> | null>(null);
 
-const diffTime = (timeStart: string, now: Dayjs): string => {
-  const start = dayjs(timeStart).utc();
-  const seconds = now.diff(start, 'second'); // elapsed seconds
+    const diffTime = (timeStart: string, now: Dayjs): string => {
+        const start = dayjs(timeStart).utc();
+        const seconds = now.diff(start, 'second'); // elapsed seconds
 
-  const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-  const secs = (seconds % 60).toString().padStart(2, '0');
-  return `${mins}:${secs}`;
-};
+        const mins = Math.floor(seconds / 60)
+            .toString()
+            .padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        return `${mins}:${secs}`;
+    };
     function startLiveTimer() {
         stopLiveTimer();
         now.value = dayjs().utc();
         interval.value = setInterval(() => {
             now.value = dayjs().utc();
 
-            document.title = `⏱ ${diffTime(currentTimeEntry.value.start,now.value)} - Panso`;
+            document.title = `⏱ ${diffTime(currentTimeEntry.value.start, now.value)} - Panso`;
         }, 1000);
     }
 
@@ -133,7 +135,7 @@ const diffTime = (timeStart: string, now: Dayjs): string => {
         }
     }
 
-    async function stopTimer() {
+    async function stopTimer(msg?: string) {
         const user = getCurrentUserId();
         const organization = getCurrentOrganizationId();
         if (organization) {
@@ -153,7 +155,7 @@ const diffTime = (timeStart: string, now: Dayjs): string => {
                             },
                         }
                     ),
-                'Timer stopped!'
+                msg ? msg : 'Timer stopped!'
             );
             $reset();
         } else {
@@ -208,20 +210,19 @@ const diffTime = (timeStart: string, now: Dayjs): string => {
             );
         }
         return false;
-    });
-
-    async function setActiveState(newState: boolean) {
+    }); 
+    async function setActiveState(newState: boolean, msg?: string) {
         if (newState) {
             startLiveTimer();
             await startTimer();
         } else {
             stopLiveTimer();
-            await stopTimer();
+            await stopTimer(msg);
         }
         useTimeEntriesStore().fetchTimeEntries();
     }
 
-    return {
+    return { 
         currentTimeEntry,
         fetchCurrentTimeEntry,
         updateTimer,
