@@ -199,6 +199,7 @@ watch(focused, (focused) => {
 function deleteTimeEntries(timeEntries: TimeEntry[]) {
     useTimeEntriesStore().deleteTimeEntries(timeEntries, "Time Entries Discarded");
 
+    emit('updateTimeEntry');
 }
 
 const isMobile = useMediaQuery('(max-width: 640px)');
