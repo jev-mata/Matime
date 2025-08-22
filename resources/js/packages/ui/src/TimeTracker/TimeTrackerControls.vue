@@ -56,6 +56,7 @@ const emit = defineEmits<{
     startLiveTimer: [];
     stopLiveTimer: [];
     discard:[isActive:boolean,TimeEntry[]];
+    reset:[]
 }>();
 
 function updateProject() {
@@ -218,7 +219,10 @@ const { floatingStyles } = useFloating(currentTimeEntryDescriptionInput, floatin
     ],
 });
 const highlightedDropdownEntryId = ref<string | null>(null);
-
+const discardTimeEntry=(isActive:boolean,currentTimeEntry:TimeEntry)=>{
+    emit('discard',isActive,[currentTimeEntry]);
+    emit('reset');
+}
 useSelectEvents(filteredRecentlyTrackedTimeEntries,
     highlightedDropdownEntryId,
     (item) => item.id,
@@ -282,7 +286,7 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
         </div>
         <div class="flex pl-4 @2xl:pl-6 pr-3 absolute sm:relative top-[6px] sm:top-0 right-0">
             <TimeTrackerStartStop :active="isActive" size="large" @changed="onToggleButtonPress"></TimeTrackerStartStop>
-            <button v-if="isActive" @click="emit('discard',isActive,[currentTimeEntry])" title="Discard Entry"
+            <button v-if="isActive" @click="discardTimeEntry(isActive,currentTimeEntry)" title="Discard Entry"
                 class="p-2 rounded-full hover:bg-red-100 text-red-600 w-10 h-10 ml-3 text-center align-center flex">
                 <TrashIcon class="flex-1 w-5 h-5" />
             </button>

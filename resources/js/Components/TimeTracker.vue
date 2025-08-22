@@ -131,9 +131,9 @@ const sortedTasks = computed(() => {
         <TimeTrackerControls v-model:current-time-entry="currentTimeEntry" v-model:live-timer="now" :create-project
             :enable-estimated-time="isAllowedToPerformPremiumAction()" :can-create-project="canCreateProjects()"
             :create-client :clients :tags :tasks="sortedTasks" :projects :create-tag :is-active
-            :currency="getOrganizationCurrencyString()" @start-live-timer="startLiveTimer"
+            :currency="getOrganizationCurrencyString()" @start-live-timer="startLiveTimer" @reset="emit('change')"
             @stop-live-timer="stopLiveTimer" @start-timer="setActiveState(true)" @stop-timer="setActiveState(false)"
-            @discard="discardTimer" @update-time-entry="updateTimeEntry"></TimeTrackerControls>
+            @discard="discardTimer" @update-time-entry="updateTimeEntry" ></TimeTrackerControls>
 
     </div>
 </template>
