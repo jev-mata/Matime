@@ -1,28 +1,31 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
-body{}
-.playBTN{
+@tailwind utilities;
+
+body {
+    @apply font-sans;
+}
+.playBTN {
     background: #00a89e;
 }
-.playBTN:hover{
-    background: #77D36F;
+.playBTN:hover {
+    background: #77d36f;
 }
-.playBTN:hover{
+.playBTN:hover {
     background: #5ba754;
 }
-.stopBTN{
+.stopBTN {
     background: #ff297e;
 }
-.stopBTN:hover{
+.stopBTN:hover {
     background: #ff297fd3;
 }
-.stopBTN:hover{
+.stopBTN:hover {
     background: #ff297fa8;
 }
 :root {
-  --label-color-vchart: #374151; /* gray-700 */
+    --label-color-vchart: #374151; /* gray-700 */
 }
 .dark {
-  --label-color-vchart: #e5e7eb; /* gray-200 */
+    --label-color-vchart: #e5e7eb; /* gray-200 */
 }

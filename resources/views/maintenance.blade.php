@@ -21,15 +21,20 @@
         a { color: #dc8100; text-decoration: none; }
         a:hover { color: #333; text-decoration: none; }
     </style>
+    
+    {{-- @vite(array_filter(\Nwidart\Modules\Module::getAssets(), fn($asset) => $asset !== 'resources/css/filament/admin/theme.css')) --}}
+    @vite(['resources/js/app.ts', 'resources/css/app.css'])
 </head>
-<body>
-    <article>
-        <h1>We'll be back soon!</h1>
-        <div>
-            <p>Sorry for the inconvenience but we're performing some maintenance at the moment. 
+<body class="bg-[#0C101E]">
+    <div class="min-w-[300px] w-[60%] mx-auto">
+        <img src="{{ asset('images/maintenance.png')}}" class="min-w-[100px] w-[25%] mx-auto p-3"/>
+        <h1 class="text-center text-5xl font-bold py-5">We'll be back soon!</h1>
+        <div class="text-center px-2">
+            <p  class="text-2xl text-center px-4 font-light">Sorry for the inconvenience but we're performing some maintenance at the moment. 
             We'll be back online shortly!</p>
             {{-- <p>&mdash; The Team</p> --}}
         </div>
-    </article>
+        <img src="{{ asset('images/logo.png')}}" class="min-w-[100px] w-[45%] mx-auto "/>
+    </div>
 </body>
 </html>

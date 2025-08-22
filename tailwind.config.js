@@ -15,7 +15,12 @@ export default {
         './extensions/**/resources/**/*.vue',
         "./resources/js/**/*.vue"
     ],
-    theme: { 
+    theme: {   
+        extend: {
+            fontFamily: {
+                sans: ["Inter", "sans-serif"],
+            },
+        },
     },
 
     plugins: [forms, typography, require("@tailwindcss/container-queries"), require("tailwindcss-animate")]
