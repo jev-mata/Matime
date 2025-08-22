@@ -7,6 +7,9 @@ import { formatDuration } from '@/packages/ui/src/utils/time';
 import TimeTrackerStartStop from '@/packages/ui/src/TimeTrackerStartStop.vue';
 import { getCurrentOrganizationId } from '@/utils/useUser';
 
+import { useNotificationsStore } from '@/utils/notification';
+const notification = useNotificationsStore();
+
 const store = useCurrentTimeEntryStore();
 const { currentTimeEntry, now, isActive } = storeToRefs(store);
 const { setActiveState } = store;
@@ -27,15 +30,38 @@ const isRunningInDifferentOrganization = computed(() => {
         currentTimeEntry.value.organization_id !== getCurrentOrganizationId()
     );
 });
+function toggleState() {
+    if (isActive) {
+ 
+
+        if (!currentTimeEntry.value.description) {
+
+            // currentTimeEntryDescriptionInput.value?.focus();
+
+            notification.addNotification('error', 'Description is Empty', 'Please Input your Description you\'ve working on.');
+        } if (!currentTimeEntry.value.project_id) {
+            // ProjectOpen.value = true;
+            notification.addNotification('error', 'Project is Empty', 'Please Choose Project you\'ve working on.');
+        } if (!currentTimeEntry.value.task_id) {
+            // ProjectOpen.value = true;
+            notification.addNotification('error', 'Task is Empty', 'Please Choose Task you\'ve working on.');
+        } else {
+
+            setActiveState(!isActive);
+        }
+    } else {
+
+        setActiveState(!isActive);
+    }
+}
+
 </script>
 
 <template>
     <div class="pt-3 pb-2.5 px-2 flex justify-between items-center relative">
-        <div
-            v-if="isRunningInDifferentOrganization"
+        <div v-if="isRunningInDifferentOrganization"
             class="absolute w-full h-full backdrop-blur-sm z-10 flex items-center justify-center">
-            <div
-                class="w-full h-[calc(100%+10px)] absolute bg-default-background opacity-75 backdrop-blur-sm"></div>
+            <div class="w-full h-[calc(100%+10px)] absolute bg-default-background opacity-75 backdrop-blur-sm"></div>
             <div class="flex space-x-3 items-center w-full z-20 justify-center">
                 <span class="text-xs text-center text-text-primary">
                     The Timer is running in a different organization.
@@ -50,9 +76,6 @@ const isRunningInDifferentOrganization = computed(() => {
                 {{ currentTime }}
             </div>
         </div>
-        <TimeTrackerStartStop
-            :active="isActive"
-            size="base"
-            @changed="setActiveState"></TimeTrackerStartStop>
+        <TimeTrackerStartStop :active="isActive" size="base" @changed="toggleState"></TimeTrackerStartStop>
     </div>
 </template>

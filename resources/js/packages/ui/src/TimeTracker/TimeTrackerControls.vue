@@ -22,6 +22,9 @@ import { autoUpdate, flip, limitShift, offset, shift, useFloating } from "@float
 import TimeTrackerRecentlyTrackedEntry from "@/packages/ui/src/TimeTracker/TimeTrackerRecentlyTrackedEntry.vue";
 import { useSelectEvents } from "@/packages/ui/src/utils/select";
 import { useMediaQuery } from '@vueuse/core'; // or your preferred media query hook
+
+import { useNotificationsStore } from '@/utils/notification';
+const notification = useNotificationsStore();
 const currentTimeEntry = defineModel<TimeEntry>('currentTimeEntry', {
     required: true,
 });
@@ -118,11 +121,16 @@ function onToggleButtonPress(newState: boolean) {
     } else {
 
         if (!tempDescription.value) {
-            currentTimeEntryDescriptionInput.value?.focus();
-        } else if (!currentTimeEntry.value.project_id) {
-            ProjectOpen.value = true;
-        } else if (!currentTimeEntry.value.task_id) {
-            ProjectOpen.value = true;
+
+            // currentTimeEntryDescriptionInput.value?.focus();
+            
+            notification.addNotification('error','Description is Empty','Please Input your Description you\'ve working on.');
+        }  if (!currentTimeEntry.value.project_id) {
+            // ProjectOpen.value = true;
+            notification.addNotification('error','Project is Empty','Please Choose Project you\'ve working on.');
+        } if (!currentTimeEntry.value.task_id) {
+            // ProjectOpen.value = true;
+            notification.addNotification('error','Task is Empty','Please Choose Task you\'ve working on.');
         } else {
             emit('stopTimer');
         }
@@ -229,8 +237,7 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                     class="z-50 absolute w-full" :style="floatingStyles">
                     <div
                         class="rounded-lg w-full fixed min-w-xl top-0 left-0   overflow-none shadow dark:bg-[#13192B] bg-white border dark:border-[#5D6370]  ">
-                        <div
-                            class="text-text-tertiary text-xs font-semibold   px-2 py-1.5">
+                        <div class="text-text-tertiary text-xs font-semibold   px-2 py-1.5">
                             Recently Tracked Time Entries
                         </div>
                         <div class="text-text-secondary py-1 px-1.5">
@@ -248,8 +255,10 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                 <div class="flex items-center w-[130px] @2xl:w-auto shrink min-w-0 ">
                     <TimeTrackerProjectTaskDropdown v-model:project="currentTimeEntry.project_id" v-model:task="currentTimeEntry.task_id
                         " :create-client :can-create-project :clients :create-project :currency="currency"
-                        :projects="projects" :tasks="tasks" :enable-estimated-time="enableEstimatedTime" class=" border-[#77D36F] bg-[#D4FFD1] hover:bg-[#C1F7B0] dark:border-[#5D6370] dark:bg-[#13192B] dark:hover:bg-[#0C101E] "
-                        :setOpen="OpenProject" :open="ProjectOpen" ref="currentTimeEntryProjectInput" @changed="updateProject">
+                        :projects="projects" :tasks="tasks" :enable-estimated-time="enableEstimatedTime"
+                        class=" border-[#77D36F] bg-[#D4FFD1] hover:bg-[#C1F7B0] dark:border-[#5D6370] dark:bg-[#13192B] dark:hover:bg-[#0C101E] "
+                        :setOpen="OpenProject" :open="ProjectOpen" ref="currentTimeEntryProjectInput"
+                        @changed="updateProject">
                     </TimeTrackerProjectTaskDropdown>
                 </div>
                 <div class="flex items-center @2xl:space-x-2 px-2 @2xl:px-4">

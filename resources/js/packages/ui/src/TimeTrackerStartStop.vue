@@ -34,8 +34,10 @@ const buttonColorClasses = computed(() => {
 });
 
 function toggleState() {
+    
     emit('changed', !props.active);
 }
+
 </script>
 
 <template>
