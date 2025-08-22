@@ -231,6 +231,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
                     'Failed to discarded time entries'
                 );
                 useCurrentTimeEntryStore().$reset();
+                useCurrentTimeEntryStore().fetchCurrentTimeEntry();
                 await fetchTimeEntries();
             }
         } else {

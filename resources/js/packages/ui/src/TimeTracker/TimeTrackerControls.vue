@@ -81,6 +81,13 @@ function setCurrentTimeEntry(timeEntry: TimeEntry) {
     currentTimeEntry.value.tags = timeEntry.tags;
     currentTimeEntry.value.billable = timeEntry.billable;
 }
+function clearCurrentTimeEntry() {
+    currentTimeEntry.value.description = null;
+    currentTimeEntry.value.project_id = null;
+    currentTimeEntry.value.task_id = null;
+    currentTimeEntry.value.tags = [];
+    currentTimeEntry.value.billable = false;
+}
 
 function startTimerIfNotActive() {
     if (highlightedDropdownEntryId.value) {
