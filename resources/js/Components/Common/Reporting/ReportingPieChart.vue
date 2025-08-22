@@ -36,7 +36,7 @@ type ReportingChartDataEntry = {
 const props = defineProps<{
     data: ReportingChartDataEntry | null;
 }>();
-const labelColor = useCssVar('--color-text-secondary', null, { observe: true });
+const labelColor = useCssVar('--label-color-vchart', null, { observe: true });
 
 const seriesData = computed(() => {
     return props.data?.map((el) => {
@@ -92,7 +92,7 @@ const option = computed(() => ({
 
 <template>
     <v-chart
-        class="background-transparent max-w-[300px] mx-auto h-[460px]"
+        class="background-transparent max-w-[300px] mx-auto h-[460px]  "
         :autoresize="true"
         :option="option" />
 </template>

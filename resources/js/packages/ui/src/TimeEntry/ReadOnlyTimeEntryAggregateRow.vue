@@ -113,7 +113,7 @@ const selectedProjectColor = computed(() => {
                     title="{{selectedProjectName +currentTask.name}}">
                     <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
                         @click="expanded = !expanded" :name="selectedProjectName"
-                        :class="'focus:dark:border-[#3F4961] w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35'">
+                        :class="'focus:dark:border-[#3F4961] w-full focus:outline-0 focus:bg-card-background-separator min-w-0 relative w-35 bg-transparent dark:bg-transparent hover:bg-transparent '">
                         <div class="flex items-center lg:space-x-1 min-w-0">
                             <span
                                 class="whitespace-nowrap text-xs lg:text-sm  font-semibold  text-text-primary text-base">
@@ -131,7 +131,7 @@ const selectedProjectColor = computed(() => {
                 <div class="flex items-center     md:col-span-2 sm:col-span-2 xl:col-span-1 2xl:col-span-1 bg-secondary min-w-0">
                     <div class="flex-1 ">
                         <TagBadge :border="false" size="large"
-                            class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary"
+                            class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary  bg-transparent dark:bg-transparent hover:bg-transparent"
                             :name="timeEntryTags(timeEntry.tags)
                                     .map((tag: Tag) => tag.name)
                                     .join(', ')

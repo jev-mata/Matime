@@ -211,7 +211,7 @@ const showCreateTagModal = ref(false);
                 </div>
                 <div class="hover:bg-card-background-active rounded-b-lg">
                     <button
-                        class="dark:bg-[#171E31] dark:text-[#BFC7D6]  w-full flex space-x-3 items-center px-4 py-3 text-xs font-semibold border-t dark:border-[#303F61] "
+                        class="dark:bg-[#171E31] dark:text-[#BFC7D6] hover:bg-gray-600/10 hover:dark:bg-gray-800/80 w-full flex space-x-3 items-center px-4 py-3 text-xs font-semibold border-t dark:border-[#303F61] "
                         @click="
                         open = false;
                         showCreateTagModal = true;

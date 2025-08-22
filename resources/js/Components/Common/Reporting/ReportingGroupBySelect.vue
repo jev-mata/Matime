@@ -27,9 +27,9 @@ const title = computed(() => {
             <Badge
                 size="large"
                 tag="button"
-                class="cursor-pointer hover:bg-card-background transition space-x-5 flex">
-                <component :is="icon" class="h-4 text-text-secondary"></component>
-                <span> {{ title }} </span>
+                class="cursor-pointer hover:text-gray-200 hover:dark:text-gray-700  transition space-x-5 flex">
+                <component :is="icon" class="h-4  "></component>
+                <span class="text-inherit"> {{ title }} </span>
             </Badge>
         </template>
     </SelectDropdown>

@@ -47,7 +47,7 @@ const tagClasses = computed(() => {
                 tagClasses,
                 badgeClasses[size],
                 borderClasses,
-                'rounded transition inline-flex items-center font-semibold text-text-primary disabled:text-text-quaternary outline-0  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'rounded transition inline-flex items-center font-semibold dark:bg-[#0C101E] bg-gray-300 border-gray-400 hover:dark:bg-[#303F61] hover:bg-gray-500 disabled:dark:text-gray-700 disabled:text-gray-200 hover:dark:text-gray-200 hover:text-gray-700 outline-0  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 props.class
             )
         ">

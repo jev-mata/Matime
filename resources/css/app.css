@@ -20,3 +20,9 @@ body{}
 .stopBTN:hover{
     background: #ff297fa8;
 }
+:root {
+  --label-color-vchart: #374151; /* gray-700 */
+}
+.dark {
+  --label-color-vchart: #e5e7eb; /* gray-200 */
+}

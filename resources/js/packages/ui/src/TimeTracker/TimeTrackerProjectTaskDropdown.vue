@@ -559,7 +559,7 @@ const showCreateProject = ref(false);
         <template #trigger>
             <ProjectBadge ref="projectDropdownTrigger" :color="selectedProjectColor" :size="size"
                 :border="showBadgeBorder" tag="button" :name="selectedProjectName" :class="twMerge(
-                    'focus:dark:border-[#5D6370] w-full focus:outline-0 focus:dark:bg-[#0C101E] min-w-0 relative dark:text-[#7D88A1] hover:dark:bg-[#0C101E]',
+                    'focus:dark:border-[#5D6370] w-full bg-transparent dark:bg-transparent focus:outline-0 focus:dark:bg-[#0C101E] min-w-0 relative dark:text-[#7D88A1] hover:dark:bg-[#0C101E] hover:bg-[#0C101E]/10',
                     props.class
                 )
                     ">

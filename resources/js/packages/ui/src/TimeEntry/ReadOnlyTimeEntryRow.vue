@@ -96,7 +96,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 <!-- Project/Task Badge -->
                 <div class="px-2 w-full 2xl:col-span-3 xl:col-span-3 md:col-span-5 sm:col-span-5 bg-secondary min-w-0">
                     <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
-                        class="flex focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0">
+                        class="flex focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 bg-transparent dark:bg-transparent hover:bg-transparent">
                         <div class="flex lg:space-x-1 min-w-0">
                             <span class="whitespace-nowrap text-xs lg:text-sm    text-text-primary text-base">
                                 {{ selectedProjectName }}
@@ -116,7 +116,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 <div class="flex bg-secondary min-w-0    sm:col-span-1 md:col-span-2 sm:col-span-2 xl:col-span-1 2xl:col-span-1">
                     <div class="flex-1 ">
                         <TagBadge :border="false" size="large"
-                            class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary"
+                            class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary  bg-transparent dark:bg-transparent hover:bg-transparent"
                             :name="timeEntryTags(timeEntry.tags)
                                     .map((tag: Tag) => tag.name)
                                     .join(', ')

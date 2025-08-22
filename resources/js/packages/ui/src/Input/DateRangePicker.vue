@@ -211,7 +211,7 @@ watch(open, (value) => {
             <button
                 :class="
                     twMerge(
-                        'flex w-full items-center justify-between whitespace-nowrap rounded-md  dark:bg-[#0C101E]    hover:dark:bg-[#303F61] hover:text-gray-100 px-3 h-[34px] shadow-sm data-[placeholder]:dark:text-[#636E88] focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
+                        'flex w-full items-center justify-between whitespace-nowrap rounded-md  dark:bg-[#0C101E]    hover:dark:bg-[#303F61] hover:dark:text-gray-100    hover:bg-gray-300 hover:text-gray-800 px-3 h-[34px] shadow-sm data-[placeholder]:dark:text-[#636E88] focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
                         !modelValue && 'text-muted-foreground'
                     )
                 ">
