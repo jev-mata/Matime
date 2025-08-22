@@ -208,7 +208,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
         }
     }
 
-    async function deleteTimeEntries(timeEntries: TimeEntry[]) {
+    async function deleteTimeEntries(timeEntries: TimeEntry[],resMSG?:string) {
         const organizationId = getCurrentOrganizationId();
         const timeEntryIds = timeEntries.map((entry) => entry.id);
         if (organizationId) {
@@ -222,7 +222,7 @@ export const useTimeEntriesStore = defineStore('timeEntries', () => {
                             organization: organizationId,
                         },
                     }),
-                'Time entries deleted successfully',
+                resMSG?resMSG:'Time entries deleted successfully',
                 'Failed to delete time entries'
             );
             await fetchTimeEntries();

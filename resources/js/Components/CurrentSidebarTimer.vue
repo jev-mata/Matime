@@ -6,8 +6,11 @@ import dayjs from 'dayjs';
 import { formatDuration } from '@/packages/ui/src/utils/time';
 import TimeTrackerStartStop from '@/packages/ui/src/TimeTrackerStartStop.vue';
 import { getCurrentOrganizationId } from '@/utils/useUser';
+import { TrashIcon } from '@heroicons/vue/24/solid' // or outline
 
+import { useTimeEntriesStore } from '@/utils/useTimeEntries';
 import { useNotificationsStore } from '@/utils/notification';
+import type { TimeEntry } from '@/packages/api/src';
 const notification = useNotificationsStore();
 
 const store = useCurrentTimeEntryStore();
@@ -32,7 +35,7 @@ const isRunningInDifferentOrganization = computed(() => {
 });
 function toggleState() {
     if (isActive) {
- 
+
 
         if (!currentTimeEntry.value.description) {
 
@@ -55,6 +58,10 @@ function toggleState() {
     }
 }
 
+function deleteTimeEntries(timeEntries: TimeEntry[]) {
+    useTimeEntriesStore().deleteTimeEntries(timeEntries, "Time Entries Discarded");
+
+}
 </script>
 
 <template>
@@ -76,6 +83,13 @@ function toggleState() {
                 {{ currentTime }}
             </div>
         </div>
-        <TimeTrackerStartStop :active="isActive" size="base" @changed="toggleState"></TimeTrackerStartStop>
+        <div class="flex">
+
+            <TimeTrackerStartStop :active="isActive" size="base" @changed="toggleState"></TimeTrackerStartStop>
+            <button v-if="isActive" @click="deleteTimeEntries([currentTimeEntry])" title="Discard Entry"
+                class="p-2 rounded-full hover:bg-red-100 text-red-600 w-10 h-10 ml-2 text-center align-center flex">
+                <TrashIcon class="flex-1 w-5 h-5" />
+            </button>
+        </div>
     </div>
 </template>

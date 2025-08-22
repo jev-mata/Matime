@@ -23,6 +23,7 @@ import TimeTrackerRecentlyTrackedEntry from "@/packages/ui/src/TimeTracker/TimeT
 import { useSelectEvents } from "@/packages/ui/src/utils/select";
 import { useMediaQuery } from '@vueuse/core'; // or your preferred media query hook
 
+import { TrashIcon } from '@heroicons/vue/24/solid' // or outline
 import { useNotificationsStore } from '@/utils/notification';
 const notification = useNotificationsStore();
 const currentTimeEntry = defineModel<TimeEntry>('currentTimeEntry', {
@@ -123,14 +124,14 @@ function onToggleButtonPress(newState: boolean) {
         if (!tempDescription.value) {
 
             // currentTimeEntryDescriptionInput.value?.focus();
-            
-            notification.addNotification('error','Description is Empty','Please Input your Description you\'ve working on.');
-        }  if (!currentTimeEntry.value.project_id) {
+
+            notification.addNotification('error', 'Description is Empty', 'Please Input your Description you\'ve working on.');
+        } if (!currentTimeEntry.value.project_id) {
             // ProjectOpen.value = true;
-            notification.addNotification('error','Project is Empty','Please Choose Project you\'ve working on.');
+            notification.addNotification('error', 'Project is Empty', 'Please Choose Project you\'ve working on.');
         } if (!currentTimeEntry.value.task_id) {
             // ProjectOpen.value = true;
-            notification.addNotification('error','Task is Empty','Please Choose Task you\'ve working on.');
+            notification.addNotification('error', 'Task is Empty', 'Please Choose Task you\'ve working on.');
         } else {
             emit('stopTimer');
         }
@@ -195,6 +196,10 @@ watch(focused, (focused) => {
     });
 });
 
+function deleteTimeEntries(timeEntries: TimeEntry[]) {
+    useTimeEntriesStore().deleteTimeEntries(timeEntries, "Time Entries Discarded");
+
+}
 
 const isMobile = useMediaQuery('(max-width: 640px)');
 const floating = ref(null);
@@ -278,8 +283,12 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                 </div>
             </div>
         </div>
-        <div class="pl-4 @2xl:pl-6 pr-3 absolute sm:relative top-[6px] sm:top-0 right-0">
+        <div class="flex pl-4 @2xl:pl-6 pr-3 absolute sm:relative top-[6px] sm:top-0 right-0">
             <TimeTrackerStartStop :active="isActive" size="large" @changed="onToggleButtonPress"></TimeTrackerStartStop>
+            <button v-if="isActive" @click="deleteTimeEntries([currentTimeEntry])" title="Discard Entry"
+                class="p-2 rounded-full hover:bg-red-100 text-red-600 w-10 h-10 ml-3 text-center align-center flex">
+                <TrashIcon class="flex-1 w-5 h-5" />
+            </button>
         </div>
     </div>
 </template>
