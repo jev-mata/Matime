@@ -359,7 +359,7 @@ class DashboardService
         } elseif ($currentRole === "manager") {
             $roletoShow = ["employee"];
         }
-        $timeEntries=[];
+        $timeEntries = [];
         if ($currentRole === "owner") {
 
             $timeEntries = TimeEntry::query()
@@ -371,7 +371,7 @@ class DashboardService
                 ->get()
                 ->sortByDesc('start')
                 ->slice(0, 4);
-        } elseif ($currentRole === "manager") {
+        } elseif ($currentRole === "admin" || $currentRole === "manager") {
 
             $timeEntries = TimeEntry::query()
                 ->select(DB::raw('distinct on (member_id) member_id, description, id, task_id, start, "end"'))
