@@ -40,8 +40,7 @@
 
     {{-- @vite(array_filter(\Nwidart\Modules\Module::getAssets(), fn($asset) => $asset !== 'resources/css/filament/admin/theme.css')) --}}
     {{-- @vite(['resources/js/app.ts', 'resources/css/app.css']) --}}
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
