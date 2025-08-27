@@ -31,6 +31,8 @@ use Laravel\Passport\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 use App\Models\Teams as Groups;
+use Illuminate\Support\Facades\Log;
+
 /**
  * @property string $id
  * @property string $name
@@ -147,13 +149,26 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
         return $this->hasOne(Member::class, 'user_id');
     }
 
+    public function currentRole()
+    {
+        $organization = $this->organizations()
+            ->where('organizations.id', $this->current_team_id) // filter by current team/org
+            ->first();
+
+        if (! $organization) { 
+            return null;
+        } 
+
+        return $organization->membership?->role;
+    }
+
     /**
      * @return BelongsToMany<Organization>
      */
     public function organizations(): BelongsToMany
     {
         return $this->belongsToMany(Organization::class, Member::class)
-            ->withPivot([
+            ->withPivot(columns: [
                 'id',
                 'role',
                 'billable_rate',
@@ -174,7 +189,7 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
     {
         return $this->belongsToMany(Groups::class, 'team_user', 'user_id', 'team_id');
     }
- 
+
     /**
      * @return BelongsTo<Organization, User>
      */

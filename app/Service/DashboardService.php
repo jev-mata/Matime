@@ -14,7 +14,9 @@ use Carbon\CarbonTimeZone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DashboardService
 {
@@ -342,16 +344,27 @@ class DashboardService
      */
     public function latestTeamActivity(Organization $organization): array
     {
-        $currentUser = auth()->user();
-        $groupIds = $currentUser->groups()->pluck('teams.id')->all();
+        $currentUser = Auth::user();
         if ($currentUser === null) {
             return [];
         }
+
+        $currentRole = $currentUser->currentRole(); 
+        $groupIds = $currentUser->groups()->pluck('teams.id')->all();
+        $roletoShow = [];
+        if ($currentRole === "owner") {
+            $roletoShow = ["admin", "manager", "employee"];
+        } elseif ($currentRole === "admin") {
+            $roletoShow = ["manager", "employee"];
+        } elseif ($currentRole === "manager") {
+            $roletoShow = ["employee"];
+        }
+ 
         $timeEntries = TimeEntry::query()
             ->select(DB::raw('distinct on (member_id) member_id, description, id, task_id, start, "end"'))
             ->whereBelongsTo($organization, 'organization')
-            ->whereHas('member', function ($memberQuery) use ($groupIds) {
-                $memberQuery->where('role', 'employee')
+            ->whereHas('member', function ($memberQuery) use ($groupIds, $roletoShow) {
+                $memberQuery->whereIn('role', $roletoShow)
                     ->whereHas('user.groups', function ($query) use ($groupIds) {
                         $query->whereIn('teams.id', $groupIds); // ✅ force correct table
                     });

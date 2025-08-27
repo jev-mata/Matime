@@ -59,8 +59,8 @@ class ProjectController extends Controller
         $ownerId = optional($organization->owner()->first())->id;
         $userId = auth()->id();
 
-        if ($this->member($organization)->role === Role::Admin->value) {
-            Log::info("admin");
+        if ($this->member($organization)->role === Role::Admin->value) { 
+            
         } else if ($ownerId !== $userId) {
             $groupIds = $team->groups->pluck('id');
 
