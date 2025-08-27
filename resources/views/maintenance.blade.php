@@ -55,7 +55,7 @@
                 We'll be back online shortly!</p>
             {{-- <p>&mdash; The Team</p> --}}
         </div>
-        <img src="{{ asset('images/logo.png') }}" class="min-w-[100px] w-[45%] mx-auto " />
+        <img src="{{ asset('images/logo.png') }}" class="min-w-[100px] w-[40%] mx-auto " />
     </div>
 </body>
 
