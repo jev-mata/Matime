@@ -349,7 +349,7 @@ class DashboardService
             return [];
         }
 
-        $currentRole = $currentUser->currentRole(); 
+        $currentRole = $currentUser->currentRole();
         $groupIds = $currentUser->groups()->pluck('teams.id')->all();
         $roletoShow = [];
         if ($currentRole === "owner") {
@@ -359,23 +359,36 @@ class DashboardService
         } elseif ($currentRole === "manager") {
             $roletoShow = ["employee"];
         }
- 
-        $timeEntries = TimeEntry::query()
-            ->select(DB::raw('distinct on (member_id) member_id, description, id, task_id, start, "end"'))
-            ->whereBelongsTo($organization, 'organization')
-            ->whereHas('member', function ($memberQuery) use ($groupIds, $roletoShow) {
-                $memberQuery->whereIn('role', $roletoShow)
-                    ->whereHas('user.groups', function ($query) use ($groupIds) {
-                        $query->whereIn('teams.id', $groupIds); // ✅ force correct table
-                    });
-            })
-            ->orderBy('member_id')
-            ->orderBy('start', 'desc')
-            ->with('member.user')
-            ->get()
-            ->sortByDesc('start')
-            ->slice(0, 4);
 
+        if ($currentRole === "owner") {
+
+            $timeEntries = TimeEntry::query()
+                ->select(DB::raw('distinct on (member_id) member_id, description, id, task_id, start, "end"'))
+                ->whereBelongsTo($organization, 'organization')
+                ->orderBy('member_id')
+                ->orderBy('start', 'desc')
+                ->with('member.user')
+                ->get()
+                ->sortByDesc('start')
+                ->slice(0, 4);
+        } elseif ($currentRole === "manager") {
+
+            $timeEntries = TimeEntry::query()
+                ->select(DB::raw('distinct on (member_id) member_id, description, id, task_id, start, "end"'))
+                ->whereBelongsTo($organization, 'organization')
+                ->whereHas('member', function ($memberQuery) use ($groupIds, $roletoShow) {
+                    $memberQuery->whereIn('role', $roletoShow)
+                        ->whereHas('user.groups', function ($query) use ($groupIds) {
+                            $query->whereIn('teams.id', $groupIds); // ✅ force correct table
+                        });
+                })
+                ->orderBy('member_id')
+                ->orderBy('start', 'desc')
+                ->with('member.user')
+                ->get()
+                ->sortByDesc('start')
+                ->slice(0, 4);
+        }
 
         $response = [];
 
