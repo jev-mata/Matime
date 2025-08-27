@@ -174,13 +174,7 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
     {
         return $this->belongsToMany(Groups::class, 'team_user', 'user_id', 'team_id');
     }
-
-    public function Timesheets()
-    {
-        return $this->hasMany(Timesheet::class, 'user_id', 'id');
-    }
-
-
+ 
     /**
      * @return BelongsTo<Organization, User>
      */

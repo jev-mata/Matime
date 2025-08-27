@@ -141,9 +141,9 @@ class DashboardService
         $timezoneShift = $this->timezoneService->getShiftFromUtc($timezone);
 
         if ($timezoneShift > 0) {
-            $dateWithTimeZone = 'start + INTERVAL \''.$timezoneShift.' second\'';
+            $dateWithTimeZone = 'start + INTERVAL \'' . $timezoneShift . ' second\'';
         } elseif ($timezoneShift < 0) {
-            $dateWithTimeZone = 'start - INTERVAL \''.abs($timezoneShift).' second\'';
+            $dateWithTimeZone = 'start - INTERVAL \'' . abs($timezoneShift) . ' second\'';
         } else {
             $dateWithTimeZone = 'start';
         }
@@ -151,10 +151,10 @@ class DashboardService
         $possibleDays = $this->lastDays($days, $timezone);
 
         $query = TimeEntry::query()
-            ->select(DB::raw('DATE('.$dateWithTimeZone.') as date, round(sum(extract(epoch from (coalesce("end", now()) - start)))) as aggregate'))
+            ->select(DB::raw('DATE(' . $dateWithTimeZone . ') as date, round(sum(extract(epoch from (coalesce("end", now()) - start)))) as aggregate'))
             ->where('user_id', '=', $user->getKey())
             ->where('organization_id', '=', $organization->getKey())
-            ->groupBy(DB::raw('DATE('.$dateWithTimeZone.')'))
+            ->groupBy(DB::raw('DATE(' . $dateWithTimeZone . ')'))
             ->orderBy('date');
 
         $query = $this->constrainDateByPossibleDates($query, $possibleDays, $timezone);
@@ -183,19 +183,19 @@ class DashboardService
         $timezone = $this->timezoneService->getTimezoneFromUser($user);
         $timezoneShift = $this->timezoneService->getShiftFromUtc($timezone);
         if ($timezoneShift > 0) {
-            $dateWithTimeZone = 'start + INTERVAL \''.$timezoneShift.' second\'';
+            $dateWithTimeZone = 'start + INTERVAL \'' . $timezoneShift . ' second\'';
         } elseif ($timezoneShift < 0) {
-            $dateWithTimeZone = 'start - INTERVAL \''.abs($timezoneShift).' second\'';
+            $dateWithTimeZone = 'start - INTERVAL \'' . abs($timezoneShift) . ' second\'';
         } else {
             $dateWithTimeZone = 'start';
         }
         $possibleDays = $this->daysOfThisWeek($timezone, $user->week_start);
 
         $query = TimeEntry::query()
-            ->select(DB::raw('DATE('.$dateWithTimeZone.') as date, round(sum(extract(epoch from (coalesce("end", now()) - start)))) as aggregate'))
+            ->select(DB::raw('DATE(' . $dateWithTimeZone . ') as date, round(sum(extract(epoch from (coalesce("end", now()) - start)))) as aggregate'))
             ->where('user_id', '=', $user->getKey())
             ->where('organization_id', '=', $organization->getKey())
-            ->groupBy(DB::raw('DATE('.$dateWithTimeZone.')'))
+            ->groupBy(DB::raw('DATE(' . $dateWithTimeZone . ')'))
             ->orderBy('date');
 
         $query = $this->constrainDateByPossibleDates($query, $possibleDays, $timezone);
@@ -330,7 +330,6 @@ class DashboardService
                 'name' => 'No project',
                 'color' => '#cccccc',
             ];
-
         }
 
         return $response;
@@ -343,20 +342,27 @@ class DashboardService
      */
     public function latestTeamActivity(Organization $organization): array
     {
+        $currentUser = auth()->user();
+        $groupIds = $currentUser->groups()->pluck('teams.id')->all();
+        if ($currentUser === null) {
+            return [];
+        }
         $timeEntries = TimeEntry::query()
             ->select(DB::raw('distinct on (member_id) member_id, description, id, task_id, start, "end"'))
             ->whereBelongsTo($organization, 'organization')
+            ->whereHas('member', function ($memberQuery) use ($groupIds) {
+                $memberQuery->where('role', 'employee')
+                    ->whereHas('user.groups', function ($query) use ($groupIds) {
+                        $query->whereIn('teams.id', $groupIds); // ✅ force correct table
+                    });
+            })
             ->orderBy('member_id')
             ->orderBy('start', 'desc')
-            // Note: limit here does not work because of the distinct on
-            ->with([
-                'member' => [
-                    'user',
-                ],
-            ])
+            ->with('member.user')
             ->get()
             ->sortByDesc('start')
             ->slice(0, 4);
+
 
         $response = [];
 
