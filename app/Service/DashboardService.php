@@ -359,7 +359,7 @@ class DashboardService
         } elseif ($currentRole === "manager") {
             $roletoShow = ["employee"];
         }
-
+        $timeEntries=[];
         if ($currentRole === "owner") {
 
             $timeEntries = TimeEntry::query()
