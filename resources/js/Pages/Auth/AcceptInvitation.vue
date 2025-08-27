@@ -22,7 +22,7 @@ const form = useForm({
 const submit = () => {
 
     console.log('Submitting to:', route('team-invitations.accept', props.invitation.id));
-    form.post(route('team-invitations.accept', props.invitation.id));
+    form.post(route('team.invitations.accept', props.invitation.id));
 }
 </script>
 

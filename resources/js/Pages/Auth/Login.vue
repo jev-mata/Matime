@@ -45,13 +45,7 @@ const page = usePage<{
             </div>
         </template>
 
-        <template #actions>
-            <Link
-                class="py-8 dark:text-[#BFC7D6] text-sm font-medium opacity-90 hover:opacity-100 transition "
-                :href="route('register')">
-            No account yet?
-            <span class=" dark:text-[#BFC7D6] text-text-primary  ">Register here!</span>
-            </Link>
+        <template #actions> 
         </template>
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-400">
