@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, inject, type ComputedRef } from 'vue';
 import type {
     CreateClientBody,
     CreateProjectBody,
@@ -13,6 +13,11 @@ import type {
 import {
     getDayJsInstance,
 } from '@/packages/ui/src/utils/time';
+import {
+    formatDate,
+    formatHumanReadableDuration,
+    formatWeekday,
+} from '@/packages/ui/src/utils/time';
 import TimeEntryAggregateRow from '@/packages/ui/src/TimeEntry/TimeEntryAggregateRow.vue';
 import ReadOnlyTimeEntryAggregateRow from '@/packages/ui/src/TimeEntry/ReadOnlyTimeEntryAggregateRow.vue';
 import ReadOnlyTimeEntryRow from '@/packages/ui/src/TimeEntry/ReadOnlyTimeEntryRow.vue';
@@ -23,6 +28,9 @@ import axios from 'axios';
 import { useNotificationsStore } from '@/utils/notification';
 // import { Checkbox } from '@/packages/ui/src';
 import Submit from '@/Pages/Timesheet/Submit.vue';
+import type { Organization } from '@/packages/api/src';
+
+const organization = inject<ComputedRef<Organization>>('organization');
 // import {
 //     type TimeEntriesQueryParams,
 // } from '@/packages/api/src';
@@ -52,7 +60,7 @@ const props = defineProps<{
     fetchTimeEntries: () => void;
 }>();
 
-const isLoading=ref<boolean>(false);
+const isLoading = ref<boolean>(false);
 const { addNotification } = useNotificationsStore();
 function startTimeEntryFromExisting(entry: TimeEntry) {
     props.createTimeEntry({
@@ -82,6 +90,7 @@ type GroupedTimeEntries = Record<
         isApproved: 'Approved' | 'Unapproved' | 'Rejected';
         isSubmitted: boolean;
         days: Record<string, TimeEntriesGroupedByType[]>; // daily breakdown
+        totalHours?: number;
     }
 >
 
@@ -114,14 +123,16 @@ function groupTimeEntriesFunc() {
 
         if (!grouped[biMonthKey]) {
             grouped[biMonthKey] = {
-                isApproved: entry.approval == "approved"?'Approved':entry.approval != "approved" &&entry.approval != "rejected"?'Unapproved':'Rejected',
+                isApproved: entry.approval == "approved" ? 'Approved' : entry.approval != "approved" && entry.approval != "rejected" ? 'Unapproved' : 'Rejected',
                 isSubmitted: entry.approval == "submitted" || entry.approval == "approved",
                 days: {}
             }
-        } 
+        }
+
         if (!grouped[biMonthKey].days[dayKey]) {
             grouped[biMonthKey].days[dayKey] = []
         }
+
         // Now find if this entry matches an existing grouped entry (by type/project/task)
         const existingGroup = grouped[biMonthKey].days[dayKey];
         const index = existingGroup.findIndex(
@@ -132,7 +143,8 @@ function groupTimeEntriesFunc() {
                 e.description === entry.description &&
                 arraysEqual(e.tags, entry.tags)
         )
-
+        grouped[biMonthKey].totalHours = grouped[biMonthKey].totalHours ?? 0;
+        grouped[biMonthKey].totalHours += entry.duration ?? 0;
         if (index !== -1) {
             const group = existingGroup[index]
             group.timeEntries.push(entry)
@@ -183,8 +195,8 @@ function unselectAllTimeEntries(value: TimeEntriesGroupedByType[]) {
 function SubmitBTN(days: string, sheet: Record<string, TimeEntriesGroupedByType[]>) {
     previewSheets.value = sheet;
     isSubmit.value = true;
-    isLoading.value=true;
-periodSelected.value=days;
+    isLoading.value = true;
+    periodSelected.value = days;
 }
 function pluckID(
     timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>
@@ -202,12 +214,12 @@ const unSubmitBTN = async (days: string, sheet: Record<string, TimeEntriesGroupe
     // selectedPeriod.value = days;
     // isSubmit.value = false;
 
-periodSelected.value=days;
-    isLoading.value=true;
+    periodSelected.value = days;
+    isLoading.value = true;
     const IDlist = pluckID(sheet);
     const success = await axios.post(
         route('approval.unsubmit'),
-        { ids: IDlist, period:days  },
+        { ids: IDlist, period: days },
         {
             withCredentials: true,
             headers: { Accept: 'application/json' },
@@ -216,12 +228,12 @@ periodSelected.value=days;
 
     // Only emit if request succeeded
     if (success) {
-    isLoading.value=false;
+        isLoading.value = false;
         addNotification('success', 'Unsubmitted', 'Entry Unsubmitted');
         props.fetchTimeEntries();
     } else {
 
-    isLoading.value=false;
+        isLoading.value = false;
         addNotification('error', 'Failed', 'Entry Failed to Submit');
     }
 }
@@ -230,10 +242,11 @@ function isSubmitted(entries: TimeEntry[]): boolean {
     return entries.every(entry => entry.approval !== 'unsubmitted');
 }
 function clearClick() {
-periodSelected.value='';
-    isLoading.value=false;
+    periodSelected.value = '';
+    isLoading.value = false;
     previewSheets.value = null;
 }
+const totalBiMonthlyDuration = ref<Record<string, number>>({});
 const previewSheets = ref<Record<string, TimeEntriesGroupedByType[]> | null>(null);
 const periodSelected = ref<string>('');
 const isSubmit = ref<boolean>(false);
@@ -249,37 +262,48 @@ watch(
 
 <template>
 
-    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey" class="border  dark:border-[#3F4961] px-4 mb-4 pb-5">
+    <div v-for="(bimonthly, bimonthlykey) in groupedTimeEntries" :key="bimonthlykey"
+        class="border  dark:border-[#3F4961] px-4 mb-4 pb-5">
         <div class="dark:border-[#3F4961] border-b-4 ">
 
-            <div class=" rounded  p-1  ">
+            <div class="flex rounded  p-1  ">
 
-                <SecondaryButton @click="SubmitBTN(bimonthlykey, bimonthly.days)"
-                    v-if="!bimonthly.isSubmitted"
-                        :loading="isLoading"
-                    class=" p-2  mx-2  shadow-none dark:text-[#77D36F] text-[#77D36F] ">
+                <SecondaryButton @click="SubmitBTN(bimonthlykey, bimonthly.days)" v-if="!bimonthly.isSubmitted"
+                    :loading="isLoading" class=" p-2  mx-2  shadow-none dark:text-[#77D36F] text-[#77D36F] ">
                     submit
                 </SecondaryButton>
                 <SecondaryButton @click="unSubmitBTN(bimonthlykey, bimonthly.days)"
-                    v-if="bimonthly.isSubmitted && bimonthly.isApproved!='Approved'"
-                        :loading="isLoading"
+                    v-if="bimonthly.isSubmitted && bimonthly.isApproved != 'Approved'" :loading="isLoading"
                     class=" p-2  mx-2  shadow-none   dark:text-[#FFC71E] text-[#FFC71E]">
                     unsubmit
                 </SecondaryButton>
 
-                <button disabled class=" py-2   button text-blue-400 opacity-0" v-if="bimonthly.isApproved" >|
+                <button disabled class=" py-2   button text-blue-400 opacity-0" v-if="bimonthly.isApproved">|
                 </button>
                 <span v-if="bimonthlykey" class="ml-4   p-2 rounded-md font-bold">{{ bimonthlykey }}</span>
-                
-                <span v-if="bimonthly.isApproved=='Approved'" class="ml-4 text-[#77D36F] p-2 rounded-md font-bold">Approved</span>
-                <span v-if="bimonthly.isApproved=='Unapproved' && bimonthly.isSubmitted"
+
+                <span v-if="bimonthly.isApproved == 'Approved'"
+                    class="ml-4 text-[#77D36F] p-2 rounded-md font-bold">Approved</span>
+                <span v-if="bimonthly.isApproved == 'Unapproved' && bimonthly.isSubmitted"
                     class="ml-4 bg-tertiary text-[#FFC71E] p-2 rounded-md font-bold">Pending</span>
-                <span v-if="bimonthly.isApproved=='Rejected' && bimonthly.isSubmitted"
+                <span v-if="bimonthly.isApproved == 'Rejected' && bimonthly.isSubmitted"
                     class="ml-4 bg-tertiary text-[#FF651E] p-2 rounded-md font-bold">Rejected</span>
+
+                <div class="flex-1 text-right">Semi-month Total:
+                    <span class="font-semibold ">
+                        {{
+                            formatHumanReadableDuration(
+                                bimonthly.totalHours ?? 0,
+                                organization?.interval_format,
+                                organization?.number_format
+                            )
+                        }}
+                    </span>
+                </div>
             </div>
 
 
-            <template v-for="(value, key) in bimonthly.days" :key="key" >
+            <template v-for="(value, key) in bimonthly.days" :key="key">
                 <div v-if="!isSubmitted(value)" class=" bg-white dark:bg-[#171E31]   rounded-md">
                     <TimeEntryRowHeading :date="key" :duration="sumDuration(value)" :checked="value.every((timeEntry: TimeEntry) =>
                         selectedTimeEntries.includes(timeEntry)
@@ -291,8 +315,9 @@ watch(
                             :create-project :can-create-project :enable-estimated-time
                             :create-time-entry="createTimeEntry" :selected-time-entries="selectedTimeEntries"
                             :create-client :projects="projects" :tasks="tasks" :tags="tags" :clients
-                            :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry :duplicate-time-entry="copyTimeEntryFromExisting"
-                            :delete-time-entries :create-tag :currency="currency" :time-entry="entry" @selected=" 
+                            :on-start-stop-click="startTimeEntryFromExisting" :update-time-entries :update-time-entry
+                            :duplicate-time-entry="copyTimeEntryFromExisting" :delete-time-entries :create-tag
+                            :currency="currency" :time-entry="entry" @selected="
                                 (timeEntries: TimeEntry[]) => {
                                     selectedTimeEntries = [
                                         ...selectedTimeEntries,
@@ -379,7 +404,8 @@ watch(
         </div>
     </div>
     <Submit v-if="previewSheets" :groupEntries="previewSheets" @clear="clearClick" :isSubmit="isSubmit"
-        :projects="projects" :period-selected="periodSelected" :tags="tags" :tasks="tasks" @getTimesheet="fetchTimeEntries">
+        :projects="projects" :period-selected="periodSelected" :tags="tags" :tasks="tasks"
+        @getTimesheet="fetchTimeEntries">
     </Submit>
 </template>
 
