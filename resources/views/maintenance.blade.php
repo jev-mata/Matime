@@ -37,16 +37,14 @@
             text-decoration: none;
         }
     </style>
-
-    {{-- @vite(array_filter(\Nwidart\Modules\Module::getAssets(), fn($asset) => $asset !== 'resources/css/filament/admin/theme.css')) --}}
-    {{-- @vite(['resources/js/app.ts', 'resources/css/app.css']) --}}
+ 
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
 <body class="bg-[#0C101E]">
-    <div class="min-w-[300px] w-[60%] mx-auto">
-        <img src="{{ asset('images/maintenance.png') }}" class="min-w-[100px] w-[20%] mx-auto p-3" />
+    <div class="min-w-[300px] w-[60%] fixed left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2">
+        <img src="{{ asset('images/maintenance.png') }}" class="min-w-[100px] w-[20%] mx-auto p-3 " />
         <h1 class="text-center text-5xl font-bold py-5">We'll be back soon!</h1>
         <div class="text-center px-2">
             <p class="text-2xl text-center px-4 font-light">Sorry for the inconvenience but we're performing some
