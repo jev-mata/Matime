@@ -8,7 +8,7 @@ import { ref } from 'vue';
 import dayjs from 'dayjs';
 
 import { router, usePage } from '@inertiajs/vue3';
-import { useNotificationsStore } from '@/utils/notification'; 
+import { useNotificationsStore } from '@/utils/notification';
 import PageTitle from '@/Components/Common/PageTitle.vue';
 import TabBarItem from '@/Components/Common/TabBar/TabBarItem.vue';
 import TabBar from '@/Components/Common/TabBar/TabBar.vue';
@@ -41,7 +41,7 @@ const page = usePage<{
     archive_timesheets: TimeEntry[];
 }>();
 
-const isLoading=ref<boolean>(false);
+const isLoading = ref<boolean>(false);
 const isGroupedEmpty = computed(
     () =>
         Object.keys(page.props.grouped as Record<string, Bimontly[]>).length ===
@@ -62,7 +62,7 @@ const isArchiveGroupedEmpty = computed(
 );
 
 async function approveRejectAll(type: 'approve' | 'reject') {
-    isLoading.value=true;
+    isLoading.value = true;
     try {
         const ids = page.props.timesheets.map((t) => t.id);
         await axios.post(
@@ -75,13 +75,13 @@ async function approveRejectAll(type: 'approve' | 'reject') {
             'success',
             `${type === 'approve' ? 'Approved' : 'Rejected'}`
         );
-    isLoading.value=false;
+        isLoading.value = false;
         setTimeout(() => {
             router.visit(route('approval.index')); // change to your target page
         }, 1500);
     } catch (error) {
         console.error(error);
-    isLoading.value=false;
+        isLoading.value = false;
         addNotification('error', 'Failed', `Could not ${type} entries`);
     }
 }
@@ -117,10 +117,10 @@ function getPeriodInfo(periodKey: string): {
 }
 
 async function UnsubmittedRemindAll(type: 'withdraw' | 'remind') {
-    isLoading.value=true;
+    isLoading.value = true;
     try {
-      
-        const ids = type=='withdraw'?page.props.archive_timesheets.map((t) => t.id):page.props.unsubmitted_timesheets.map((t) => t.id);
+
+        const ids = type == 'withdraw' ? page.props.archive_timesheets.map((t) => t.id) : page.props.unsubmitted_timesheets.map((t) => t.id);
 
         await axios.post(
             route(`approval.${type}`), // approval.approve | approval.reject
@@ -132,13 +132,13 @@ async function UnsubmittedRemindAll(type: 'withdraw' | 'remind') {
             'success',
             `${type === 'withdraw' ? 'Withdraw Entries' : 'Sent Reminder Successfuly'}`
         );
-    isLoading.value=false;
+        isLoading.value = false;
         setTimeout(() => {
             router.visit(route('approval.index')); // change to your target page
         }, 1500);
     } catch (error) {
         console.error(error);
-    isLoading.value=false;
+        isLoading.value = false;
         addNotification('error', 'Failed', `Could not ${type} entries`);
     }
 }
@@ -162,31 +162,19 @@ function formatDate(dateString: string, format?: string) {
                     <TabBarItem value="archive">Archive</TabBarItem>
                 </TabBar>
                 <div class="w-full flex items-end justify-end  dark:text-[#7D88A1] ">
-                    <PrimaryButton
-                        v-if="activeTab == 'archive'"
-                        :loading="isLoading"
-                        class="border-0 px-2  mx-2 "
+                    <PrimaryButton v-if="activeTab == 'archive'" :loading="isLoading" class="border-0 px-2  mx-2 "
                         @click="UnsubmittedRemindAll('withdraw')">
                         WITHDRAW ALL
                     </PrimaryButton>
-                    <PrimaryButton
-                        v-if="activeTab == 'unsubmitted'"
-                        :loading="isLoading"
-                        class="border-0 px-2  mx-2 "
+                    <PrimaryButton v-if="activeTab == 'unsubmitted'" :loading="isLoading" class="border-0 px-2  mx-2 "
                         @click="UnsubmittedRemindAll('remind')">
                         REMIND ALL
                     </PrimaryButton>
-                    <PrimaryButton
-                        v-if="activeTab == 'pending'"
-                        :loading="isLoading"
-                        class="border-0 px-2  mx-2 "
+                    <PrimaryButton v-if="activeTab == 'pending'" :loading="isLoading" class="border-0 px-2  mx-2 "
                         @click="approveRejectAll('approve')">
                         APPROVE ALL
                     </PrimaryButton>
-                    <DangerButton
-                        v-if="activeTab == 'pending'"
-                        :loading="isLoading"
-                        class="border-1 px-2  mx-2  "
+                    <DangerButton v-if="activeTab == 'pending'" :loading="isLoading" class="border-1 px-2  mx-2  "
                         @click="approveRejectAll('reject')">
                         REJECT ALL
                     </DangerButton>
@@ -196,75 +184,63 @@ function formatDate(dateString: string, format?: string) {
 
         <div class="flow-root max-w-[100vw] overflow-x-auto pt-[7%]">
             <div class="inline-block w-full align-middle">
-                <div
-                    data-testid="client_table"
-                    class="grid w-full"
-                    v-if="activeTab == 'pending'">
-                    <div
-                        v-if="isGroupedEmpty"
-                        class="col-span-3 py-24 text-center">
-                        <UserCircleIcon
-                            class="w-8 text-icon-default inline pb-2" />
+                <div data-testid="client_table" class="grid w-full" v-if="activeTab == 'pending'">
+                    <div v-if="isGroupedEmpty" class="col-span-3 py-24 text-center">
+                        <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
                         <h3 class="text-text-primary font-semibold">
                             No {{ activeTab }} timesheets found
                         </h3>
                     </div>
-                    <template
-                        v-for="(userEntries, period) in page.props.grouped"
-                        :key="period">
-                        <TimesheetTable
-                            :get-period-info="getPeriodInfo"
-                            :format-date="formatDate"
-                            :period="period"
+                    <div v-if="!isGroupedEmpty" class="flex border  dark:border-[#303F61]  p-3">
+
+                        <div class="flex-1">Name</div>
+                        <div class="flex-1">Groups
+                        </div>
+                        <div class="flex px-5">Hours</div>
+                    </div>
+                    <template v-for="(userEntries, period) in page.props.grouped" :key="period">
+                        <TimesheetTable :get-period-info="getPeriodInfo" :format-date="formatDate" :period="period"
                             :user-entries="userEntries" />
                     </template>
                 </div>
-                <div
-                    data-testid="client_table"
-                    class="grid w-full"
-                    v-if="activeTab == 'unsubmitted'">
-                    <div
-                        v-if="isUnsubmittedGroupedEmpty"
-                        class="col-span-3 py-24 text-center">
-                        <UserCircleIcon
-                            class="w-8 text-icon-default inline pb-2" />
+                <div data-testid="client_table" class="grid w-full" v-if="activeTab == 'unsubmitted'">
+                    <div v-if="isUnsubmittedGroupedEmpty" class="col-span-3 py-24 text-center">
+                        <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
                         <h3 class="text-text-primary font-semibold">
                             No {{ activeTab }} timesheets found
                         </h3>
                     </div>
-                    <template
-                        v-for="(userEntries, period) in page.props
-                            .unsubmitted_grouped"
-                        :key="period">
-                        
-                        <TimesheetTable
-                            :get-period-info="getPeriodInfo"
-                            :format-date="formatDate"
-                            :period="period"
+                    <div v-if="!isUnsubmittedGroupedEmpty" class="flex border sticky top-0 dark:border-[#303F61]  p-3">
+
+                        <div class="flex-1">Name</div>
+                        <div class="flex-1">Groups
+                        </div>
+                        <div class="flex px-5">Hours</div>
+                    </div>
+                    <template v-for="(userEntries, period) in page.props
+                        .unsubmitted_grouped" :key="period">
+
+                        <TimesheetTable :get-period-info="getPeriodInfo" :format-date="formatDate" :period="period"
                             :user-entries="userEntries" />
                     </template>
                 </div>
-                <div
-                    data-testid="client_table"
-                    class="grid w-full"
-                    v-if="activeTab == 'archive'">
-                    <div
-                        v-if="isArchiveGroupedEmpty"
-                        class="col-span-3 py-24 text-center">
-                        <UserCircleIcon
-                            class="w-8 text-icon-default inline pb-2" />
+                <div data-testid="client_table" class="grid w-full" v-if="activeTab == 'archive'">
+                    <div v-if="isArchiveGroupedEmpty" class="col-span-3 py-24 text-center">
+                        <UserCircleIcon class="w-8 text-icon-default inline pb-2" />
                         <h3 class="text-text-primary font-semibold">
                             No {{ activeTab }} timesheets found
                         </h3>
                     </div>
-                    <template
-                        v-for="(userEntries, period) in page.props
-                            .archive_grouped"
-                        :key="period">
-                        <TimesheetTable
-                            :get-period-info="getPeriodInfo"
-                            :format-date="formatDate"
-                            :period="period"
+                    <div v-if="!isArchiveGroupedEmpty" class="flex border sticky top-0 dark:border-[#303F61]  p-3">
+
+                        <div class="flex-1">Name</div>
+                        <div class="flex-1">Groups
+                        </div>
+                        <div class="flex px-5">Hours</div>
+                    </div>
+                    <template v-for="(userEntries, period) in page.props
+                        .archive_grouped" :key="period">
+                        <TimesheetTable :get-period-info="getPeriodInfo" :format-date="formatDate" :period="period"
                             :user-entries="userEntries" />
                     </template>
                 </div>

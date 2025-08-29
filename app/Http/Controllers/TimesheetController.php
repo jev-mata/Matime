@@ -102,10 +102,7 @@ class TimesheetController extends Controller
         Log::info($entries);
         return response()->json($entries);
     }
-    public function destroy(Request $request)
-    {
-
-    }
+    public function destroy(Request $request) {}
 
     public function Submit(Request $request)
     {
@@ -144,7 +141,6 @@ class TimesheetController extends Controller
                 )
             );
         }
-
     }
 
     public function Unsubmit(Request $request)
@@ -357,10 +353,21 @@ class TimesheetController extends Controller
 
         $query = TimeEntry::with(['user.groups', 'member']);
 
-        if ($memberRole->role === 'manager') {
+        if ($memberRole->role === 'admin') {
             $teamIds = Auth::user()->groups()->pluck('teams.id');
+            $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin']));
+            $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
+        } else if ($memberRole->role === 'manager') {
+            $teamIds = Auth::user()->groups()->pluck('teams.id');
+            $query->whereHas('member', fn($q) => $q->whereIn('role', ['employee', 'intern']));
+            $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
+        }else{
+            
+            $teamIds = Auth::user()->groups()->pluck('teams.id');
+            $query->whereHas('member', fn($q) => $q->whereIn('role', ['employee', 'manager', 'intern','admin']));
             $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         }
+        $query->where('user_id', '!=', Auth::id());
 
         $submitted = (clone $query)->where('approval', 'submitted')->get();
         $unsubmitted = (clone $query)->where('approval', 'unsubmitted')->get();

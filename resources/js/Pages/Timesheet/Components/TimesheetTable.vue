@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import type { Bimontly } from '../Index.vue';
 
- 
-const props =  defineProps<{
-        getPeriodInfo: (period: string) => { endDate: string; endDate2: string; isHighlighted: boolean };
-        formatDate: (date: string) => string;
-        period: string;
-        userEntries: Bimontly[];
-    }>();
+
+const props = defineProps<{
+    getPeriodInfo: (period: string) => { endDate: string; endDate2: string; isHighlighted: boolean };
+    formatDate: (date: string) => string;
+    period: string;
+    userEntries: Bimontly[];
+}>();
 </script>
 <template>
     <div class="p-3 font-bold" :class="getPeriodInfo(period).isHighlighted
-            ? 'dark:bg-[#0F1426]  text-white'
-            : 'dark:bg-[#0C101E] '
+        ? 'dark:bg-[#0F1426]  text-white'
+        : 'dark:bg-[#0C101E] '
         ">
         {{ formatDate(period) }} -
         {{ getPeriodInfo(period).endDate }}
     </div>
+
     <a v-for="entry in userEntries" :key="entry.user.id" class="flex border  dark:border-[#303F61]  p-3" :href="route('approval.ApprovalOverview', {
         user_id: entry.user.member.id,
         date_start: period,
@@ -25,10 +26,11 @@ const props =  defineProps<{
         ">
         <div class="flex-1">{{ entry.user.name }}</div>
         <div class="flex-1">
-            {{
-                entry.user.groups?.[0]?.manager?.name ?? '—'
+            {{entry.user.groups.map((g) => g.name).join(", ") || " "
+
+
             }}
         </div>
-        <div class="flex-1">{{ entry.totalHours }}</div>
+        <div class="flex px-5">{{ entry.totalHours }}</div>
     </a>
 </template>
