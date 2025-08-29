@@ -289,7 +289,7 @@ watch(
                 <span v-if="bimonthly.isApproved == 'Rejected' && bimonthly.isSubmitted"
                     class="ml-4 bg-tertiary text-[#FF651E] p-2 rounded-md font-bold">Rejected</span>
 
-                <div class="flex-1 text-right">Semi-month Total:
+                <div class="flex-1 text-right align-center  p-2  ">Semi-month Total:
                     <span class="font-semibold ">
                         {{
                             formatHumanReadableDuration(
