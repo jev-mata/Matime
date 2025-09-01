@@ -175,10 +175,7 @@ class TimesheetController extends Controller
         $ids = $request->input('ids'); // or $request->get('ids'); 
 
         $period = $request->input('period', 'All'); // or $request->get('ids');
-
-        $curOrg = $this->currentOrganization();
-        $memb = $this->member($curOrg)->whereIn('role', [Role::Manager, Role::Admin])->pluck('user_id');
-        $user = User::whereIn('id', $memb)->get();
+ 
         // Optional validation
         if (!is_array($ids)) {
             return response()->json(['error' => 'Invalid payload'], 422);
@@ -192,17 +189,34 @@ class TimesheetController extends Controller
             ->values()               // reindex
             ->implode(', ');         // convert to a comma-separated string
 
+        $teamIds = Auth::user()->groups()->pluck('teams.id');
+        $users = User::with('organizations')
+            ->where(function ($query) use ($teamIds) {
+                // 1) Users in same groups AND Manager/Admin
+                $query->whereHas('groups', function ($q) use ($teamIds) {
+                    $q->whereIn('teams.id', $teamIds);
+                })->whereHas('organizations', function ($q) {
+                    $q->whereIn('role', [Role::Manager, Role::Admin]);
+                });
+
+                // 2) OR Users with role Owner (anywhere)
+                $query->orWhereHas('organizations', function ($q) {
+                    $q->where('role', Role::Owner);
+                });
+            })
+            ->get(); 
+
 
         $entries->update([
             'approval' => 'unsubmitted',
             'approved_by' => null,
         ]);
 
-        $emails = $user->pluck('email');                 // reindex (optional)
+        $emails = $users->pluck('email');                 // reindex (optional)
         foreach ($emails as $email) {
             Mail::to($email)->send(
                 new TimeEntrySubmittionNotification(
-                    route('approval.approve'),
+                    route('approval.index'),
                     $period,
                     Auth::user()->name,
                     $names,
