@@ -459,12 +459,11 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
             <div class="sm:grid grid-cols-4 pt-6 items-start">
                 <div class="col-span-3 bg-card-background rounded-lg border border-card-border pt-3">
 
-                    <div class="grid items-center" style="grid-template-columns: 1fr 100px 150px">
+                    <div class="grid items-center" style="grid-template-columns: auto auto auto">
                         <div
                             class="contents [&>*]:border-card-background-separator [&>*]:border-b [&>*]:bg-tertiary [&>*]:pb-1.5 [&>*]:pt-1 text-text-secondary text-sm">
                             <div class="pl-6">Name</div>
-                            <div class="text-right">Duration</div>
-                            <div class="text-right pr-6">Cost</div>
+                            <div class="text-right">Duration</div> 
                         </div>
                         <template v-if="
                             aggregatedTableTimeEntries?.grouped_data &&
