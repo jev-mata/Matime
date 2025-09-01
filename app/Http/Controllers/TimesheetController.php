@@ -143,10 +143,7 @@ class TimesheetController extends Controller
                     $q->where('role', Role::Owner);
                 });
             })
-            ->get();
-
-        Log::info($users);
-        return response()->json(['error' => 'Invalid payload'], 422);
+            ->get(); 
 
 
         $names = $entries->get()
@@ -159,7 +156,7 @@ class TimesheetController extends Controller
         $entries->update([
             'approval' => 'submitted',
         ]);
-        $emails = $user->pluck('email');                 // reindex (optional)
+        $emails = $users->pluck('email');                 // reindex (optional)
         foreach ($emails as $email) {
             Mail::to($email)->send(
                 new TimeEntrySubmittionNotification(
