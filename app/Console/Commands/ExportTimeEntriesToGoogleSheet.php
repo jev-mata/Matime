@@ -96,7 +96,7 @@ class ExportTimeEntriesToGoogleSheet extends Command
         $spreadsheet = IOFactory::load($filePath); // Your newly generated Excel export
 
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->freezePane('A1');
+        $sheet->freezePane('A2'); 
         if (count($files->getFiles()) > 0) {
             // ✅ Download existing file
             $existingFile = $files->getFiles()[0];
@@ -144,6 +144,9 @@ class ExportTimeEntriesToGoogleSheet extends Command
                 }
             }
 
+            $highestRow2 = $existingSheet->getHighestRow();
+            $highestColumn2 = $existingSheet->getHighestColumn(); // e.g., 'K' 
+            $existingSheet->setAutoFilter("A1:{$highestColumn2}{$highestRow2}");
             // ✅ Save to temp file
             $finalTempFile = storage_path("app/final_" . $fileName);
             IOFactory::createWriter($existingSpreadsheet, 'Xlsx')->save($finalTempFile);

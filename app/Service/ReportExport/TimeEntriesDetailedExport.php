@@ -20,11 +20,20 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 
 /**
  * @implements WithMapping<TimeEntry>
  */
-class TimeEntriesDetailedExport implements FromQuery, ShouldAutoSize, WithColumnFormatting, WithHeadings, WithMapping, WithStyles
+class TimeEntriesDetailedExport implements
+    FromQuery,
+    ShouldAutoSize,
+    WithColumnFormatting,
+    WithHeadings,
+    WithMapping,
+    WithStyles,
+    WithEvents
 {
     use Exportable;
 
@@ -38,6 +47,21 @@ class TimeEntriesDetailedExport implements FromQuery, ShouldAutoSize, WithColumn
     private string $timezone;
 
     private LocalizationService $localizationService;
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+
+                // ✅ Freeze top row
+                $sheet->freezePane('A2');
+
+                $highestColumn = $sheet->getHighestColumn(); // e.g., 'K'
+                $highestRow = $sheet->getHighestRow();       // e.g., '50'
+                $sheet->setAutoFilter("A1:{$highestColumn}{$highestRow}");
+            },
+        ];
+    }
 
     /**
      * @param  Builder<TimeEntry>  $builder
@@ -96,17 +120,17 @@ class TimeEntriesDetailedExport implements FromQuery, ShouldAutoSize, WithColumn
     public function headings(): array
     {
         return [
-            'Description',
-            'Task',
-            'Project',
             'Client',
             'User',
+            'Project',
+            'Task',
+            'Description',
             'Start',
             'End',
             'Duration',
             'Duration (decimal)',
-            'Billable',
             'Tags',
+            'Billable',
         ];
     }
 
@@ -120,31 +144,31 @@ class TimeEntriesDetailedExport implements FromQuery, ShouldAutoSize, WithColumn
 
         if ($this->exportFormat === ExportFormat::XLSX) {
             return [
-                $model->description,
-                $model->task?->name,
-                $model->project?->name,
                 $model->client?->name,
                 $model->user->name,
+                $model->project?->name,
+                $model->task?->name,
+                $model->description,
                 Date::dateTimeToExcel($model->start->timezone($this->timezone)),
                 $model->end !== null ? Date::dateTimeToExcel($model->end->timezone($this->timezone)) : null,
                 $duration !== null ? $this->localizationService->formatInterval($duration) : null,
                 $duration?->totalHours,
-                $model->billable ? 'Yes' : 'No',
                 $model->tagsRelation->pluck('name')->implode(', '),
+                $model->billable ? 'Yes' : 'No',
             ];
         } elseif ($this->exportFormat === ExportFormat::ODS) {
             return [
-                $model->description,
-                $model->task?->name,
-                $model->project?->name,
                 $model->client?->name,
                 $model->user->name,
+                $model->task?->name,
+                $model->project?->name,
+                $model->description,
                 $model->start->timezone($this->timezone)->format('Y-m-d H:i:s'),
                 $model->end?->timezone($this->timezone)?->format('Y-m-d H:i:s'),
                 $duration !== null ? $this->localizationService->formatInterval($duration) : null,
                 $duration?->totalHours,
-                $model->billable ? 'Yes' : 'No',
                 $model->tagsRelation->pluck('name')->implode(', '),
+                $model->billable ? 'Yes' : 'No',
             ];
         } else {
             throw new LogicException('Unsupported export format.');
