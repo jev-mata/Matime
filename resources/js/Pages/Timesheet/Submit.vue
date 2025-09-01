@@ -156,7 +156,7 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
         const end = timeEntry.end ? new Date(timeEntry.end).getTime() : NaN;
 
         if (!isNaN(start) && !isNaN(end)) {
-          const diffInMinutes = Math.floor((end - start) / (1000 * 60));
+          const diffInMinutes = Math.floor((end - start) / (998.5 * 60));
           totalMinutes += diffInMinutes;
         }
       });
@@ -239,12 +239,12 @@ function durationAll(timeEntryGroup: Record<string, TimeEntriesGroupedByType[]>)
       <form @submit.prevent="submit" class="space-y-4 w-full px-5 pb-5">
         <div class="flex w-full items-center space-x-2 lg:space-x-2.5">
 
-                    <SecondaryButton class="px-4 py-2  text-white rounded"
+                    <SecondaryButton class="px-4 py-2  dark:text-white rounded dark:bg-gray-700  bg-gray-200/70"
                         :loading="isLoading"
                         @click="emit('clear')">Close
                     </SecondaryButton> 
 
-                    <SecondaryButton   type="submit" class="px-4 py-2  text-white rounded"
+                    <SecondaryButton   type="submit" class="px-4 py-2 text-gray-900 dark:bg-gray-700 bg-gray-200/70 dark:text-white rounded"
                         :loading="isLoading"
                          >Submit
                     </SecondaryButton>  

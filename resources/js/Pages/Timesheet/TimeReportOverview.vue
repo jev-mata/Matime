@@ -426,22 +426,22 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
                     {{ formatDate(page.props.period.end, 'ddd, MMMM D - YYYY') }})
                 </div>
                 <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'submitted'">
-                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-white"
                         :loading="isLoading"
                         @click="approveReject('approve')">APPROVE
                     </SecondaryButton>
-                    <SecondaryButton class="border-0 px-2 bg-red-600 mx-2 text-quaternary"
+                    <SecondaryButton class="border-0 px-2 bg-red-600 mx-2 text-white"
                         :loading="isLoading"
                         @click="approveReject('reject')">REJECT</SecondaryButton>
                 </div>
                 <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'unsubmitted'">
-                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-white"
                         :loading="isLoading"
                         @click="UnsubmittedRemind('remind')">REMIND TO SUBMIT
                     </SecondaryButton>
                 </div>
                 <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus != 'submitted' && approvalStatus != 'unsubmitted'">
-                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-quaternary"
+                    <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-white"
                         :loading="isLoading"
                         @click="UnsubmittedRemind('withdraw')">WITHDRAW
                     </SecondaryButton>

@@ -141,7 +141,7 @@ class TimesheetController extends Controller
         foreach ($emails as $email) {
             Mail::to($email)->send(
                 new TimeEntrySubmittionNotification(
-                    route('approval.approve'),
+                    route('approval.index'),
                     $period,
                     Auth::user()->name,
                     $names,
