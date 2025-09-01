@@ -356,7 +356,7 @@ class TimesheetController extends Controller
         if ($memberRole->role === 'admin') {
             $teamIds = Auth::user()->groups()->pluck('teams.id');
             $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin','employee']));
-            $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
+            // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         } else if ($memberRole->role === 'manager') {
             $teamIds = Auth::user()->groups()->pluck('teams.id');
             $query->whereHas('member', fn($q) => $q->whereIn('role', ['employee', 'intern']));
