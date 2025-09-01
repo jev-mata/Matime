@@ -129,13 +129,22 @@ class TimesheetController extends Controller
         $entries = TimeEntry::with('user')->whereIn('id', $ids);
 
         $teamIds = Auth::user()->groups()->pluck('teams.id');
-        $users = User::with('organizations')->whereHas('organizations', function ($query) use ($teamIds) {
-                $query->whereIn('role', [Role::Manager, Role::Admin]);
-            })
-            ->whereHas('groups', function ($query) use ($teamIds) {
-                $query->whereIn('teams.id', $teamIds);
+        $users = User::with('organizations')
+            ->where(function ($query) use ($teamIds) {
+                // 1) Users in same groups AND Manager/Admin
+                $query->whereHas('groups', function ($q) use ($teamIds) {
+                    $q->whereIn('teams.id', $teamIds);
+                })->whereHas('organizations', function ($q) {
+                    $q->whereIn('role', [Role::Manager, Role::Admin]);
+                });
+
+                // 2) OR Users with role Owner (anywhere)
+                $query->orWhereHas('organizations', function ($q) {
+                    $q->where('role', Role::Owner);
+                });
             })
             ->get();
+
         Log::info($users);
         return response()->json(['error' => 'Invalid payload'], 422);
 
