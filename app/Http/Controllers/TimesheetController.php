@@ -49,15 +49,15 @@ class TimesheetController extends Controller
 
         if ($memberRole->role === 'admin') {
             $teamIds = Auth::user()->groups()->pluck('teams.id');
-            $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin','employee']));
+            $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin', 'employee']));
             // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         } else if ($memberRole->role === 'manager') {
             $teamIds = Auth::user()->groups()->pluck('teams.id');
             $query->whereHas('member', fn($q) => $q->whereIn('role', ['employee', 'intern']));
             $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
-        }else  if ($memberRole->role === 'owner'){
-             
-        } 
+        } else if ($memberRole->role === 'owner') {
+
+        }
         $timesheets = $query->where('approval', 'submitted')->get();
 
         // Group and map entries
@@ -110,7 +110,9 @@ class TimesheetController extends Controller
         Log::info($entries);
         return response()->json($entries);
     }
-    public function destroy(Request $request) {}
+    public function destroy(Request $request)
+    {
+    }
 
     public function Submit(Request $request)
     {
@@ -119,13 +121,24 @@ class TimesheetController extends Controller
 
         $curOrg = $this->currentOrganization();
         $memb = $this->member($curOrg)->whereIn('role', [Role::Manager, Role::Admin])->pluck('user_id');
-        $user = User::whereIn('id', $memb)->get();
         // Optional validation
         if (!is_array($ids)) {
             return response()->json(['error' => 'Invalid payload'], 422);
         }
 
         $entries = TimeEntry::with('user')->whereIn('id', $ids);
+
+        $teamIds = Auth::user()->groups()->pluck('teams.id');
+        $users = User::with('organizations')->whereHas('organizations', function ($query) use ($teamIds) {
+                $query->whereIn('role', [Role::Manager, Role::Admin]);
+            })
+            ->whereHas('groups', function ($query) use ($teamIds) {
+                $query->whereIn('teams.id', $teamIds);
+            })
+            ->get();
+        Log::info($users);
+        return response()->json(['error' => 'Invalid payload'], 422);
+
 
         $names = $entries->get()
             ->pluck('user.name')     // get user names
@@ -363,14 +376,14 @@ class TimesheetController extends Controller
 
         if ($memberRole->role === 'admin') {
             $teamIds = Auth::user()->groups()->pluck('teams.id');
-            $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin','employee']));
+            $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin', 'employee']));
             // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         } else if ($memberRole->role === 'manager') {
             $teamIds = Auth::user()->groups()->pluck('teams.id');
             $query->whereHas('member', fn($q) => $q->whereIn('role', ['employee', 'intern']));
             $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
-        }else  if ($memberRole->role === 'owner'){
-             
+        } else if ($memberRole->role === 'owner') {
+
         }
         // $query->where('user_id', '!=', Auth::id());
 
