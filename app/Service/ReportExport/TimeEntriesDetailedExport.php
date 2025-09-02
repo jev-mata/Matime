@@ -89,15 +89,15 @@ class TimeEntriesDetailedExport implements
     {
         if ($this->exportFormat === ExportFormat::XLSX) {
             return [
-                'I' => NumberFormat::FORMAT_DATE_YYYYMMDD2, // Start Date
-                'J' => 'hh:mm:ss AM/PM',                   // Start Time
-                'K' => NumberFormat::FORMAT_DATE_YYYYMMDD2, // End Date
-                'L' => 'hh:mm:ss AM/PM',                   // End Time
-                'N' => NumberFormat::FORMAT_NUMBER_00,     // Duration (decimal)
+                'k' => NumberFormat::FORMAT_DATE_YYYYMMDD2, // Start Date
+                'l' => 'hh:mm:ss AM/PM',                   // Start Time
+                'm' => NumberFormat::FORMAT_DATE_YYYYMMDD2, // End Date
+                'n' => 'hh:mm:ss AM/PM',                   // End Time
+                'p' => NumberFormat::FORMAT_NUMBER_00,     // Duration (decimal)
             ];
         } elseif ($this->exportFormat === ExportFormat::ODS) {
             return [
-                'N' => NumberFormat::FORMAT_NUMBER_00,
+                'p' => NumberFormat::FORMAT_NUMBER_00,
             ];
         } else {
             throw new LogicException('Unsupported export format.');
