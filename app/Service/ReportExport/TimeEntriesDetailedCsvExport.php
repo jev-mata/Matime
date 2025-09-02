@@ -69,7 +69,9 @@ class TimeEntriesDetailedCsvExport extends CsvExport
             'End Date' => $model->end?->timezone($this->timezone)?->format('Y-m-d'),
             'End Time' => $model->end?->timezone($this->timezone)?->format('h:i:s A'),
             'Duration (h)' => $duration !== null ? $interval->format($model->getDuration()) : null,
-            'Duration (decimal)' => $duration?->totalHours,
+            'Duration (decimal)' => $duration !== null
+                ? number_format($duration->totalHours, 2, '.', '')
+                : null,
             'Approval' => $model->approval,
         ];
     }
