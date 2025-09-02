@@ -89,19 +89,21 @@ class TimeEntriesDetailedExport implements
     {
         if ($this->exportFormat === ExportFormat::XLSX) {
             return [
-                'F' => 'yyyy-mm-dd hh:mm:ss',
-                'G' => 'yyyy-mm-dd hh:mm:ss',
-                'I' => NumberFormat::FORMAT_NUMBER_00,
+                'F' => NumberFormat::FORMAT_DATE_YYYYMMDD2, // Start Date
+                'G' => 'hh:mm:ss AM/PM',                   // Start Time
+                'H' => NumberFormat::FORMAT_DATE_YYYYMMDD2, // End Date
+                'I' => 'hh:mm:ss AM/PM',                   // End Time
+                'J' => NumberFormat::FORMAT_NUMBER_00,     // Duration (decimal)
             ];
         } elseif ($this->exportFormat === ExportFormat::ODS) {
             return [
-                'I' => NumberFormat::FORMAT_NUMBER_00,
+                'J' => NumberFormat::FORMAT_NUMBER_00,
             ];
         } else {
             throw new LogicException('Unsupported export format.');
         }
-
     }
+
 
     /**
      * @return array<int|string, array<string, array<string, bool>>>
@@ -131,9 +133,9 @@ class TimeEntriesDetailedExport implements
             'Start Date',
             'Start Time',
             'End  Date',
-            'End  Time', 
+            'End  Time',
             'Duration (h)',
-            'Duration (decimal)',   
+            'Duration (decimal)',
         ];
     }
 
@@ -160,10 +162,10 @@ class TimeEntriesDetailedExport implements
                 $model->end !== null ? Date::dateTimeToExcel($model->end->timezone($this->timezone)) : null,
                 $model->end !== null ? Date::dateTimeToExcel($model->end->timezone($this->timezone)) : null,
                 $duration !== null ? $this->localizationService->formatInterval($duration) : null,
-                $duration?->totalHours, 
+                $duration?->totalHours,
             ];
         } elseif ($this->exportFormat === ExportFormat::ODS) {
-            return [ 
+            return [
                 $model->project?->name,
                 $model->client?->name,
                 $model->description,
@@ -173,11 +175,12 @@ class TimeEntriesDetailedExport implements
                 $model->user?->email,
                 $model->tagsRelation->pluck('name')->implode(', '),
                 $model->start->timezone($this->timezone)->format('Y-m-d'),
-                $model->start->timezone($this->timezone)->format('H:i:s'),
+                $model->start->timezone($this->timezone)->format('h:i:s A'),
                 $model->end?->timezone($this->timezone)?->format('Y-m-d'),
-                $model->end?->timezone($this->timezone)?->format('H:i:s'),
+                $model->end?->timezone($this->timezone)?->format('h:i:s A'),
+
                 $duration !== null ? $this->localizationService->formatInterval($duration) : null,
-                $duration?->totalHours, 
+                $duration?->totalHours,
             ];
         } else {
             throw new LogicException('Unsupported export format.');
