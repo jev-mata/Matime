@@ -136,6 +136,7 @@ class TimeEntriesDetailedExport implements
             'End  Time',
             'Duration (h)',
             'Duration (decimal)',
+            'Approval',
         ];
     }
 
@@ -163,6 +164,7 @@ class TimeEntriesDetailedExport implements
                 $model->end !== null ? Date::dateTimeToExcel($model->end->timezone($this->timezone)) : null,
                 $duration !== null ? $this->localizationService->formatInterval($duration) : null,
                 $duration?->totalHours,
+                $model->approval,
             ];
         } elseif ($this->exportFormat === ExportFormat::ODS) {
             return [
@@ -181,6 +183,7 @@ class TimeEntriesDetailedExport implements
 
                 $duration !== null ? $this->localizationService->formatInterval($duration) : null,
                 $duration?->totalHours,
+                $model->approval,
             ];
         } else {
             throw new LogicException('Unsupported export format.');
