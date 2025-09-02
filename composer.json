@@ -31,7 +31,7 @@
         "league/oauth2-client": "^2.8",
         "league/oauth2-google": "^4.0",
         "maatwebsite/excel": "^3.1",
-        "minishlink/web-push": "*",
+        "minishlink/web-push": "^9.0",
         "novadaemon/filament-pretty-json": "^2.2",
         "nwidart/laravel-modules": "^11.0.11",
         "owen-it/laravel-auditing": "^13.6",
