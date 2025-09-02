@@ -76,15 +76,16 @@ class TeamController extends Controller
 
 
 
-        $team = Teams::with(['users', 'projects'])->where('organization_id', '=', $currentOrg->currentOrganization->id)->get();
+        $team = Teams::with(['users.organizations', 'projects'])->where('organization_id', '=', $currentOrg->currentOrganization->id)->get();
 
 
         $teamsWithManagers = Teams::with([
             'users' => function ($query) use ($currentOrg) {
                 $query->whereHas('organizationMember', function ($q) use ($currentOrg) {
                     $q->where('organization_id', $currentOrg->currentOrganization->id)
-                        ->where('role', 'manager');
+                        ->whereIn('role', ['manager','admin']);
                 });
+                $query->with('organizations');
             }
         ])
             ->where('organization_id', $currentOrg->currentOrganization->id)

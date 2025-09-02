@@ -6,7 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-
+use Illuminate\Support\Carbon;
+use NotificationChannels\WebPush\WebPushMessage;
 class UpdateNotification extends Notification
 {
     use Queueable;
@@ -15,47 +16,56 @@ class UpdateNotification extends Notification
      * Create a new notification instance.
      */
 
-    private string $taskName;
+    private Carbon $maintenanceAt;
 
-    public function __construct(string $taskName)
+    public function __construct(Carbon $maintenanceAt)
     {
-        $this->taskName = $taskName;
+        $this->maintenanceAt = $maintenanceAt;
     }
     /**
      * Get the notification's delivery channels.
      *
      * @return array<int, string>
      */
+
     public function via(object $notifiable): array
     {
         return ['mail', 'database', 'broadcast'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->subject('Scheduled Maintenance Notification')
+            ->line('Please be advised that the system will undergo maintenance.')
+            ->line('📅 Scheduled Time: ' . $this->maintenanceAt->timezone(config('app.timezone'))->format('M d, Y h:i A'))
+            ->line('During this time the system may be unavailable.')
+            ->line('Thank you for your understanding.');
     }
 
     public function toDatabase($notifiable): array
     {
         return [
-            'message' => "You have been assigned to the task: {$this->taskName}",
-            'task' => $this->taskName,
+            'message' => 'System maintenance has been scheduled.',
+            'scheduled_at' => $this->maintenanceAt->format('Y-m-d H:i:s'),
         ];
     }
 
     public function toBroadcast($notifiable): \Illuminate\Notifications\Messages\BroadcastMessage
     {
         return new \Illuminate\Notifications\Messages\BroadcastMessage([
-            'message' => "You have been assigned to the task: {$this->taskName}",
-            'task' => $this->taskName,
+            'message' => 'System maintenance has been scheduled.',
+            'scheduled_at' => $this->maintenanceAt->format('Y-m-d H:i:s'),
         ]);
+    }
+
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        return (new WebPushMessage)
+            ->title('Scheduled Maintenance')
+            ->icon('/panso.png')
+            ->body('System will be maintenance on ' . $this->maintenanceAt->format('M d, Y h:i A').'\n. This may temporarily disrupt your use of Panso, but it will be back shortly. ')
+            ->action('View', url('/'));
     }
     /**
      * Get the array representation of the notification.
