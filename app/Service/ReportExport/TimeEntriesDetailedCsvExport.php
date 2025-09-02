@@ -15,17 +15,23 @@ use Illuminate\Database\Eloquent\Model;
 class TimeEntriesDetailedCsvExport extends CsvExport
 {
     public const array HEADER = [
-        'Description',
-        'Task',
         'Project',
         'Client',
+        'Description',
+        'Task',
         'User',
-        'Start',
-        'End',
-        'Duration',
-        'Duration (decimal)',
-        'Billable',
+        'Group',
+        'Email',
         'Tags',
+        'Invoiced',
+        'Invoice ID',
+        'Start Date',
+        'Start Time',
+        'End  Date',
+        'End  Time',
+        'Duration (h)',
+        'Duration (decimal)',
+        'Approval',
     ];
 
     protected const string CARBON_FORMAT = 'Y-m-d H:i:s';
@@ -48,17 +54,23 @@ class TimeEntriesDetailedCsvExport extends CsvExport
         $duration = $model->getDuration();
 
         return [
-            'Description' => $model->description,
-            'Task' => $model->task?->name,
             'Project' => $model->project?->name,
             'Client' => $model->client?->name,
+            'Description' => $model->description,
+            'Task' => $model->task?->name,
             'User' => $model->user->name,
-            'Start' => $model->start->timezone($this->timezone),
-            'End' => $model->end->timezone($this->timezone),
+            'Group' => $model->project?->groups()?->first()?->name,
+            'Email' => $model->user?->email,
+            'Tags' => $model->tagsRelation->pluck('name')->implode(', '),
+            'Invoiced' => '',
+            'Invoice ID' => '',
+            'Start Date' => $model->start->timezone($this->timezone)->format('Y-m-d'),
+            'Start Time' => $model->start->timezone($this->timezone)->format('h:i:s A'),
+            'End Date' => $model->end?->timezone($this->timezone)?->format('Y-m-d'),
+            'End Time' => $model->end?->timezone($this->timezone)?->format('h:i:s A'),
             'Duration' => $duration !== null ? $interval->format($model->getDuration()) : null,
             'Duration (decimal)' => $duration?->totalHours,
-            'Billable' => $model->billable ? 'Yes' : 'No',
-            'Tags' => $model->tagsRelation->pluck('name')->implode(', '),
+            'Approval' => $model->approval,
         ];
     }
 }
