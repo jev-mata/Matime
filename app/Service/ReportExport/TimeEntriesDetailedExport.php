@@ -120,17 +120,20 @@ class TimeEntriesDetailedExport implements
     public function headings(): array
     {
         return [
-            'Client',
-            'User',
             'Project',
-            'Task',
+            'Client',
             'Description',
-            'Start',
-            'End',
-            'Duration',
-            'Duration (decimal)',
+            'Task',
+            'User',
+            'Group',
+            'Email',
             'Tags',
-            'Billable',
+            'Start Date',
+            'Start Time',
+            'End  Date',
+            'End  Time', 
+            'Duration (h)',
+            'Duration (decimal)',   
         ];
     }
 
@@ -144,31 +147,37 @@ class TimeEntriesDetailedExport implements
 
         if ($this->exportFormat === ExportFormat::XLSX) {
             return [
-                $model->client?->name,
-                $model->user->name,
                 $model->project?->name,
-                $model->task?->name,
+                $model->client?->name,
                 $model->description,
+                $model->task?->name,
+                $model->user->name,
+                $model->project?->groups()?->first(),
+                $model->user?->email,
+                $model->tagsRelation->pluck('name')->implode(', '),
+                Date::dateTimeToExcel($model->start->timezone($this->timezone)),
                 Date::dateTimeToExcel($model->start->timezone($this->timezone)),
                 $model->end !== null ? Date::dateTimeToExcel($model->end->timezone($this->timezone)) : null,
+                $model->end !== null ? Date::dateTimeToExcel($model->end->timezone($this->timezone)) : null,
                 $duration !== null ? $this->localizationService->formatInterval($duration) : null,
-                $duration?->totalHours,
-                $model->tagsRelation->pluck('name')->implode(', '),
-                $model->billable ? 'Yes' : 'No',
+                $duration?->totalHours, 
             ];
         } elseif ($this->exportFormat === ExportFormat::ODS) {
-            return [
-                $model->client?->name,
-                $model->user->name,
-                $model->task?->name,
+            return [ 
                 $model->project?->name,
+                $model->client?->name,
                 $model->description,
-                $model->start->timezone($this->timezone)->format('Y-m-d H:i:s'),
-                $model->end?->timezone($this->timezone)?->format('Y-m-d H:i:s'),
-                $duration !== null ? $this->localizationService->formatInterval($duration) : null,
-                $duration?->totalHours,
+                $model->task?->name,
+                $model->user->name,
+                $model->project?->groups()?->first(),
+                $model->user?->email,
                 $model->tagsRelation->pluck('name')->implode(', '),
-                $model->billable ? 'Yes' : 'No',
+                $model->start->timezone($this->timezone)->format('Y-m-d'),
+                $model->start->timezone($this->timezone)->format('H:i:s'),
+                $model->end?->timezone($this->timezone)?->format('Y-m-d'),
+                $model->end?->timezone($this->timezone)?->format('H:i:s'),
+                $duration !== null ? $this->localizationService->formatInterval($duration) : null,
+                $duration?->totalHours, 
             ];
         } else {
             throw new LogicException('Unsupported export format.');

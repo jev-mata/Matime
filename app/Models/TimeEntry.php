@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 use Korridor\LaravelComputedAttributes\ComputedAttributes;
@@ -39,6 +40,7 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property Carbon|null $updated_at
  * @property-read User $user
  * @property-read Member $member
+ * @property-read Teams $group
  * @property string $organization_id
  * @property-read Organization $organization
  * @property string|null $project_id
@@ -171,7 +173,10 @@ class TimeEntry extends Model implements AuditableContract
     {
         return $this->belongsTo(Member::class, 'member_id');
     }
-
+    /**
+     * @return BelongsToMany<Teams, TimeEntry>
+     */
+ 
     /**
      * @return BelongsTo<Organization, TimeEntry>
      */
