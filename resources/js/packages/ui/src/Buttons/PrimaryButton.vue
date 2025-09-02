@@ -21,7 +21,7 @@ const props = withDefaults(
     <button
         :type="type"
         :disabled="loading"
-        class="inline-flex items-center px-2 dark:bg-[#2770DB] dark:text-[#FFFFFF] sm:px-3 py-1 sm:py-2  hover:dark:bg-[#468AEE]  hover:bg-[#1654AF]  rounded-md font-medium text-xs sm:text-sm text-button-primary-text hover:bg-button-primary-background-hover active:bg-button-primary-background-hover focus:outline-none focus-visible:ring-2 focus-visible:border-transparent focus-visible:ring-ring transition ease-in-out duration-150">
+        class="inline-flex items-center px-2  sm:px-3 py-1 sm:py-2 dark:bg-[#2770DB] dark:text-[#FFFFFF] hover:dark:bg-[#468AEE]  hover:bg-[#1654AF]  rounded-md font-medium text-xs sm:text-sm text-button-primary-text hover:bg-button-primary-background-hover active:bg-button-primary-background-hover focus:outline-none focus-visible:ring-2 focus-visible:border-transparent focus-visible:ring-ring transition ease-in-out duration-150">
         <span
             :class="
                 twMerge('flex items-center ', props.icon ? 'space-x-1.5' : '')

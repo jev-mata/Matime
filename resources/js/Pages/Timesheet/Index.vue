@@ -143,7 +143,7 @@ function formatDate(dateString: string, format?: string) {
 <template>
   <AppLayout title="Dashboard" data-testid="dashboard_view">
     <MainContainer
-      class="py-5 border-b dark:bg-[#171E31] dark:border-[#303F61] fixed w-[83%] z-10 flex justify-between items-center w-full"
+      class="py-5 border-b dark:bg-[#171E31] dark:border-[#303F61] sticky top-0   z-10 flex justify-between items-center "
     >
       <div class="flex items-center space-x-1 sm:space-x-3 w-full">
         <PageTitle :icon="HandThumbUpIcon" title="Approval" />
@@ -156,7 +156,7 @@ function formatDate(dateString: string, format?: string) {
           <PrimaryButton
             v-if="activeTab == 'archive'"
             :loading="isLoading"
-            class="border-0 px-2 mx-2"
+            class="border-0 px-2 mx-2 "
             @click="UnsubmittedRemindAll('withdraw')"
           >
             WITHDRAW ALL
@@ -180,7 +180,7 @@ function formatDate(dateString: string, format?: string) {
           <DangerButton
             v-if="activeTab == 'pending'"
             :loading="isLoading"
-            class="border-1 px-2 mx-2"
+            class="border-0 px-2 mx-2"
             @click="approveRejectAll('reject')"
           >
             REJECT ALL
@@ -189,7 +189,7 @@ function formatDate(dateString: string, format?: string) {
       </div>
     </MainContainer>
 
-    <div class="flow-root max-w-[100vw] overflow-x-auto pt-[7%]">
+    <div class="flow-root max-w-[100vw] overflow-x-auto ">
       <div class="inline-block w-full align-middle">
         <div data-testid="client_table" class="grid w-full" v-if="activeTab == 'pending'">
           <div v-if="isGroupedEmpty" class="col-span-3 py-24 text-center">
