@@ -387,39 +387,46 @@ class TimesheetController extends Controller
     {
         $curOrg = $this->currentOrganization();
         $memberRole = $this->member($curOrg);
-
+    
         if ($memberRole->role === 'employee') {
             return redirect()->route('dashboard');
         }
-
-        $query = TimeEntry::with(['user.groups', 'member']);
-
+    
+        $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id']);
+    
+        $teamIds = Auth::user()->groups()->pluck('teams.id')->toArray();
+    
         if ($memberRole->role === 'admin') {
-            $teamIds = Auth::user()->groups()->pluck('teams.id');
-            $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin', 'employee']));
+            $query->whereHas('member', fn($q) =>
+                $q->whereIn('role', ['manager', 'admin', 'employee'])
+            );
+            // Optional: team filter if admins should only see their own teams
             // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
-        } else if ($memberRole->role === 'manager') {
-            $teamIds = Auth::user()->groups()->pluck('teams.id');
-            $query->whereHas('member', fn($q) => $q->whereIn('role', ['employee', 'intern']));
-            $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
-        } else if ($memberRole->role === 'owner') {
-
+        } elseif ($memberRole->role === 'manager') {
+            $query->whereHas('member', fn($q) =>
+                $q->whereIn('role', ['employee', 'intern'])
+            )->whereHas('user.groups', fn($q) =>
+                $q->whereIn('teams.id', $teamIds)
+            );
+        } elseif ($memberRole->role === 'owner') {
+            // owner sees everything, no filters
         }
-        // $query->where('user_id', '!=', Auth::id());
-
-        $submitted = (clone $query)->where('approval', 'submitted')->get();
+    
+        // Run 3 queries (role-filtered each time)
+        $submitted   = (clone $query)->where('approval', 'submitted')->get();
         $unsubmitted = (clone $query)->where('approval', 'unsubmitted')->get();
-        $approved = (clone $query)->where('approval', 'approved')->get();
-
+        $approved    = (clone $query)->where('approval', 'approved')->get();
+    
         return Inertia::render('Timesheet/Index', [
-            'timesheets' => $submitted,
-            'grouped' => $this->groupTimesheets($submitted),
+            'timesheets'             => $submitted,
+            'grouped'                => $this->groupTimesheets($submitted),
             'unsubmitted_timesheets' => $unsubmitted,
-            'unsubmitted_grouped' => $this->groupTimesheets($unsubmitted),
-            'archive_timesheets' => $approved,
-            'archive_grouped' => $this->groupTimesheets($approved),
+            'unsubmitted_grouped'    => $this->groupTimesheets($unsubmitted),
+            'archive_timesheets'     => $approved,
+            'archive_grouped'        => $this->groupTimesheets($approved),
         ]);
     }
+    
 
     private function groupTimesheets($timesheets)
     {
