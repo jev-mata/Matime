@@ -392,18 +392,18 @@ class TimesheetController extends Controller
             return redirect()->route('dashboard');
         }
     
-        $query = null;
-    
+        $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id']);
+
         $teamIds = Auth::user()->groups()->pluck('teams.id')->toArray();
     
         if ($memberRole->role === 'admin') {
-            $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id'])->whereHas('member', fn($q) =>
+            $query->whereHas('member', fn($q) =>
                 $q->whereIn('role', ['manager', 'admin', 'employee'])
             );
             // Optional: team filter if admins should only see their own teams
             // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         } elseif ($memberRole->role === 'manager') {
-            $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id'])->whereHas('member', fn($q) =>
+            $query->whereHas('member', fn($q) =>
                 $q->whereIn('role', ['employee', 'intern'])
             )->whereHas('user.groups', fn($q) =>
                 $q->whereIn('teams.id', $teamIds)
