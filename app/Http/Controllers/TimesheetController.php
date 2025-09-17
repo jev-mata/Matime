@@ -392,15 +392,32 @@ class TimesheetController extends Controller
             return redirect()->route('dashboard');
         }
     
-        $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id']);
-
         $teamIds = Auth::user()->groups()->pluck('teams.id')->toArray();
     
+        // Base query with aggregation at SQL level
+        $query = TimeEntry::query()
+            ->selectRaw("
+                user_id,
+                member_id,
+                approval,
+                SUM(TIMESTAMPDIFF(MINUTE, start, end)) as total_minutes,
+                DATE_FORMAT(start, '%Y-%m') as year_month,
+                CASE WHEN DAY(start) <= 15 THEN 1 ELSE 16 END as half
+            ")
+            ->with([
+                'user:id,name',
+                'user.groups:id,name',
+                'member:id,user_id' // only need id + relation
+            ])
+            ->groupBy('user_id', 'member_id', 'approval', 'year_month', 'half')
+            ->whereIn('approval', ['submitted', 'unsubmitted', 'approved']);
+    
+        // Role-based filtering
         if ($memberRole->role === 'admin') {
             $query->whereHas('member', fn($q) =>
                 $q->whereIn('role', ['manager', 'admin', 'employee'])
             );
-            // Optional: team filter if admins should only see their own teams
+            // Optional: uncomment if admins should only see their teams
             // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         } elseif ($memberRole->role === 'manager') {
             $query->whereHas('member', fn($q) =>
@@ -409,61 +426,67 @@ class TimesheetController extends Controller
                 $q->whereIn('teams.id', $teamIds)
             );
         } elseif ($memberRole->role === 'owner') {
-            // owner sees everything, no filters
+            // owner sees everything, no extra filter
         }
-        $timesheets = $query
-        ->whereIn('approval', ['submitted', 'unsubmitted', 'approved'])
-        ->get()
-        ->groupBy('approval'); 
-        
-
-$submitted   = $timesheets->get('submitted', collect());
-$unsubmitted = $timesheets->get('unsubmitted', collect());
-$approved    = $timesheets->get('approved', collect());
+    
+        // Fetch grouped timesheets
+        $timesheets = $query->get()->groupBy('approval');
+    
+        $submitted   = $timesheets->get('submitted', collect());
+        $unsubmitted = $timesheets->get('unsubmitted', collect());
+        $approved    = $timesheets->get('approved', collect());
+    
         return Inertia::render('Timesheet/Index', [
-            'timesheets'             => $submitted,
+            'timesheets'             => $this->transformTimesheets($submitted),
             'grouped'                => $this->groupTimesheets($submitted),
-            'unsubmitted_timesheets' => $unsubmitted,
+            'unsubmitted_timesheets' => $this->transformTimesheets($unsubmitted),
             'unsubmitted_grouped'    => $this->groupTimesheets($unsubmitted),
-            'archive_timesheets'     => $approved,
+            'archive_timesheets'     => $this->transformTimesheets($approved),
             'archive_grouped'        => $this->groupTimesheets($approved),
         ]);
     }
     
-
+    /**
+     * Map SQL-aggregated results into expected structure
+     */
+    private function transformTimesheets($timesheets)
+    {
+        return $timesheets->map(function ($row) {
+            $user   = $row->user;
+            $member = $row->member;
+    
+            $hours   = floor($row->total_minutes / 60);
+            $minutes = $row->total_minutes % 60;
+    
+            return [
+                'period' => $row->year_month . '-' . $row->half,
+                'user' => [
+                    'id'     => $user->id,
+                    'name'   => $user->name,
+                    'groups' => $user->groups,
+                    'member' => $member ? ['id' => $member->id] : null,
+                ],
+                'totalHours' => "{$hours}h {$minutes}m",
+            ];
+        });
+    }
+    
+    /**
+     * Group timesheets by period and user (for UI rendering)
+     */
     private function groupTimesheets($timesheets)
     {
         return $timesheets
-            ->groupBy(function ($t) {
-                $d = Carbon::parse($t->start);
-                $half = $d->day <= 15 ? 1 : 16;
-                return $d->format('Y-m') . '-' . $half;
-            })
+            ->groupBy('period')
             ->map(function ($entriesByPeriod) {
                 return $entriesByPeriod
                     ->groupBy('user_id')
                     ->map(function ($entriesByUser) {
-                        $first = $entriesByUser->first();
-                        $user = $first->user;
-                        $member = $first->member;
-
-                        $totalMinutes = $entriesByUser->sum(function ($e) {
-                            return Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end));
-                        });
-
-                        return [
-                            'user' => [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                                'groups' => $user->groups,
-                                'member' => $member ? ['id' => $member->id] : null,
-                            ],
-                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
-                        ];
-                    })->values();
+                        return $entriesByUser->values();
+                    });
             });
     }
-
+    
     public function ApprovalOverview(Request $request)
     {
         $user = Member::with('user')->find($request->input('user_id'));
