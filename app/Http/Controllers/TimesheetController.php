@@ -392,18 +392,18 @@ class TimesheetController extends Controller
             return redirect()->route('dashboard');
         }
     
-        $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id']);
+        $query = null;
     
         $teamIds = Auth::user()->groups()->pluck('teams.id')->toArray();
     
         if ($memberRole->role === 'admin') {
-            $query->whereHas('member', fn($q) =>
+            $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id'])->whereHas('member', fn($q) =>
                 $q->whereIn('role', ['manager', 'admin', 'employee'])
             );
             // Optional: team filter if admins should only see their own teams
             // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         } elseif ($memberRole->role === 'manager') {
-            $query->whereHas('member', fn($q) =>
+            $query = TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id'])->whereHas('member', fn($q) =>
                 $q->whereIn('role', ['employee', 'intern'])
             )->whereHas('user.groups', fn($q) =>
                 $q->whereIn('teams.id', $teamIds)
@@ -411,12 +411,15 @@ class TimesheetController extends Controller
         } elseif ($memberRole->role === 'owner') {
             // owner sees everything, no filters
         }
-    
-        // Run 3 queries (role-filtered each time)
-        $submitted   = (clone $query)->where('approval', 'submitted')->get();
-        $unsubmitted = (clone $query)->where('approval', 'unsubmitted')->get();
-        $approved    = (clone $query)->where('approval', 'approved')->get();
-    
+        $timesheets = $query
+        ->whereIn('approval', ['submitted', 'unsubmitted', 'approved'])
+        ->get()
+        ->groupBy('approval'); 
+        
+
+$submitted   = $timesheets->get('submitted', collect());
+$unsubmitted = $timesheets->get('unsubmitted', collect());
+$approved    = $timesheets->get('approved', collect());
         return Inertia::render('Timesheet/Index', [
             'timesheets'             => $submitted,
             'grouped'                => $this->groupTimesheets($submitted),
