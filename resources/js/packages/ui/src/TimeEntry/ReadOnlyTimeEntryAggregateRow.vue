@@ -16,6 +16,9 @@ import {
     formatHumanReadableDuration,
     formatStartEnd,
 } from '@/packages/ui/src/utils/time';
+
+import { twMerge } from 'tailwind-merge';
+import BillableToggleButton from '@/packages/ui/src/Input/BillableToggleButton.vue';
 import TimeEntryRow from '@/packages/ui/src/TimeEntry/ReadOnlyTimeEntryRow.vue';
 import GroupedItemsCountButton from '@/packages/ui/src/GroupedItemsCountButton.vue';
 import type { TimeEntriesGroupedByType } from '@/types/time-entries';
@@ -90,8 +93,8 @@ const selectedProjectColor = computed(() => {
     <div class="hover:border-y dark:border-[#3F4961] dark:bg-[#171E31] bg-row-background min-w-0 transition" data-testid="time_entry_row"
         title="Editing disabled for submitted entries">
         <MainContainer class="min-w-0 opacity-40">
-            <div class="grid sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-8 2xl:grid-cols-10 py-1.5 items-center min-w-0 justify-between group">
-                <div class="flex items-center 2xl:col-span-2 xl:col-span-3 md:col-span-3 sm:col-span-3 min-w-0">
+            <div class="grid sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-8 2xl:grid-cols-10 items-center py-2 group">
+                <div class="flex  items-center 2xl:col-span-2 xl:col-span-3 md:col-span-3 sm:col-span-3 min-w-0">
                     <Checkbox :checked="timeEntry.timeEntries.every(
                         (aggregateTimeEntry: TimeEntry) =>
                             selectedTimeEntries.includes(
@@ -128,17 +131,20 @@ const selectedProjectColor = computed(() => {
                         </div>
                     </ProjectBadge>
                 </div>
-                <div class="flex items-center     md:col-span-2 sm:col-span-2 xl:col-span-2 2xl:col-span-1 bg-secondary min-w-0">
-                    <div class="flex-1 ">
+                <div class="flex items-center     md:col-span-2 sm:col-span-2 xl:col-span-2 2xl:col-span-2 bg-secondary min-w-0">
+                    <div class="flex-1 flex   grid grid-cols-5  ">
                         <TagBadge :border="false" size="large"
-                            class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary  bg-transparent dark:bg-transparent hover:bg-transparent"
+                            class="border-0 sm:px-1.5  col-span-4 text-icon-default group-focus-within/dropdown:text-text-primary  bg-transparent dark:bg-transparent hover:bg-transparent"
                             :name="timeEntryTags(timeEntry.tags)
                                     .map((tag: Tag) => tag.name)
                                     .join(', ')
                                 "></TagBadge>
+                        <BillableToggleButton :model-value="timeEntry.billable"
+                            :class="twMerge('col-span-1 opacity-50 group-hover:opacity-100 focus-visible:opacity-100')"
+                            size="small" ></BillableToggleButton>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2  md:col-span-6 sm:col-span-6 xl:col-span-6 2xl:col-span-4  justify-end">
+                <div class="flex items-center    md:col-span-4 xl:col-span-4 2xl:col-span-3 justify-end sm:col-span-6">
                     <div class=" text-sm   whitespace-nowrap  px-4">
                         {{
                             formatStartEnd(

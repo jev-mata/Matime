@@ -139,7 +139,7 @@ function deleteSelected() {
               class="w-full   text-center flex justify-center"
               :icon="PlusIcon"
               @click="showManualTimeEntryModal = true"
-              >Manual 🕓
+              >Manual
             </SecondaryButton>
           </div>
         </div>

@@ -88,7 +88,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 <div class="flex items-center 2xl:col-span-2 xl:col-span-3 md:col-span-3 sm:col-span-3 min-w-0">
                     <Checkbox :checked="selected" @update:checked="onSelectChange" />
                     <div v-if="indent === true" class="w-10 h-7"></div>
-                    <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary  truncate">
+                    <div class="min-w-0 pl-5 pr-1 text-sm text-text-primary  truncate">
                         {{ timeEntry.description }}
                     </div>
                 </div>
@@ -113,7 +113,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 <!-- Time Range -->
                 <!-- Duration Input -->
 
-                <div class="flex bg-secondary min-w-0  sm:col-span-1 md:col-span-2 sm:col-span-2 xl:col-span-2 2xl:col-span-1">
+                <div class="flex bg-secondary min-w-0  sm:col-span-1 md:col-span-2 sm:col-span-2 xl:col-span-2 2xl:col-span-2">
                     <div class="flex-1  grid grid-cols-5  ">
                         <TagBadge :border="false" size="large"
                             class="border-0 sm:px-1.5 col-span-4  text-icon-default group-focus-within/dropdown:text-text-primary  bg-transparent dark:bg-transparent hover:bg-transparent"
@@ -127,7 +127,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                     </div>
                 </div>
                 <!-- Lock/Action -->
-                <div class="flex items-center   space-x-2 md:col-span-6 xl:col-span-6 2xl:col-span-4 justify-end sm:col-span-6">
+                <div class="flex items-center    md:col-span-4 xl:col-span-4 2xl:col-span-3 justify-end sm:col-span-6">
                     <div class="text-sm   px-4 ">
                         {{
                             formatStartEnd(

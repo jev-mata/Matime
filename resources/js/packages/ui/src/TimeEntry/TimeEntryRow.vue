@@ -96,11 +96,11 @@ function onSelectChange(checked: boolean) {
     <div class="hover:border-y hover:dark:text-gray-100 dark:border-[#3F4961]  dark:bg-[#171E31] transition min-w-0 bg-row-background"
         data-testid="time_entry_row">
         <MainContainer class="min-w-0">
-            <div class="grid  sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-8 2xl:grid-cols-9 py-2 min-w-0    group">
-                <div class="flex 2xl:col-span-2 xl:col-span-2 md:col-span-3 sm:col-span-3  items-center min-w-0  ">
+            <div class="grid sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-8 2xl:grid-cols-10 items-center py-2 group">
+                <div class="flex items-center 2xl:col-span-2 xl:col-span-3 md:col-span-3 sm:col-span-3 min-w-0">
                     <Checkbox :checked="selected" @update:checked="onSelectChange" />
                     <div v-if="indent === true" class="w-10 h-7"></div>
-                    <TimeEntryDescriptionInput class="min-w-0 mx-4 dark:text-[#7D88A1] hover:dark:bg-[#0C101E] py-2 rounded" :model-value="timeEntry.description
+                    <TimeEntryDescriptionInput class="min-w-0 pl-3 pr-1 text-sm text-text-primary  truncate" :model-value="timeEntry.description
                         " @changed="updateTimeEntryDescription"></TimeEntryDescriptionInput>
                     <div v-if="showMember && members" class="text-sm px-2">
                         {{ memberName }}
@@ -124,7 +124,7 @@ function onSelectChange(checked: boolean) {
                             "></BillableToggleButton>
                     </div>
                 </div>
-                <div class="flex items-center    md:col-span-4 xl:col-span-4 2xl:col-span-2 justify-end sm:col-span-6">
+                <div class="flex items-center    md:col-span-4 xl:col-span-4 2xl:col-span-3 justify-end sm:col-span-6">
                     <TimeEntryRangeSelector class="   " :start="timeEntry.start" :end="timeEntry.end"
                         :show-date @changed="
                             updateStartEndTime
