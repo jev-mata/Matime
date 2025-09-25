@@ -164,42 +164,60 @@ watch(open, () => {
     }
 });
 </script>
-
 <template>
     <Dropdown v-model="open" :align="align" :close-on-content-click="false">
-        <template #trigger>
-            <slot name="trigger"> </slot>
-        </template>
-        <template #content>
-            <div
-                ref="dropdownViewport"
-                :class="
-                    twMerge(
-                        'py-1.5 max-h-60 overflow-y-scroll  dark:border-[#303F61]  dark:bg-[#0F1426] bg-white dark:text-[#7D88A1] ',
-                        props.class
-                    )
-                ">
-                <div
-                    v-for="item in filteredItems" class="hover:dark:border-y dark:border-[#303F61] px-5   hover:bg-[#F3F3F4] "
-                    :key="props.getKeyFromItem(item) ?? 'none'"
-                    role="option"
-                    :data-select-id="props.getKeyFromItem(item)"
-                    :value="props.getKeyFromItem(item)"
-                    :data-item-id="props.getKeyFromItem(item)">
-                    <SelectDropdownItem
-                        :highlighted="
-                            props.getKeyFromItem(item) === highlightedItemId
-                        "
-                        :selected="props.getKeyFromItem(item) === model"
-                        :name="props.getNameForItem(item)"
-                        @mouseenter="
-                            highlightedItemId = props.getKeyFromItem(item)
-                        "
-                        @click="setItem(props.getKeyFromItem(item))"></SelectDropdownItem>
-                </div>
-            </div>
-        </template>
+      <template #trigger>
+        <slot name="trigger"> </slot>
+      </template>
+      <template #content>
+        <div
+          class="p-2 border-b dark:border-[#303F61] bg-white dark:bg-[#0F1426]"
+        >
+          <input
+            v-model="searchValue"
+            type="text"
+            placeholder="Search..."
+            class="w-full px-3 py-2 text-sm rounded-md border dark:border-[#303F61] 
+                   dark:bg-[#1B2238] dark:text-white focus:outline-none"
+          />
+        </div>
+  
+        <div
+          ref="dropdownViewport"
+          :class="
+            twMerge(
+              'py-1.5 max-h-60 overflow-y-scroll dark:border-[#303F61] dark:bg-[#0F1426] bg-white dark:text-[#7D88A1]',
+              props.class
+            )
+          "
+        >
+          <div
+            v-for="item in filteredItems"
+            :key="props.getKeyFromItem(item) ?? 'none'"
+            class="hover:dark:border-y dark:border-[#303F61] px-5 hover:bg-[#F3F3F4]"
+            role="option"
+            :data-select-id="props.getKeyFromItem(item)"
+            :value="props.getKeyFromItem(item)"
+            :data-item-id="props.getKeyFromItem(item)"
+          >
+            <SelectDropdownItem
+              :highlighted="props.getKeyFromItem(item) === highlightedItemId"
+              :selected="props.getKeyFromItem(item) === model"
+              :name="props.getNameForItem(item)"
+              @mouseenter="highlightedItemId = props.getKeyFromItem(item)"
+              @click="setItem(props.getKeyFromItem(item))"
+            />
+          </div>
+  
+          <div
+            v-if="filteredItems.length === 0"
+            class="px-5 py-2 text-sm text-gray-500 dark:text-gray-400"
+          >
+            No results found
+          </div>
+        </div>
+      </template>
     </Dropdown>
-</template>
-
+  </template>
+  
 <style scoped></style>

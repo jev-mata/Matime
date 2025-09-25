@@ -7,11 +7,11 @@ import type { Client, Project, Tag, Task, TimeEntry } from '@/packages/api/src';
 // import TimeEntryRowTagDropdown from '@/packages/ui/src/TimeEntry/TimeEntryRowTagDropdown.vue';
 import TimeEntryRowDurationInput from '@/packages/ui/src/TimeEntry/TimeEntryRowDurationInput.vue';
 // import TimeEntryMoreOptionsDropdown from '@/packages/ui/src/TimeEntry/TimeEntryMoreOptionsDropdown.vue';
-// import BillableToggleButton from '@/packages/ui/src/Input/BillableToggleButton.vue';
+import BillableToggleButton from '@/packages/ui/src/Input/BillableToggleButton.vue';
 import { computed, inject, type ComputedRef } from 'vue';
 // import TimeTrackerProjectTaskDropdown from '@/packages/ui/src/TimeTracker/TimeTrackerProjectTaskDropdown.vue';
 import { Checkbox } from '@/packages/ui/src';
-// import { twMerge } from 'tailwind-merge';
+import { twMerge } from 'tailwind-merge';
 
 import TagBadge from '@/packages/ui/src/Tag/TagBadge.vue';
 import { ChevronRightIcon, LockClosedIcon } from '@heroicons/vue/16/solid';
@@ -83,9 +83,9 @@ const organization = inject<ComputedRef<Organization>>('organization');
     <div class="hover:border-y  dark:border-[#3F4961] transition min-w-0  dark:bg-[#171E31]" data-testid="time_entry_row"
         title="Editing disabled for submitted entries">
         <MainContainer class="min-w-0 opacity-40">
-            <div class="grid sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-10 items-center py-2 group">
+            <div class="grid sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-8 2xl:grid-cols-10 items-center py-2 group">
                 <!-- Checkbox + Description -->
-                <div class="flex items-center 2xl:col-span-2 xl:col-span-2 md:col-span-3 sm:col-span-3 min-w-0">
+                <div class="flex items-center 2xl:col-span-2 xl:col-span-3 md:col-span-3 sm:col-span-3 min-w-0">
                     <Checkbox :checked="selected" @update:checked="onSelectChange" />
                     <div v-if="indent === true" class="w-10 h-7"></div>
                     <div class="min-w-0 pl-3 pr-1 text-sm text-text-primary  truncate">
@@ -94,7 +94,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 </div>
 
                 <!-- Project/Task Badge -->
-                <div class="px-2 w-full 2xl:col-span-3 xl:col-span-3 md:col-span-5 sm:col-span-5 bg-secondary min-w-0">
+                <div class="px-2 w-full 2xl:col-span-3 xl:col-span-5 md:col-span-5 sm:col-span-5 bg-secondary min-w-0">
                     <ProjectBadge :color="selectedProjectColor" :border="false" tag="button"
                         class="flex focus:border-border-tertiary w-full focus:outline-0 focus:bg-card-background-separator min-w-0 bg-transparent dark:bg-transparent hover:bg-transparent">
                         <div class="flex lg:space-x-1 min-w-0">
@@ -113,18 +113,21 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 <!-- Time Range -->
                 <!-- Duration Input -->
 
-                <div class="flex bg-secondary min-w-0    sm:col-span-1 md:col-span-2 sm:col-span-2 xl:col-span-1 2xl:col-span-1">
-                    <div class="flex-1 ">
+                <div class="flex bg-secondary min-w-0  sm:col-span-1 md:col-span-2 sm:col-span-2 xl:col-span-2 2xl:col-span-1">
+                    <div class="flex-1  grid grid-cols-5  ">
                         <TagBadge :border="false" size="large"
-                            class="border-0 sm:px-1.5 text-icon-default group-focus-within/dropdown:text-text-primary  bg-transparent dark:bg-transparent hover:bg-transparent"
+                            class="border-0 sm:px-1.5 col-span-4  text-icon-default group-focus-within/dropdown:text-text-primary  bg-transparent dark:bg-transparent hover:bg-transparent"
                             :name="timeEntryTags(timeEntry.tags)
                                     .map((tag: Tag) => tag.name)
                                     .join(', ')
                                 "></TagBadge>
+                        <BillableToggleButton :model-value="timeEntry.billable"
+                            :class="twMerge('col-span-1 opacity-50 group-hover:opacity-100 focus-visible:opacity-100')"
+                            size="small" ></BillableToggleButton>
                     </div>
                 </div>
                 <!-- Lock/Action -->
-                <div class="flex items-center   space-x-2 md:col-span-6 xl:col-span-4 2xl:col-span-4 justify-end sm:col-span-6">
+                <div class="flex items-center   space-x-2 md:col-span-6 xl:col-span-6 2xl:col-span-4 justify-end sm:col-span-6">
                     <div class="text-sm   px-4 ">
                         {{
                             formatStartEnd(

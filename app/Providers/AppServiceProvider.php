@@ -29,26 +29,16 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
-use Inertia\Inertia;
-use League\OAuth2\Client\Provider\Google;
-use Nwidart\Modules\Facades\Module;
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Component\Mailer\Transport\Smtp\Auth\OAuth2Authenticator;
-use Symfony\Component\Mailer\Transport\Smtp\Auth\OAuth2\OAuth2Token;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    public function register()
+    public function register(): void
     {
         $this->app->singleton('module_menus', function () {
             return collect();
@@ -56,17 +46,18 @@ class AppServiceProvider extends ServiceProvider
 
     }
 
-
     /**
      * Bootstrap any application services.
      */
     public function boot(): void
     {
- 
+
         if (env('APP_ENV') === 'production') {
             URL::forceScheme('https');
-        }
+        } else {
+            URL::forceScheme('http');
 
+        }
 
         if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
@@ -74,9 +65,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Eloquent
-        Model::preventLazyLoading(!$this->app->isProduction());
-        Model::preventSilentlyDiscardingAttributes(!$this->app->isProduction());
-        Model::preventAccessingMissingAttributes(!$this->app->isProduction());
+        Model::preventLazyLoading(! $this->app->isProduction());
+        Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
+        Model::preventAccessingMissingAttributes(! $this->app->isProduction());
         $menus = [];
 
         Relation::enforceMorphMap([
@@ -125,8 +116,6 @@ class AppServiceProvider extends ServiceProvider
         Route::model('member', Member::class);
         Route::model('invitation', OrganizationInvitation::class);
         Route::model('apiToken', Token::class);
-
-
 
     }
 }

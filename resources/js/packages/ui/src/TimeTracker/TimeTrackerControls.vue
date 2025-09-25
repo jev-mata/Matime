@@ -239,8 +239,8 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
 <template>
     <div class="flex items-center relative @container " data-testid="dashboard_timer">
         <div
-            class="flex flex-col @2xl:flex-row w-full justify-between relative  rounded-lg dark:bg-[#13192B] bg-white  transition shadow">
-            <div class="  flex-1 items-center pr-6   w-full  ">
+            class="flex grid sm:grid-cols-8 md:grid-cols-8 xl:grid-cols-8 2xl:grid-cols-9  @2xl:flex-row w-full justify-between relative  rounded-lg dark:bg-[#13192B] bg-white  transition shadow">
+            <div class=" 2xl:col-span-3 xl:col-span-3 md:col-span-8 sm:col-span-3 flex-1 items-center pr-6   w-full  ">
                 <input ref="currentTimeEntryDescriptionInput" v-model="tempDescription"
                     placeholder="What are you working on?" data-testid="time_entry_description"
                     class="w-full rounded-l-lg py-4 sm:py-2.5 px-3.5   @2xl:px-4 text-base   text-text-primary font-medium bg-transparent border-none placeholder-muted focus:ring-0 transition"
@@ -264,24 +264,24 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                     </div>
                 </div>
             </div>
-            <div class="flex items-center justify-between pl-2 shrink min-w-0">
-                <div class="flex items-center w-[130px] @2xl:w-auto shrink min-w-0 ">
+            <div class="flex grid grid-cols-4 2xl:col-span-5 xl:col-span-4 md:col-span-7 sm:col-span-3 items-center truncate  justify-between pl-2 shrink min-w-0">
+                <div class="flex flex-1 items-center col-span-2 @2xl:w-auto shrink min-w-0 ">
                     <TimeTrackerProjectTaskDropdown v-model:project="currentTimeEntry.project_id" v-model:task="currentTimeEntry.task_id
                         " :create-client :can-create-project :clients :create-project :currency="currency"
                         :projects="projects" :tasks="tasks" :enable-estimated-time="enableEstimatedTime"
-                        class=" border-[#77D36F] bg-[#D4FFD1] hover:bg-[#C1F7B0] dark:border-[#5D6370] dark:bg-[#13192B] dark:hover:bg-[#0C101E] "
+                        class=" border-[#77D36F] truncate bg-[#D4FFD1] hover:bg-[#C1F7B0] dark:border-[#5D6370] dark:bg-[#13192B] dark:hover:bg-[#0C101E] "
                         :setOpen="OpenProject" :open="ProjectOpen" ref="currentTimeEntryProjectInput"
                         @changed="updateProject">
                     </TimeTrackerProjectTaskDropdown>
                 </div>
-                <div class="flex items-center @2xl:space-x-2 px-2 @2xl:px-4">
+                <div class="flex flex-1  grid grid-cols-2  items-center col-span-1  @2xl:space-x-2 px-2 @2xl:px-4">
                     <TimeTrackerTagDropdown v-model="currentTimeEntry.tags
                         " ref="currentTimeEntryTaskInput" :create-tag :tags="tags" @changed="$emit('updateTimeEntry')">
                     </TimeTrackerTagDropdown>
                     <BillableToggleButton v-model="currentTimeEntry.billable
                         " @changed="$emit('updateTimeEntry')"></BillableToggleButton>
                 </div>
-                <div class=" ">
+                <div class="  flex-1  col-span-1">
                     <TimeTrackerRangeSelector v-model:current-time-entry="currentTimeEntry"
                         v-model:live-timer="liveTimer" @start-live-timer="emit('startLiveTimer')"
                         @stop-live-timer="emit('stopLiveTimer')" @update-timer="emit('updateTimeEntry')"
@@ -290,13 +290,13 @@ useSelectEvents(filteredRecentlyTrackedTimeEntries,
                         "></TimeTrackerRangeSelector>
                 </div>
             </div>
-        </div>
-        <div class="flex pl-4 @2xl:pl-6 pr-3 absolute sm:relative top-[6px] sm:top-0 right-0">
+        <div class="flex   2xl:col-span-1 xl:col-span-1 md:col-span-1 sm:col-span-3   absolute sm:relative top-[6px] sm:top-0 right-0">
             <TimeTrackerStartStop :active="isActive" size="large" @changed="onToggleButtonPress"></TimeTrackerStartStop>
             <button v-if="isActive" @click="discardTimeEntry(isActive,currentTimeEntry)" title="Discard Entry"
                 class="p-2 rounded-full hover:bg-red-100 text-red-600 w-10 h-10 ml-3 text-center align-center flex">
                 <TrashIcon class="flex-1 w-5 h-5" />
             </button>
+        </div>
         </div>
     </div>
 </template>

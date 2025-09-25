@@ -12,6 +12,7 @@ import { useProjectMembersStore } from '@/utils/useProjectMembers';
 import BillableRateInput from '@/packages/ui/src/Input/BillableRateInput.vue';
 import { getOrganizationCurrencyString } from '@/utils/money';
 import axios from 'axios';
+import { UserGroupIcon } from "@heroicons/vue/20/solid"
 import { Badge } from '@/packages/ui/src';
 import { UserIcon, ChevronDownIcon } from '@heroicons/vue/24/solid';
 import SelectDropdown from '@/packages/ui/src/Input/SelectDropdown.vue';
@@ -42,7 +43,7 @@ const groupBillableRate = ref<number | null>(null); // stores rate separately
 async function getGroupNotMember() {
     const { data } = await axios.get(`/organizations/teams/projects/${props.projectId}`);
     projectGroupMember.value = data.team.length > 0 ? data.team : [{ id: null, name: 'No Group Available', billable_rate: null }]; // team from your sample response
- 
+
 }
 watch(
     () => show.value,
@@ -115,7 +116,7 @@ function clearGroupSelection() {
             <div class="grid grid-cols-3 items-center space-x-4">
                 <div class="col-span-3 sm:col-span-2">
                     <MemberCombobox v-model="projectMember.member_id" :hidden-members="props.existingMembers"
-                        :placeholder="'Select Members...'">
+                        :placeholder="'Select Members...'"> 
                     </MemberCombobox>
                 </div>
                 <div class="col-span-3 sm:col-span-1 flex-1">

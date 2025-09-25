@@ -129,17 +129,17 @@ function deleteSelected() {
         class="pt-5 lg:pt-8 pb-4 lg:pb-6 dark:bg-[#171E31] bg-[#F3F3F4] p-5 sticky top-0 z-10"
       >
         <div
-          class="lg:flex items-endlg:divide-x divide-default-background-separator divide-y lg:divide-y-0 space-y-2 lg:space-y-0 lg:space-x-2"
+          class="lg:flex items-endlg:divide-x divide-default-background-separator divide-y lg:divide-y-0 space-y-2 lg:space-y-0"
         >
-          <div class="flex-1">
+          <div class="flex-1   ">
             <TimeTracker></TimeTracker>
           </div>
-          <div class="pb-2 lg:pt-12 xl:pt-11 lg:pl-4 flex justify-center items-center">
+          <div class="pb-2 lg:pt-10 xl:pt-10  justify-center items-center">
             <SecondaryButton
-              class="w-full text-center flex justify-center"
+              class="w-full   text-center flex justify-center"
               :icon="PlusIcon"
               @click="showManualTimeEntryModal = true"
-              >Manual time entry
+              >Manual 🕓
             </SecondaryButton>
           </div>
         </div>

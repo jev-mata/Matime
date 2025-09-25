@@ -29,11 +29,12 @@ const organization = inject<ComputedRef<Organization>>('organization');
 
 <template>
     <div
-        class="contents text-text-primary [&>*]:transition   hover:border-b [&>*]:h-[50px] ">
+        class="grid grid-cols-12 text-text-primary [&>*]:transition   hover:border-b [&>*]:h-[50px] ">
+        
         <div
             :class="
                 twMerge(
-                    'pl-6 font-medium flex items-center space-x-3',
+                    'pl-6 col-span-10 font-medium flex items-center space-x-3',
                     props.indent ? 'pl-16' : ''
                 )
             ">
@@ -47,7 +48,7 @@ const organization = inject<ComputedRef<Organization>>('organization');
                 {{ entry.description }}
             </span>
         </div>
-        <div class="justify-end flex items-center pr-2">
+        <div class="justify-start col-span-2 flex items-center pr-2">
             {{
                 formatHumanReadableDuration(
                     entry.seconds,

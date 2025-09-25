@@ -6,7 +6,7 @@ import { UserGroupIcon } from '@heroicons/vue/20/solid';
 import SecondaryButton from '@/packages/ui/src/Buttons/SecondaryButton.vue';
 import TabBar from '@/Components/Common/TabBar/TabBar.vue';
 import TabBarItem from '@/Components/Common/TabBar/TabBarItem.vue';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import MemberTable from '@/Components/Common/Member/MemberTable.vue';
 import MemberInviteModal from '@/Components/Common/Member/MemberInviteModal.vue';
 import type { Role } from '@/types/jetstream';
@@ -15,6 +15,15 @@ import InvitationTable from '@/Components/Common/Invitation/InvitationTable.vue'
 import { canCreateInvitations } from '@/utils/permissions';
 import Show from './Teams/Show.vue';
 import TeamsPage from './Teams/TeamsPage.vue';
+import axios from 'axios';
+export interface Membership {
+  id: string; 
+  role:string;
+} 
+export interface Organizations {
+  id: string; 
+  membership:Membership;
+} 
 
 const inviteMember = ref(false);
 
@@ -24,6 +33,30 @@ defineProps<{
 
 const activeTab = ref<'all' | 'invitations' | 'teams'>('all');
 
+export interface User {
+    id: string;
+    name: string;
+    organizations: Organizations[];
+    // add more if needed
+}
+
+export interface Project {
+    id: string;
+    name: string;
+    // add more if needed
+}
+
+export interface Team {
+    id: string;
+    name: string;
+    users: User[];
+    projects: Project[];
+}
+
+export interface Manager {
+    id: string;
+    users: User[];
+} 
 </script>
 
 <template>
@@ -45,7 +78,7 @@ const activeTab = ref<'all' | 'invitations' | 'teams'>('all');
         </MainContainer>
         <MemberTable v-if="activeTab === 'all'"></MemberTable>
         <InvitationTable v-if="activeTab === 'invitations'"></InvitationTable>
-        <TeamsPage v-if="activeTab === 'teams'">
+        <TeamsPage v-if="activeTab === 'teams'" >
         </TeamsPage>
     </AppLayout>
 </template>

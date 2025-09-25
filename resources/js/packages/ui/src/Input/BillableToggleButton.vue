@@ -20,9 +20,9 @@ const props = withDefaults(
 
 const iconColorClasses = computed(() => {
     if (active.value) {
-        return ' dark:text-[#BFC7D6] focus:dark:text-[#BFC7D6] hover:dark:text-[#BFC7D6]';
+        return ' dark:text-[#77d36f] focus:dark:text-[#77d36f] hover:dark:text-[#77d36f] font-bold';
     } else {
-        return ' dark:text-[#7D88A1] focus:text-[#BFC7D6] hover:text-[#BFC7D6]';
+        return ' dark:text-[#616a7d]/55  focus:text-[#BFC7D6] hover:text-[#BFC7D6] font-thin';
     }
 });
 
@@ -48,7 +48,7 @@ const iconSizeWrapperClasses =
             )
         "
         @click="toggleBillable">
-        <BillableIcon :class="iconSizeClasses"></BillableIcon>
+        <BillableIcon ></BillableIcon>
     </button>
 </template>
 

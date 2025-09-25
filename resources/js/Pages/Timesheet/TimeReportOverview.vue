@@ -10,7 +10,7 @@ import { formatCents } from '@/packages/ui/src/utils/money';
 import ReportingRow from '@/Components/Common/Reporting/ReportingRow.vue';
 import ReportingChart from '@/Components/Common/Reporting/ReportingChart.vue';
 import MainContainer from '@/packages/ui/src/MainContainer.vue';
-import TimeReportRowHeading from '@/Pages/Timesheet/TimeReportRowHeading.vue'; 
+import TimeReportRowHeading from '@/Pages/Timesheet/TimeReportRowHeading.vue';
 import ReportingPieChart from '@/Components/Common/Reporting/ReportingPieChart.vue';
 
 import { Link } from '@inertiajs/vue3';
@@ -21,13 +21,13 @@ import type {
     TimeEntry,
     Client,
 } from '@/packages/api/src';
-import type { TimeEntriesGroupedByType } from '@/types/time-entries'; 
+import type { TimeEntriesGroupedByType } from '@/types/time-entries';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, type ComputedRef, inject, onMounted, ref, watch, watchEffect } from 'vue';
 import { useReportingStore, type GroupingOption } from '@/utils/useReporting';
 import { storeToRefs } from 'pinia';
 import {
-    type AggregatedTimeEntriesQueryParams, 
+    type AggregatedTimeEntriesQueryParams,
     type Organization,
 } from '@/packages/api/src';
 import {
@@ -46,7 +46,7 @@ import { ArrowLeftIcon } from '@heroicons/vue/24/solid';
 import ReadOnlyTimeEntryRow from './ReadOnlyTimeEntryRow.vue';
 import { SecondaryButton } from '@/packages/ui/src';
 import axios from 'axios';
-import ReadOnlyTimeEntryAggregateRow from './ReadOnlyTimeEntryAggregateRow.vue'; 
+import ReadOnlyTimeEntryAggregateRow from './ReadOnlyTimeEntryAggregateRow.vue';
 
 const page = usePage<{
     userid: string;
@@ -58,7 +58,7 @@ const page = usePage<{
     tags: Tag[];
     clients: Client[];
 }>();
-const isLoading=ref<boolean>(false);
+const isLoading = ref<boolean>(false);
 const approvalStatus = computed(() => {
     const entries = page.props.timeEntries;
 
@@ -87,7 +87,7 @@ const group = useStorage<GroupingOption>('reporting-group', 'project');
 const subGroup = useStorage<GroupingOption>('reporting-sub-group', 'task');
 watch(
     () => selectedMembers,               // source
-    (newVal,  ) => {                // callback
+    (newVal,) => {                // callback
         console.log('selectedMembers changed:', newVal);
     },
     { deep: true }                       // optional: use if it's an array or object
@@ -157,7 +157,7 @@ function updateTableReporting() {
     params.sub_group = subGroup.value;
     useReportingStore().fetchTableReporting(params);
 }
- 
+
 function getOptimalGroupingOption(
     startDate: string,
     endDate: string
@@ -186,17 +186,19 @@ const { tags } = storeToRefs(useTagsStore());
 async function createTag(tag: string) {
     return await useTagsStore().createTag(tag);
 }
- 
+
 const { addNotification } = useNotificationsStore();
 async function approveReject(type: 'approve' | 'reject') {
-    isLoading.value=true;
+    isLoading.value = true;
     try {
         const ids = page.props.timeEntries.map(t => t.id);
-  await axios.post(
+        await axios.post(
             route(`approval.${type}`),          // approval.approve | approval.reject
-            { timeEntries: ids,period:
-                    `${ formatDate(page.props.period.start, 'ddd, MMMM D') } -
-                    ${ formatDate(page.props.period.end, 'D - YYYY') }` },
+            {
+                timeEntries: ids, period:
+                    `${formatDate(page.props.period.start, 'ddd, MMMM D')} -
+                    ${formatDate(page.props.period.end, 'D - YYYY')}`
+            },
             { withCredentials: true, headers: { Accept: 'application/json' } }
         );
 
@@ -204,7 +206,7 @@ async function approveReject(type: 'approve' | 'reject') {
             'success',
             `${type === 'approve' ? 'Approved' : 'Rejected'}`,
         );
-    isLoading.value=false;
+        isLoading.value = false;
         setTimeout(() => {
             router.visit(route('approval.index')); // change to your target page
         }, 1500);
@@ -215,14 +217,14 @@ async function approveReject(type: 'approve' | 'reject') {
             'Failed',
             `Could not ${type} entries`
         );
-    isLoading.value=false;
+        isLoading.value = false;
     }
 }
 
 const { getNameForReportingRowEntry, emptyPlaceholder } = useReportingStore();
 
 const projectsStore = useProjectsStore();
-const { projects } = storeToRefs(projectsStore); 
+const { projects } = storeToRefs(projectsStore);
 
 const groupedPieChartData = computed(() => {
     return (
@@ -290,7 +292,7 @@ function formatDate(dateString: string, format?: string) {
     }
     const formatted = dayjs(dateString).format(format);
     return formatted;
-} 
+}
 
 const groupedTimeEntries = computed(() => {
     const groupedEntriesByDay: Record<string, TimeEntry[]> = {};
@@ -364,15 +366,17 @@ function sumDuration(timeEntries: TimeEntry[]) {
 
 
 async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
-    isLoading.value=true;
+    isLoading.value = true;
     try {
         const ids = page.props.timeEntries.map(t => t.id);
 
-          await axios.post(
+        await axios.post(
             route(`approval.${type}`),          // approval.approve | approval.reject
-            { timeEntries: ids,period:
-                    `${ formatDate(page.props.period.start, 'ddd, MMMM D') } -
-                    ${ formatDate(page.props.period.end, 'D - YYYY') }` },
+            {
+                timeEntries: ids, period:
+                    `${formatDate(page.props.period.start, 'ddd, MMMM D')} -
+                    ${formatDate(page.props.period.end, 'D - YYYY')}`
+            },
             { withCredentials: true, headers: { Accept: 'application/json' } }
         );
 
@@ -383,7 +387,7 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
         setTimeout(() => {
             router.visit(route('approval.index')); // change to your target page
         }, 1500);
-    isLoading.value=false;
+        isLoading.value = false;
     } catch (error) {
         console.error(error);
         addNotification(
@@ -391,7 +395,7 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
             'Failed',
             `Could not ${type} entries`
         );
-    isLoading.value=false;
+        isLoading.value = false;
     }
 }
 </script>
@@ -404,9 +408,9 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
         <MainContainer
             class="py-3 sm:py-5 border-b border-default-background-separator flex justify-between items-center">
             <div class="flex space-x-2">
-            <Link :href="route('approval.index')" title="back">
-            <ArrowLeftIcon class="w-5"></ArrowLeftIcon>
-            </Link> 
+                <Link :href="route('approval.index')" title="back">
+                <ArrowLeftIcon class="w-5"></ArrowLeftIcon>
+                </Link>
                 <div class="px-2 font-bold text-lg">
                     {{ page.props.name }}</div>
                 <div class="font-bold text-lg">
@@ -427,23 +431,20 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
                 </div>
                 <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'submitted'">
                     <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-white dark:text-white"
-                        :loading="isLoading"
-                        @click="approveReject('approve')">APPROVE
+                        :loading="isLoading" @click="approveReject('approve')">APPROVE
                     </SecondaryButton>
                     <SecondaryButton class="border-0 px-2 bg-red-600 mx-2 text-white dark:text-white"
-                        :loading="isLoading"
-                        @click="approveReject('reject')">REJECT</SecondaryButton>
+                        :loading="isLoading" @click="approveReject('reject')">REJECT</SecondaryButton>
                 </div>
                 <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus == 'unsubmitted'">
                     <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-white dark:text-white"
-                        :loading="isLoading"
-                        @click="UnsubmittedRemind('remind')">REMIND TO SUBMIT
+                        :loading="isLoading" @click="UnsubmittedRemind('remind')">REMIND TO SUBMIT
                     </SecondaryButton>
                 </div>
-                <div class="absolute right-5 pl-2 font-semibold" v-if="approvalStatus != 'submitted' && approvalStatus != 'unsubmitted'">
+                <div class="absolute right-5 pl-2 font-semibold"
+                    v-if="approvalStatus != 'submitted' && approvalStatus != 'unsubmitted'">
                     <SecondaryButton class="border-0 px-2 bg-blue-600 mx-2 text-white dark:text-white"
-                        :loading="isLoading"
-                        @click="UnsubmittedRemind('withdraw')">WITHDRAW
+                        :loading="isLoading" @click="UnsubmittedRemind('withdraw')">WITHDRAW
                     </SecondaryButton>
                 </div>
 
@@ -457,13 +458,14 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
         </MainContainer>
         <MainContainer>
             <div class="sm:grid grid-cols-4 pt-6 items-start">
-                <div class="col-span-3 bg-card-background rounded-lg border border-card-border pt-3">
+                <div class="col-span-3 bg-card-background rounded-lg dark:bg-[#171e31] ">
 
-                    <div class="grid items-center" style="grid-template-columns: auto auto">
+                    <div class="   items-center">
                         <div
-                            class="contents [&>*]:border-card-background-separator [&>*]:border-b [&>*]:bg-tertiary [&>*]:pb-1.5 [&>*]:pt-1 text-text-secondary text-sm">
-                            <div class="pl-6">Name</div>
-                            <div class="text-right">Duration</div> 
+                            class="  grid grid-cols-12     [&>*]:dark:bg-[#0c101e] [ [&>*]:py-5 text-text-secondary text-sm">
+                             
+                            <div class="pl-6 col-span-10 justify-center">Name</div>
+                            <div class="  col-span-2 flex justify-start">Duration</div>
                         </div>
                         <template v-if="
                             aggregatedTableTimeEntries?.grouped_data &&
@@ -472,32 +474,24 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
                             <ReportingRow v-for="entry in tableData" :key="entry.description ?? 'none'"
                                 :currency="getOrganizationCurrencyString()"
                                 :type="aggregatedTableTimeEntries.grouped_type" :entry="entry"></ReportingRow>
-                            <div class="contents [&>*]:transition text-text-tertiary [&>*]:h-[50px]">
-                                <div class="flex items-center pl-6 font-medium">
-                                    <span>Total</span>
-                                </div>
-                                <div class="justify-end flex items-center font-medium">
-                                    {{
-                                        formatHumanReadableDuration(
-                                            aggregatedTableTimeEntries.seconds,
-                                            organization?.interval_format,
-                                            organization?.number_format
-                                        )
-                                    }}
-                                </div>
-                                <div class="justify-end pr-6 flex items-center font-medium">
-                                    {{
-                                        aggregatedTableTimeEntries.cost
-                                            ? formatCents(
-                                                aggregatedTableTimeEntries.cost,
-                                                getOrganizationCurrencyString(),
-                                                organization?.currency_format,
-                                                organization?.currency_symbol,
+                            <div class="grid grid-cols-12 [&>*]:transition text-text-tertiary [&>*]:h-[50px]">
+                                 
+                                <div class="col-span-10"></div>
+                                <div class="col-span-2  flex justify-start">
+                                    <div class="flex items-center pr-2 font-medium">
+                                        <span>Total:</span>
+                                    </div>
+                                    <div class="justify-end flex items-center font-medium">
+                                        {{
+                                            formatHumanReadableDuration(
+                                                aggregatedTableTimeEntries.seconds,
+                                                organization?.interval_format,
                                                 organization?.number_format
                                             )
-                                            : '--'
-                                    }}
+                                        }}
+                                    </div> 
                                 </div>
+
                             </div>
                         </template>
                         <div v-else class="chart flex flex-col items-center justify-center py-12 col-span-3">
@@ -516,7 +510,7 @@ async function UnsubmittedRemind(type: 'withdraw' | 'remind') {
         <MainContainer class=" ">
 
             <div v-for="(value, key) in groupedTimeEntries" :key="key">
-                <div class=" border border-1 mt-5 border-tertiary border-b-4">
+                <div class=" border border-1 mt-5    border-[#2c354f] border-b-4">
 
 
 

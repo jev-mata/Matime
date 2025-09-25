@@ -22,6 +22,11 @@ class ForceHttps
             URL::forceScheme('https');
             $request->server->set('HTTPS', 'on');
             $request->headers->set('X-Forwarded-Proto', 'https');
+        }else{
+            
+            URL::forceScheme('http');
+            $request->server->set('HTTP', 'on');
+            $request->headers->set('X-Forwarded-Proto', 'http');
         }
 
         return $next($request);

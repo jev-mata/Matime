@@ -10,6 +10,7 @@ use App\Models\Member;
 use App\Models\Organization;
 use App\Models\Project;
 use App\Models\Tag;
+use App\Models\Task;
 use App\Models\Teams;
 use App\Models\TimeEntry;
 use App\Models\User;
@@ -33,74 +34,64 @@ class TimesheetController extends Controller
         $curOrg = $this->currentOrganization();
         $memberRole = $this->member($curOrg);
         $isManager = $memberRole->role !== 'employee';
-
-        // Redirect employees away from approval route
+    
         if ($memberRole->role === 'employee') {
             return redirect()->route('dashboard');
         }
-
+    
         $teamIds = Auth::user()->groups()->pluck('teams.id');
-
-        // Start base query with eager-loaded user.groups and member
-        $query = TimeEntry::with(['user.groups', 'member'])
-            ->where('approval', 'submitted');
-
-        // Filter based on manager’s teams
-
+    
+        // Base query
+        $query = TimeEntry::query()
+        ->selectRaw("
+            user_id,
+            TO_CHAR(start, 'YYYY-MM') as year_month,
+            CASE WHEN EXTRACT(DAY FROM start) <= 15 THEN 1 ELSE 2 END as half,
+            SUM(EXTRACT(EPOCH FROM (\"end\" - start)) / 60) as totalMinutes
+        ")
+        ->where('approval', 'submitted')
+        ->groupBy('user_id', 'year_month', 'half')
+        ->with('user:id,name')
+        ->with('member:id,user_id,role');
+    
+        // Role filters
         if ($memberRole->role === 'admin') {
-            $teamIds = Auth::user()->groups()->pluck('teams.id');
-            $query->whereHas('member', fn($q) => $q->whereIn('role', ['manager', 'admin', 'employee']));
-            // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
-        } else if ($memberRole->role === 'manager') {
-            $teamIds = Auth::user()->groups()->pluck('teams.id');
-            $query->whereHas('member', fn($q) => $q->whereIn('role', ['employee', 'intern']));
-            $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
-        } else if ($memberRole->role === 'owner') {
-
+            $query->whereHas('member', fn($q) =>
+                $q->whereIn('role', ['manager', 'admin', 'employee'])
+            );
+        } elseif ($memberRole->role === 'manager') {
+            $query->whereHas('member', fn($q) =>
+                $q->whereIn('role', ['employee', 'intern'])
+            )->whereHas('user.groups', fn($q) =>
+                $q->whereIn('teams.id', $teamIds)
+            );
         }
-        $timesheets = $query->where('approval', 'submitted')->get();
-
-        // Group and map entries
-        $grouped = $timesheets
-            ->groupBy(function ($entry) {
-                $date = Carbon::parse($entry->start);
-                $half = $date->day <= 15 ? 1 : 2;
-                return $date->format('Y-m') . '-' . $half;  // e.g. 2025-07-1 or 2025-07-2
-            })
-            ->map(function ($entriesByPeriod) {
-                return $entriesByPeriod
-                    ->groupBy('user_id')
-                    ->map(function ($entriesByUser) {
-                        $first = $entriesByUser->first();
-                        $user = $first->user;
-                        $member = $first->member;
-
-                        $totalMinutes = $entriesByUser->sum(function ($e) {
-                            return Carbon::parse($e->start)->diffInMinutes(Carbon::parse($e->end));
-                        });
-
-                        return [
-                            'user' => [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                                'groups' => $user->groups,
-                                'member' => $member ? ['id' => $member->id] : null,
-                            ],
-                            'totalHours' => floor($totalMinutes / 60) . 'h ' . ($totalMinutes % 60) . 'm',
-                        ];
-                    })
-                    ->values(); // Remove user_id keys
+    
+        $timesheets = $query->get();
+    
+        // Transform
+        $grouped = $timesheets->groupBy(fn($row) => $row->year_month . '-' . $row->half)
+            ->map(function ($entries) {
+                return $entries->map(function ($row) {
+                    return [
+                        'user' => [
+                            'id' => $row->user->id,
+                            'name' => $row->user->name,
+                            'groups' => $row->user->groups ?? [],
+                            'member' => $row->member ? ['id' => $row->member->id] : null,
+                        ],
+                        'totalHours' => floor($row->totalMinutes / 60) . 'h ' . ($row->totalMinutes % 60) . 'm',
+                    ];
+                })->values();
             });
-
-        // Optional: Count total distinct users across all periods
-        $totalUsers = $timesheets->pluck('user_id')->unique()->count();
-
+    
         return response()->json([
             'isManager' => $isManager,
-            'remain' => $totalUsers,     // Number of bi-monthly periods  
+            'remain' => $timesheets->pluck('user_id')->unique()->count(),
+            'data' => $grouped,
         ]);
     }
-
+    
 
     public function getAllTimeEntries()
     {
@@ -476,6 +467,7 @@ $approved    = $timesheets->get('approved', collect());
         $curOrg = $this->currentOrganization();
 
         $projects = Project::where('organization_id', $curOrg->id)->get();
+        $tasks = Task::where('organization_id', $curOrg->id)->get();
         $tags = Tag::where('organization_id', $curOrg->id)->get();
         $clients = Client::where('organization_id', $curOrg->id)->get();
 
@@ -495,7 +487,7 @@ $approved    = $timesheets->get('approved', collect());
             'name' => $user->user->name,
             'projects' => $projects,
             'timeEntries' => $timeEntriesQuery->get(),
-            'tasks' => $projects, // you might want to actually load real tasks if needed
+            'tasks' => $tasks, // you might want to actually load real tasks if needed
             'tags' => $tags,
             'clients' => $clients,
         ]);
