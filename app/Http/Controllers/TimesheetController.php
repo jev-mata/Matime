@@ -387,7 +387,7 @@ class TimesheetController extends Controller
             // Optional: team filter if admins should only see their own teams
             // $query->whereHas('user.groups', fn($q) => $q->whereIn('teams.id', $teamIds));
         } elseif ($memberRole->role === 'admin') {
-            $query =TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id'])->whereHas('member', fn ($q) => $q->whereIn('role', ['manager',  'employee'])
+            $query =TimeEntry::with(['user.groups:id,name', 'member:id,role,organization_id'])->whereHas('member', fn ($q) => $q->whereIn('role', ['manager','admin',  'employee'])
             )->whereHas('user.groups', fn ($q) => $q->whereIn('teams.id', $teamIds)
         );
             // Optional: team filter if admins should only see their own teams
