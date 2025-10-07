@@ -80,7 +80,7 @@ class TimeEntry extends Model implements AuditableContract
         'is_imported' => 'bool',
         'still_active_email_sent_at' => 'datetime',
         'approval' => 'string',
-        'approved_by' => 'string',
+        'approved_by' => 'string', 
     ];
 
     /**
