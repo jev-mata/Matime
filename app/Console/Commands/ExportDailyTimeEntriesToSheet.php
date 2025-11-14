@@ -7,52 +7,61 @@ namespace App\Console\Commands;
 use App\Models\TimeEntry;
 use Carbon\Carbon;
 use Google\Service\Sheets as GoogleSheets;
-use Google\Service\Exception as GoogleException;
 use Illuminate\Console\Command;
 use Revolution\Google\Sheets\Facades\Sheets;
 
 class ExportDailyTimeEntriesToSheet extends Command
 {
     protected $signature = 'sheets:export-time-entries';
+
     protected $description = 'Export daily time entries to Google Sheets at midnight';
 
     public function handle(): void
     {
-        $today = Carbon::yesterday(); // yesterday's date for midnight run
+        $today = Carbon::yesterday()->setDate(2025, 11, 7); // yesterday's date for midnight run
         $entries = TimeEntry::whereDate('created_at', $today)->get();
-    
+
         if ($entries->isEmpty()) {
             $this->info("No entries for {$today->toDateString()}");
+
             return;
         }
-    
+
         $spreadsheetId = env('GOOGLE_SHEETS_ID');
-    
+
         /**
          * ---- NEW WEEK LOGIC ----
          * Week count starting from the first Monday of January 2025
          */
-        $startOfYear = Carbon::create(2025, 1, 1)->startOfWeek(Carbon::MONDAY);
-        $diffWeeks = $startOfYear->diffInWeeks($today);
-        $sheetName = 'Week ' . ($diffWeeks + 1);
+        // Always align today to the Monday of its week
+        $currentWeekStart = $today->copy()->startOfWeek(Carbon::MONDAY);
+
+        // First Monday of 2025
+        $yearStart = Carbon::create(2025, 1, 1)->startOfWeek(Carbon::MONDAY);
+
+        // Whole-week difference (never decimals)
+        $weekNumber = $yearStart->diffInWeeks($currentWeekStart) + 1;
+
+        // Final sheet name
+        $sheetName = 'Week '.$weekNumber;
+
         // -------------------------
-        
-    
+
         $client = Sheets::getService(); // raw Google API client
-    
+
         // --- Ensure the sheet exists ---
         $spreadsheet = $client->spreadsheets->get($spreadsheetId);
         $sheet = collect($spreadsheet->getSheets())
-            ->first(fn($s) => $s->getProperties()->getTitle() === $sheetName);
-    
-        if (!$sheet) {
-    
+            ->first(fn ($s) => $s->getProperties()->getTitle() === $sheetName);
+
+        if (! $sheet) {
+
             Sheets::spreadsheet($spreadsheetId)->addSheet($sheetName);
-    
+
             $spreadsheet = $client->spreadsheets->get($spreadsheetId);
             $sheet = collect($spreadsheet->getSheets())
-                ->first(fn($s) => $s->getProperties()->getTitle() === $sheetName);
-    
+                ->first(fn ($s) => $s->getProperties()->getTitle() === $sheetName);
+
             // Add header
             Sheets::spreadsheet($spreadsheetId)
                 ->sheet($sheetName)
@@ -62,18 +71,18 @@ class ExportDailyTimeEntriesToSheet extends Command
                     'Duration (H:i)', 'Duration (Decimal)', 'Approval',
                 ]]);
         }
-    
+
         $sheetId = $sheet->getProperties()->getSheetId();
-    
+
         // --- Prepare entries ---
         $data = [];
-    
+
         foreach ($entries as $entry) {
             $duration = $entry->getDuration();
             $decimalHours = $duration
                 ? $duration->h + ($duration->i / 60) + ($duration->s / 3600)
                 : 0;
-    
+
             $data[] = [
                 $entry->project?->name ?? '',
                 $entry->client?->name ?? '',
@@ -95,9 +104,9 @@ class ExportDailyTimeEntriesToSheet extends Command
                 $entry->approval ?? 'N/A',
             ];
         }
-    
+
         Sheets::spreadsheet($spreadsheetId)->sheet($sheetName)->append($data);
-    
+
         // --- Apply filter ---
         $requests = [
             new GoogleSheets\Request([
@@ -114,13 +123,12 @@ class ExportDailyTimeEntriesToSheet extends Command
                 ],
             ]),
         ];
-    
+
         $client->spreadsheets->batchUpdate(
             $spreadsheetId,
             new GoogleSheets\BatchUpdateSpreadsheetRequest(['requests' => $requests])
         );
-    
-        $this->info("Exported ".count($entries)." entries into {$sheetName}");
+
+        $this->info('Exported '.count($entries)." entries into {$sheetName}");
     }
-    
 }
