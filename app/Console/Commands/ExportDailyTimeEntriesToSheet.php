@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\TimeEntry;
-use Carbon\Carbon;
+use App\Models\TimeEntry; 
 use Google\Service\Sheets as GoogleSheets;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Revolution\Google\Sheets\Facades\Sheets;
 
 class ExportDailyTimeEntriesToSheet extends Command
@@ -18,7 +18,7 @@ class ExportDailyTimeEntriesToSheet extends Command
 
     public function handle(): void
     {
-        $today = Carbon::yesterday()->setDate(2025, 11, 7); // yesterday's date for midnight run
+        $today = Carbon::yesterday(); // yesterday's date for midnight run
         $entries = TimeEntry::whereDate('created_at', $today)->get();
 
         if ($entries->isEmpty()) {
