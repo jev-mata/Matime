@@ -19,7 +19,7 @@ class ExportDailyTimeEntriesToSheet extends Command
     public function handle(): void
     {
         $today = Carbon::yesterday(); // yesterday's date for midnight run
-        $entries = TimeEntry::whereDate('created_at', $today)->get();
+        $entries = TimeEntry::whereDate('start', $today)->get();
 
         if ($entries->isEmpty()) {
             $this->info("No entries for {$today->toDateString()}");
