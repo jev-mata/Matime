@@ -1,5 +1,5 @@
 *
 !public/
 !.gitignore
-!google
-!service-account.json
+google
+service-account.json
