@@ -43,7 +43,7 @@ class ExportDailyTimeEntriesToSheet extends Command
         $weekNumber = $yearStart->diffInWeeks($currentWeekStart) + 1;
 
         // Final sheet name
-        $sheetName = 'Week '.$weekNumber;
+        $sheetName = ''.$weekNumber;
 
         // -------------------------
 
@@ -95,9 +95,9 @@ class ExportDailyTimeEntriesToSheet extends Command
                 $entry->billable ? 'Yes' : 'No',
                 $entry->invoiced ?? '',
                 $entry->invoice_id ?? '',
-                $entry->start?->format('Y-m-d') ?? '',
+                $entry->start?->format('m/d/Y') ?? '',
                 $entry->start?->format('H:i') ?? '',
-                $entry->end?->format('Y-m-d') ?? '',
+                $entry->end?->format('m/d/Y') ?? '',
                 $entry->end?->format('H:i') ?? '',
                 $duration?->format('%h:%i') ?? '',
                 round($decimalHours, 2),
