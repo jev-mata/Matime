@@ -1,0 +1,2 @@
+import{d as s,e as t,o,b as n,P as c,w as i,D as r,J as l,a as d,y as p}from"./app-CZLkYVhz.js";const _={class:"text-sm text-text-secondary"},u=s({__name:"ActionMessage",props:{on:Boolean},setup(e){return(a,m)=>(o(),t("div",null,[n(c,{"leave-active-class":"transition ease-in duration-1000","leave-from-class":"opacity-100","leave-to-class":"opacity-0"},{default:i(()=>[r(d("div",_,[p(a.$slots,"default")],512),[[l,e.on]])]),_:3})]))}});export{u as _};
+//# sourceMappingURL=ActionMessage.vue_vue_type_script_setup_true_lang-BRfNpY_X.js.map

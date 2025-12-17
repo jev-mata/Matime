@@ -1,0 +1,2 @@
+import{Q as u}from"./app-CZLkYVhz.js";const e=u();function a(){return e.props.auth.user.id}function i(){return e.props.auth.user}function n(){return e.props.auth.user.current_team_id}function o(){var r;return(r=e.props.auth.user.all_teams.find(t=>t.id===n()))==null?void 0:r.membership.id}function p(){var r;return(r=e.props.auth.user.all_teams.find(t=>t.id===n()))==null?void 0:r.membership.role}export{o as a,p as b,a as c,i as d,n as g};
+//# sourceMappingURL=useUser-Dc3_Hjqo.js.map
