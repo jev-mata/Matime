@@ -1,11 +1,11 @@
 /.phpunit.cache
 node_modules
 dist
-/public/build
+!/public/build
 /public/hot
 /public/storage
-/public/css
-/public/js
+!/public/css
+!/public/js
 /public/vendor
 /lang/vendor
 /storage/*.key
